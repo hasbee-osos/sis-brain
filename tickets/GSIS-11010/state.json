@@ -3,10 +3,10 @@
   "ticket": "GSIS-11010",
   "jira_url": "https://gearsjira.atlassian.net/browse/GSIS-11010",
   "status": "NEEDS_INPUT",
-  "next_action": "Human answers analysis-2.md open questions: QA retests cancel and remove-applicant on current base-sandbox-qa judging by EMAIL (in-app is unreliable for applicants on any event); confirm remove-applicant recipients and that supervisors = the schedule examiners. If not reproducible: close as fixed by GSIS-17509/25660/26324. Otherwise run the designer with the answers.",
+  "next_action": "Developer pastes qa-packet.md into a GSIS-11010 Jira comment for QA. When QA replies (retest result by email on base-qa/gcet-qa/gutech-qa; remove-applicant recipients; supervisors = examiners; cancel recipients; applicant in-app), run /work GSIS-11010: close as fixed by GSIS-17509/25660/26324 if not reproducible, otherwise run the designer with the answers.",
   "blocked_on": "Analysis open questions 1-2 (retest on a build with 6c051d28c4/1b4f29ea57/af70c0d6ed, judged by email; remove-applicant recipients) and confirmation of Q3 (supervisors = schedule faculty members)",
   "created_at": "2026-09-16T10:33:30Z",
-  "updated_at": "2026-09-16T14:21:41Z",
+  "updated_at": "2026-09-16T14:32:09Z",
   "iteration": 1,
   "max_iterations": 3,
   "workspace": "C:/Projects/sis-repos",
@@ -52,7 +52,8 @@
     "D-2"
   ],
   "artifacts": {
-    "analysis": "analysis-2.md"
+    "analysis": "analysis-2.md",
+    "qa_packet": "qa-packet.md"
   },
   "notes": [
     "Jira context read via getJiraIssue (GSIS-11010, linked GSIS-2701). The single ticket comment was manually provided by the human (comment-list tool blocked by jira-guard): developer states the notifications fail because null values are passed for the notification users, a pre-existing code issue unrelated to the version bump. Jira attachments (1 image, 2 mp4 screen recordings) could not be read.",
