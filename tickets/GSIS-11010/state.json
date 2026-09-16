@@ -2,24 +2,56 @@
   "schema_version": 1,
   "ticket": "GSIS-11010",
   "jira_url": "https://gearsjira.atlassian.net/browse/GSIS-11010",
-  "status": "NEEDS_INPUT",
-  "next_action": "Human to confirm flow, branch name, source branch and PR targets; then fetch repos and run the analyzer",
-  "blocked_on": "flow_and_branch confirmation",
+  "status": "ANALYZING",
+  "next_action": "Fetch all workspace repos and run the analyzer against origin/base-development",
+  "blocked_on": null,
   "created_at": "2026-09-16T10:33:30Z",
-  "updated_at": "2026-09-16T10:33:30Z",
+  "updated_at": "2026-09-16T13:01:25Z",
   "iteration": 1,
   "max_iterations": 3,
   "workspace": "C:/Projects/sis-repos",
-  "flow": null,
-  "source_branch": null,
-  "branch": null,
+  "flow": "A",
+  "source_branch": "base-development",
+  "branch": "base/bugfix/GSIS-11010-exam-interview-cancel-notifications",
   "repos": {},
   "context_repos": [],
-  "pr_targets": [],
+  "pr_targets": [
+    {
+      "stage": 1,
+      "targets": [
+        "base-sandbox-qa"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "stage": 2,
+      "targets": [
+        "gcet-sandbox-qa",
+        "gutech-sandbox-qa"
+      ],
+      "status": "PENDING"
+    }
+  ],
   "prs": [],
-  "sessions": [ { "session_id": "15aef57a-c4b0-4732-aeb3-80918d270a70", "started_at": "2026-09-16T10:33:30Z", "ended_at": null } ],
-  "human_confirmations": [],
-  "decisions": [],
+  "sessions": [
+    {
+      "session_id": "15aef57a-c4b0-4732-aeb3-80918d270a70",
+      "started_at": "2026-09-16T10:33:30Z",
+      "ended_at": null
+    }
+  ],
+  "human_confirmations": [
+    {
+      "what": "flow_and_branch",
+      "at": "2026-09-16T13:01:25Z",
+      "value": "Flow A, base/bugfix/GSIS-11010-exam-interview-cancel-notifications, source base-development; stage 1 base-sandbox-qa; stage 2 gcet-sandbox-qa + gutech-sandbox-qa"
+    }
+  ],
+  "decisions": [
+    "D-1"
+  ],
   "artifacts": {},
-  "notes": ["Jira context read via getJiraIssue (GSIS-11010, linked GSIS-2701). The ticket's 1 comment could not be read: listJiraIssueComments is blocked by jira-guard."]
+  "notes": [
+    "Jira context read via getJiraIssue (GSIS-11010, linked GSIS-2701). The ticket's 1 comment could not be read: listJiraIssueComments is blocked by jira-guard."
+  ]
 }
