@@ -1,0 +1,28 @@
+{
+  "ticket": "GSIS-11010",
+  "updated_at": "2026-09-16T13:09:37.651Z",
+  "tokens": {
+    "input": 74,
+    "output": 14808,
+    "cache_read": 1854099,
+    "cache_creation": 226590,
+    "thinking": 1609
+  },
+  "tokens_by_stage": {
+    "analyze": {
+      "input": 74,
+      "output": 14808,
+      "cache_read": 1854099,
+      "cache_creation": 226590,
+      "thinking": 1609
+    }
+  },
+  "turns": 35,
+  "stage_seconds": {},
+  "iterations": 0,
+  "verdicts": {},
+  "findings": {
+    "blocking": 0,
+    "non_blocking": 0
+  }
+}
