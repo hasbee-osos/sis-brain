@@ -26,3 +26,30 @@
 - **Convention cited:** none
 - **Evidence:** sis-product-sis-admin-backend/src/main/java/com/ubs/sis/administration/service/impl/CourseOfferingCourseServiceImpl.java:175-192, 588-676; sis-product-sis-admin-backend/.../StudyPlanCourseServiceImpl.java:229-240, 752-850; sis-product-sis-admin-backend/src/main/java/com/ubs/sis/student/service/helper/StudentStudyPlanCourseRequisiteSeedHelper.java:66-78; Liquibase V2/1-table_modifications 000709-000712, 000737-000738, 002011-002013; Jira GSIS-28778 AC-1, AC-4; GSIS-20628 comments 2026-05-20/21
 - **Status:** LOCKED
+
+### D-4 — Scope: deliver RC-2 and AC-1…AC-5 in full under GSIS-28778 as one bug, ordered as phases S1–S4 on one branch
+- **Stage:** analyze, iteration 1
+- **Decided by:** developer · confirmed by human 2026-09-17T10:01:18Z
+- **Options considered:** keep bug scoped to RC-2 and move AC-1…AC-5 to a new story; switch to feature and slice into Jira sub-tasks; switch to feature and deliver the whole story; keep bug and deliver the whole scope
+- **Why:** the team cannot create additional Jira stories or sub-tasks, and the ticket's ACs must be met for QA to accept it. This overrides the work-types too-big rule (reviewability) with that reason. Reviewability is kept by delivering the analysis-2 slices as ordered phases with focused commits: S1 RC-2 row-ID fix; S2 override marker per rule type per level with backfill; S3 push-on-save cascade skipping overrides plus AC-5 regression tests; S4 UI inherited/overridden indicator and reset. Scope in: AC-1…AC-5 on base-development and RC-2 (D-2). Out: GCET-line SQL routines (D-5), legacy *PreRequisitesOne/Two and *CoRequisites lists. Assumption: Pre-Req includes advanced pre-requisite conditions. Work type stays bug per D-1.
+- **Convention cited:** work-types → story too big for one run: human override recorded with reason
+- **Evidence:** analysis-2.md Gap and proposed slices; Jira GSIS-28778 Acceptance Criteria; developer answer 2026-09-17
+- **Status:** LOCKED
+
+### D-5 — GCET/OSOS forecast and eligibility SQL routines are out of scope
+- **Stage:** analyze, iteration 1
+- **Decided by:** developer · confirmed by human 2026-09-17T10:01:18Z
+- **Options considered:** leave the routines unchanged and record a known gap; align fn_forecast_process_cs_v19 and fn_get_course_per_student_by_ay_aysem_v28 with AC-5 in stage 2
+- **Why:** the routines exist only on the gcet line and OSOS hotfix branches, not on base-development where this change is made; changing them widens the stage-2 regression surface. Known gap: they ignore student-level pre-requisite overrides and fall back to Module Master for co-requisites, contrary to AC-5.
+- **Convention cited:** engineering-standards → smallest change that completely delivers the ticket; document unrelated problems as findings
+- **Evidence:** origin/pre-hotfix-osos-staging-31feab8 src/main/resources/db/changelog/sql_files/stored_routines/fn_forecast_process_cs_v19.sql:1096-1190, 1449-1461 (sis-product-sis-admin-backend)
+- **Status:** LOCKED
+
+### D-6 — Backfill classifies existing lower-level rows by comparing them to their parent
+- **Stage:** analyze, iteration 1
+- **Decided by:** developer · confirmed by human 2026-09-17T10:01:18Z
+- **Options considered:** compare to parent (identical = inherited, different = overridden and kept; empty level inherited unless rules were deliberately deleted after creation); treat all existing rows as inherited; defer to the Designer
+- **Why:** keeps manual lower-level edits made before the marker existed (AC-4 regression surface) while letting untouched records receive future Module Master pushes.
+- **Convention cited:** none
+- **Evidence:** analysis-2.md DD-3; per-level tables have no marker (Liquibase V2/1-table_modifications 000709-000712, 000737-000738, 002011-002013)
+- **Status:** LOCKED

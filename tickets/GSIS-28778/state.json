@@ -14,11 +14,11 @@
     "assignee": "Ashoka Jayasekara",
     "refreshed_at": "2026-09-17T05:11:55Z"
   },
-  "status": "NEEDS_INPUT",
-  "next_action": "Developer decides DD-1, DD-2 and DD-4 (no other team needed); then the Designer runs. Do not post qa-packet.md: analysis-2.md answered its questions from evidence.",
-  "blocked_on": "developer decisions DD-1 (work type), DD-2 (slicing), DD-4 (GCET SQL routines in stage 2) from analysis-2.md",
+  "status": "DESIGNING",
+  "next_action": "Designer produces design.md for D-4 scope (phases S1-S4)",
+  "blocked_on": null,
   "created_at": "2026-09-17T05:11:55Z",
-  "updated_at": "2026-09-17T06:41:04Z",
+  "updated_at": "2026-09-17T10:01:18Z",
   "iteration": 1,
   "max_iterations": 3,
   "workspace": "C:/Projects/sis-repos",
@@ -58,12 +58,30 @@
       "what": "flow_and_branch",
       "at": "2026-09-17T05:16:24Z",
       "value": "Bug, Flow A, base/bugfix/GSIS-28778-module-relationship-rule-propagation, source base-development; stage 1 base-sandbox-qa; stage 2 gcet-sandbox-qa + gutech-sandbox-qa"
+    },
+    {
+      "what": "scope",
+      "at": "2026-09-17T10:01:18Z",
+      "value": "Single bug: RC-2 + AC-1..AC-5 as phases S1-S4 (no new Jira stories)"
+    },
+    {
+      "what": "gcet_sql_routines",
+      "at": "2026-09-17T10:01:18Z",
+      "value": "Out of scope"
+    },
+    {
+      "what": "backfill_classification",
+      "at": "2026-09-17T10:01:18Z",
+      "value": "Compare to parent"
     }
   ],
   "decisions": [
     "D-1",
     "D-2",
-    "D-3"
+    "D-3",
+    "D-4",
+    "D-5",
+    "D-6"
   ],
   "artifacts": {
     "analysis": "analysis-2.md"

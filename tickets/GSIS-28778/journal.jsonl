@@ -10,3 +10,11 @@
 {"ts":"2026-09-17T06:41:04Z","event":"decision_locked","id":"D-2","summary":"Root cause: offering/study-plan course creation posts parent rows with parent IDs; createList soft-deletes seeded rows and merges foreign IDs"}
 {"ts":"2026-09-17T06:41:04Z","event":"decision_locked","id":"D-3","summary":"Reported symptom is never-built behaviour: no push of master rules to existing records, no override marker"}
 {"ts":"2026-09-17T06:41:04Z","event":"input_requested","audience":"developer","packet":null,"questions":3}
+{"ts":"2026-09-17T10:01:18Z","event":"input_received","audience":"developer","packet":null}
+{"ts":"2026-09-17T10:01:18Z","event":"human_confirmed","what":"scope","value":"Single bug: RC-2 + AC-1..AC-5 as phases S1-S4 (no new Jira stories)"}
+{"ts":"2026-09-17T10:01:18Z","event":"decision_locked","id":"D-4","summary":"Deliver RC-2 and AC-1..AC-5 under GSIS-28778 as one bug, phases S1-S4 on one branch"}
+{"ts":"2026-09-17T10:01:18Z","event":"human_confirmed","what":"gcet_sql_routines","value":"Out of scope"}
+{"ts":"2026-09-17T10:01:18Z","event":"decision_locked","id":"D-5","summary":"GCET/OSOS forecast and eligibility SQL routines out of scope (known gap)"}
+{"ts":"2026-09-17T10:01:18Z","event":"human_confirmed","what":"backfill_classification","value":"Compare to parent"}
+{"ts":"2026-09-17T10:01:18Z","event":"decision_locked","id":"D-6","summary":"Backfill: rows identical to parent are inherited, different are overridden"}
+{"ts":"2026-09-17T10:01:18Z","event":"stage_start","stage":"design","iteration":1}
