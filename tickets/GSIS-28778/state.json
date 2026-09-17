@@ -15,10 +15,10 @@
     "refreshed_at": "2026-09-17T05:11:55Z"
   },
   "status": "IMPLEMENTING",
-  "next_action": "Create ticket branches, then run the Implementor for iteration 1 (phases S1-S4)",
+  "next_action": "Implementor iteration 1: phases S1-S4 per design.md",
   "blocked_on": null,
   "created_at": "2026-09-17T05:11:55Z",
-  "updated_at": "2026-09-17T11:09:25Z",
+  "updated_at": "2026-09-17T11:15:11Z",
   "iteration": 1,
   "max_iterations": 3,
   "workspace": "C:/Projects/sis-repos",
@@ -29,11 +29,11 @@
   "repos": {
     "sis-product-sis-admin-backend": {
       "role": "change",
-      "branch_created": false
+      "branch_created": true
     },
     "sis-product-sis-frontend": {
       "role": "change",
-      "branch_created": false
+      "branch_created": true
     }
   },
   "context_repos": [
@@ -112,6 +112,11 @@
       "what": "push_student_plan_scope",
       "at": "2026-09-17T11:09:25Z",
       "value": "All live plans (confirms D-10)"
+    },
+    {
+      "what": "local_changes_handling",
+      "at": "2026-09-17T11:15:11Z",
+      "value": "Developer stashed uncommitted local config in admin-backend and frontend (base-sandbox-qa) before branch creation"
     }
   ],
   "decisions": [
@@ -142,7 +147,8 @@
     "Jira context read via getJiraIssue (evidence view). No comments, no issue links, no parent set; the description names linked story GSIS-20628 and epic GSIS-2639 (Admin Review) in text only, so jira.epic is null. Label SIS-OSOS-QA, customer 'Product Core Feature', environment Staging.",
     "One attachment: C0_REQ_Consition_violation.mp4 (44 s screen recording), downloaded and read as frames locally (not stored in the brain).",
     "The Analyzer could not read Jira; the orchestrator read GSIS-20628 and its comments. The agreed design (comments 2026-05-20/21) copies rules downward Master -> Offering -> Programme Study Plan -> Student Study Plan, with validation reading only the student plan; it does not say whether later Master changes push to existing records. Summarised in the analysis addendum.",
-    "qa-packet.md was never posted and is superseded: analysis-2.md answered Q1-Q5 from the ticket ACs, the GSIS-20628 thread, the recording, code and branch history, at the developer request to minimise cross-team back-and-forth."
+    "qa-packet.md was never posted and is superseded: analysis-2.md answered Q1-Q5 from the ticket ACs, the GSIS-20628 thread, the recording, code and branch history, at the developer request to minimise cross-team back-and-forth.",
+    "Developer's local config edits (admin-backend application.yml, application-boldreports.yml; frontend package.json, package-lock.json) are in a git stash on base-sandbox-qa in each repo; restore with git stash pop after switching back."
   ],
   "analysis": "READY",
   "design": "READY"
