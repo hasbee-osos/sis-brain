@@ -14,11 +14,11 @@
     "assignee": "Ashoka Jayasekara",
     "refreshed_at": "2026-09-17T05:11:55Z"
   },
-  "status": "DESIGNING",
-  "next_action": "Designer produces design.md for D-4 scope (phases S1-S4)",
+  "status": "AWAITING_REPO_CONFIRMATION",
+  "next_action": "Developer confirms repos to change (sis-product-sis-admin-backend, sis-product-sis-frontend) and the design defaults; then ticket branches are created",
   "blocked_on": null,
   "created_at": "2026-09-17T05:11:55Z",
-  "updated_at": "2026-09-17T10:01:18Z",
+  "updated_at": "2026-09-17T10:22:08Z",
   "iteration": 1,
   "max_iterations": 3,
   "workspace": "C:/Projects/sis-repos",
@@ -81,10 +81,21 @@
     "D-3",
     "D-4",
     "D-5",
-    "D-6"
+    "D-6",
+    "D-7",
+    "D-8",
+    "D-9",
+    "D-10",
+    "D-11",
+    "D-12",
+    "D-13",
+    "D-14",
+    "D-15",
+    "D-16"
   ],
   "artifacts": {
-    "analysis": "analysis-2.md"
+    "analysis": "analysis-2.md",
+    "design": "design.md"
   },
   "notes": [
     "Jira context read via getJiraIssue (evidence view). No comments, no issue links, no parent set; the description names linked story GSIS-20628 and epic GSIS-2639 (Admin Review) in text only, so jira.epic is null. Label SIS-OSOS-QA, customer 'Product Core Feature', environment Staging.",
@@ -92,5 +103,6 @@
     "The Analyzer could not read Jira; the orchestrator read GSIS-20628 and its comments. The agreed design (comments 2026-05-20/21) copies rules downward Master -> Offering -> Programme Study Plan -> Student Study Plan, with validation reading only the student plan; it does not say whether later Master changes push to existing records. Summarised in the analysis addendum.",
     "qa-packet.md was never posted and is superseded: analysis-2.md answered Q1-Q5 from the ticket ACs, the GSIS-20628 thread, the recording, code and branch history, at the developer request to minimise cross-team back-and-forth."
   ],
-  "analysis": "READY"
+  "analysis": "READY",
+  "design": "READY"
 }

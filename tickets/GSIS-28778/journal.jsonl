@@ -18,3 +18,14 @@
 {"ts":"2026-09-17T10:01:18Z","event":"human_confirmed","what":"backfill_classification","value":"Compare to parent"}
 {"ts":"2026-09-17T10:01:18Z","event":"decision_locked","id":"D-6","summary":"Backfill: rows identical to parent are inherited, different are overridden"}
 {"ts":"2026-09-17T10:01:18Z","event":"stage_start","stage":"design","iteration":1}
+{"ts":"2026-09-17T10:22:08Z","event":"stage_end","stage":"design","iteration":1}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-7","summary":"S1: backend nulls posted requisite row ids not owned by the parent"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-8","summary":"Override marker: 3 boolean columns on each level course record table"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-9","summary":"Marked overridden only when a level save changes canonical content; only reset clears"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-10","summary":"Synchronous transactional top-down cascade skipping overridden rule types"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-11","summary":"Backfill and sync as Liquibase SQL 002026-002028"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-12","summary":"Marker fields on record responses; reset endpoints on level controllers"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-13","summary":"Programme Study Plan inherits offering rules unfiltered"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-14","summary":"Seed helper catch-all out of scope"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-15","summary":"Test strategy: Mockito unit, PostgreSQL container for SQL, Karma spec"}
+{"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-16","summary":"Deviation: cascade targets by parent FK plus tenant, not campus filter"}
