@@ -1,0 +1,81 @@
+{
+  "ticket": "GSIS-28778",
+  "updated_at": "2026-09-17T05:26:35.338Z",
+  "sessions": {
+    "c55645c6-ba59-4cce-8d70-44e2ef68e5c1": {
+      "turns": 46,
+      "tokens_by_stage": {
+        "analyze": {
+          "input": 102,
+          "output": 23268,
+          "cache_read": 3202679,
+          "cache_creation": 242355,
+          "thinking": 4530
+        }
+      },
+      "tokens_by_model": {
+        "claude-opus-5": {
+          "input": 102,
+          "output": 23268,
+          "cache_read": 3202679,
+          "cache_creation": 242355,
+          "thinking": 4530
+        }
+      }
+    },
+    "4242c67e-9480-43be-86f0-a2f1b9cd52be": {
+      "turns": 10,
+      "tokens_by_stage": {
+        "analyze": {
+          "input": 20,
+          "output": 5880,
+          "cache_read": 3091149,
+          "cache_creation": 22470,
+          "thinking": 2706
+        }
+      },
+      "tokens_by_model": {
+        "claude-opus-5": {
+          "input": 20,
+          "output": 5880,
+          "cache_read": 3091149,
+          "cache_creation": 22470,
+          "thinking": 2706
+        }
+      }
+    }
+  },
+  "tokens": {
+    "input": 122,
+    "output": 29148,
+    "cache_read": 6293828,
+    "cache_creation": 264825,
+    "thinking": 7236
+  },
+  "tokens_by_stage": {
+    "analyze": {
+      "input": 122,
+      "output": 29148,
+      "cache_read": 6293828,
+      "cache_creation": 264825,
+      "thinking": 7236
+    }
+  },
+  "tokens_by_model": {
+    "claude-opus-5": {
+      "input": 122,
+      "output": 29148,
+      "cache_read": 6293828,
+      "cache_creation": 264825,
+      "thinking": 7236
+    }
+  },
+  "turns": 56,
+  "stage_seconds": {},
+  "iterations": 0,
+  "verdicts": {},
+  "findings": {
+    "blocking": 0,
+    "non_blocking": 0
+  }
+}
