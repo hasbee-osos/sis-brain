@@ -1,0 +1,678 @@
+<title>SIS Harness Record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #f2f4f7;
+    --surface: #ffffff;
+    --sunken: #e9edf2;
+    --ink: #161e2b;
+    --muted: #5b6677;
+    --faint: #8792a3;
+    --rule: #dbe0e8;
+    --accent: #2447c4;
+    --accent-soft: #e5eafa;
+    --ok: #1d7a52;
+    --ok-soft: #e1f2ea;
+    --warn: #9a5c0e;
+    --warn-soft: #f7ecda;
+    --bad: #b1372f;
+    --bad-soft: #f8e3e1;
+    --wait: #6d44b8;
+    --wait-soft: #eee7f9;
+    --bar: #9fb1e8;
+    --sans: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e131b; --surface: #151c27; --sunken: #1b2431; --ink: #e5e9ef; --muted: #9aa5b6; --faint: #6f7b8e;
+      --rule: #263142; --accent: #86a0ff; --accent-soft: #1f2a48; --ok: #52c792; --ok-soft: #143326;
+      --warn: #e2a64e; --warn-soft: #3a2c15; --bad: #f07a70; --bad-soft: #3d1e1c; --wait: #b89af5; --wait-soft: #2b2242;
+      --bar: #3e5498; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e131b; --surface: #151c27; --sunken: #1b2431; --ink: #e5e9ef; --muted: #9aa5b6; --faint: #6f7b8e;
+    --rule: #263142; --accent: #86a0ff; --accent-soft: #1f2a48; --ok: #52c792; --ok-soft: #143326;
+    --warn: #e2a64e; --warn-soft: #3a2c15; --bad: #f07a70; --bad-soft: #3d1e1c; --wait: #b89af5; --wait-soft: #2b2242;
+    --bar: #3e5498; color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+  .page { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; display: grid; gap: 28px; }
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+  h2 { font-size: 16px; font-weight: 600; }
+  h3 { font-size: 13px; font-weight: 600; }
+  p { margin: 0; }
+  a { color: var(--accent); }
+  button, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .muted { color: var(--muted); }
+  .small { font-size: 12px; }
+
+  /* header */
+  .masthead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--rule); padding-bottom: 18px; }
+  .masthead .lede { max-width: 62ch; color: var(--muted); margin-top: 6px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; }
+  .filters label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); font-weight: 500; }
+  .filters select { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; min-width: 150px; max-width: 100%; }
+
+  /* KPIs */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .kpi { background: var(--surface); padding: 14px 16px; display: grid; gap: 2px; align-content: start; }
+  .kpi .value { font-family: var(--mono); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .kpi .label { font-size: 12px; color: var(--muted); }
+  .kpi .sub { font-size: 11px; color: var(--faint); }
+
+  section { display: grid; gap: 12px; }
+  .section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+
+  /* board */
+  .board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .lane { background: var(--sunken); border-radius: 10px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 96px; }
+  .lane-head { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 4px; }
+  .lane-head .count { font-family: var(--mono); color: var(--muted); font-size: 12px; }
+  .lane-empty { color: var(--faint); font-size: 12px; padding: 4px; }
+  .card { text-align: left; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 11px; display: grid; gap: 6px; cursor: pointer; width: 100%; }
+  .card:hover { border-color: var(--accent); }
+  .card[aria-current="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .card .key { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+  .card .title { font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .card .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; white-space: nowrap; background: var(--sunken); color: var(--muted); }
+  .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .pill.working { background: var(--accent-soft); color: var(--accent); }
+  .pill.waiting { background: var(--wait-soft); color: var(--wait); }
+  .pill.done, .pill.pass { background: var(--ok-soft); color: var(--ok); }
+  .pill.escalated, .pill.fail { background: var(--bad-soft); color: var(--bad); }
+  .pill.insufficient { background: var(--warn-soft); color: var(--warn); }
+  .pill.plain::before { display: none; }
+
+  /* stage breakdown */
+  .panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+  .split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .bars { display: grid; gap: 9px; margin-top: 10px; }
+  .bar-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) 84px; gap: 10px; align-items: center; font-size: 12px; }
+  .bar-track { height: 10px; background: var(--sunken); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--bar); border-radius: 3px; }
+  .bar-fill.wait { background: var(--wait); opacity: 0.55; }
+  .bar-row .num { text-align: right; }
+
+  /* table */
+  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; min-width: 860px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: var(--sunken); white-space: nowrap; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover td { background: var(--accent-soft); }
+  tbody tr[aria-current="true"] td { background: var(--accent-soft); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; }
+  td .t-title { max-width: 36ch; }
+
+  /* detail */
+  .detail { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 20px; display: grid; gap: 22px; }
+  .detail-head { display: grid; gap: 6px; }
+  .detail-head h2 { font-size: 20px; line-height: 1.3; font-weight: 600; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 20px; }
+  .fact { display: grid; gap: 1px; min-width: 0; }
+  .fact dt { font-size: 11px; color: var(--muted); }
+  .fact dd { margin: 0; overflow-wrap: anywhere; }
+  .stands { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 12px 14px; border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
+  .stands.waiting { border-color: var(--wait); background: var(--wait-soft); }
+  .stands.done { border-color: var(--ok); background: var(--ok-soft); }
+  .stands.escalated { border-color: var(--bad); background: var(--bad-soft); }
+  .stands p { max-width: 90ch; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; }
+  .block { display: grid; gap: 10px; align-content: start; }
+
+  .lifecycle { display: flex; height: 26px; border-radius: 6px; overflow: hidden; background: var(--sunken); }
+  .lifecycle span { display: block; min-width: 3px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+
+  .timeline { list-style: none; margin: 0; padding: 0; display: grid; }
+  .timeline li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; padding: 7px 0; border-bottom: 1px dashed var(--rule); font-size: 13px; }
+  .timeline li:last-child { border-bottom: 0; }
+  .timeline time { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-top: 1px; }
+
+  details.decision { border: 1px solid var(--rule); border-radius: 8px; padding: 9px 12px; }
+  details.decision + details.decision { margin-top: 8px; }
+  details.decision summary { cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: baseline; list-style: none; }
+  details.decision summary::-webkit-details-marker { display: none; }
+  details.decision .id { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+  details.decision .body { display: grid; gap: 6px; margin-top: 10px; font-size: 13px; }
+  details.decision .body b { font-weight: 600; }
+  .superseded summary .d-title { text-decoration: line-through; color: var(--muted); }
+
+  .mini { width: 100%; border-collapse: collapse; min-width: 0; font-size: 12.5px; }
+  .mini th, .mini td { padding: 6px 8px; }
+  .mini th { background: transparent; }
+  .files { display: flex; flex-wrap: wrap; gap: 6px; }
+  .files span { font-family: var(--mono); font-size: 11.5px; background: var(--sunken); border-radius: 4px; padding: 2px 6px; }
+  .empty { color: var(--faint); font-size: 13px; }
+  footer { color: var(--faint); font-size: 12px; display: grid; gap: 4px; border-top: 1px solid var(--rule); padding-top: 14px; }
+
+  @media (max-width: 900px) {
+    .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .split, .cols { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .page { padding-inline: 16px; }
+    .board { grid-template-columns: minmax(0, 1fr); }
+    .filters { width: 100%; }
+    .filters label { flex: 1 1 140px; }
+    .filters select { min-width: 0; width: 100%; }
+    .timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    .bar-row { grid-template-columns: 76px minmax(0, 1fr) 70px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<script id="brain-data" type="application/json">__BRAIN_DATA__</script>
+
+<div class="page">
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">SIS engineering harness</div>
+      <h1>Harness Record</h1>
+      <p class="lede">How Claude worked each Jira ticket: where it stands, who it is waiting on, the decisions it locked, and what the work took. Built from the team's brain repository.</p>
+    </div>
+    <div class="filters">
+      <label for="f-sprint">Sprint<select id="f-sprint"></select></label>
+      <label for="f-epic">Epic<select id="f-epic"></select></label>
+      <label for="f-type">Work type<select id="f-type"></select></label>
+    </div>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section>
+    <div class="section-head">
+      <h2>Where things stand</h2>
+      <span class="small muted">Select a ticket to see how it was worked</span>
+    </div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Where the time and cost go</h2>
+      <span class="small muted">Across the tickets shown, by harness stage</span>
+    </div>
+    <div class="split">
+      <div class="panel">
+        <h3>Time</h3>
+        <p class="small muted">Claude working per stage, and time waiting on people for answers</p>
+        <div class="bars" id="bars-time"></div>
+      </div>
+      <div class="panel">
+        <h3>API-equivalent cost</h3>
+        <p class="small muted">Tokens priced at list API rates per stage</p>
+        <div class="bars" id="bars-cost"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Tickets</h2>
+      <span class="small muted" id="table-count"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket</th><th>Title</th><th>Sprint</th><th>Epic</th><th>Status</th>
+            <th class="num">Iterations</th><th>Last verdict</th><th class="num">Claude time</th><th class="num">Waiting</th><th class="num">Cost</th><th>Updated</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="detail-section" aria-live="polite">
+    <div class="detail" id="detail"></div>
+  </section>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var data;
+  try { data = JSON.parse(document.getElementById("brain-data").textContent); }
+  catch (e) { data = { tickets: [], generated_at: null, unreadable: [] }; }
+  var tickets = data.tickets || [];
+  var now = data.generated_at ? Date.parse(data.generated_at) : Date.now();
+
+  var STAGES = ["analyze", "design", "implement", "evaluate", "pr", "publish"];
+  var STAGE_LABEL = { analyze: "Analyze", design: "Design", implement: "Implement", evaluate: "Evaluate", pr: "Pull requests", publish: "Publish" };
+  var STAGE_COLOR = { analyze: "#5b7be0", design: "#3fa3a0", implement: "#d08a2e", evaluate: "#b95796", pr: "#6f8f3a", publish: "#8a8f99" };
+  var STATUS_LABEL = {
+    ANALYZING: "Analyzing", DESIGNING: "Designing", AWAITING_REPO_CONFIRMATION: "Awaiting repo confirmation",
+    IMPLEMENTING: "Implementing", EVALUATING: "Evaluating", PR_STAGE_1: "PRs · stage 1", PR_STAGE_2: "PRs · stage 2",
+    DONE: "Done", NEEDS_INPUT: "Needs input", ESCALATED: "Escalated"
+  };
+  var WAIT_LABEL = { qa: "QA", sme: "SME", developer: "Developer", reviewers: "PR reviewers" };
+  var PHASES = [
+    { id: "working", label: "Claude working" },
+    { id: "waiting", label: "Waiting on people" },
+    { id: "done", label: "Delivered" },
+    { id: "escalated", label: "Escalated" }
+  ];
+
+  var state = { sprint: "", epic: "", type: "", selected: tickets.length ? tickets[0].id : null };
+
+  // ------------------------------------------------------------ helpers
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (attrs[k] == null || attrs[k] === false) continue;
+      if (k === "class") node.className = attrs[k];
+      else if (k === "text") node.textContent = attrs[k];
+      else if (k === "style") node.setAttribute("style", attrs[k]);
+      else if (k.slice(0, 2) === "on") node.addEventListener(k.slice(2), attrs[k]);
+      else node.setAttribute(k, attrs[k]);
+    }
+    (children || []).forEach(function (c) {
+      if (c == null || c === false) return;
+      node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return node;
+  }
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); return node; }
+
+  function duration(sec) {
+    if (!sec || sec < 1) return "—";
+    var m = Math.round(sec / 60);
+    if (sec < 60) return Math.round(sec) + "s";
+    if (m < 60) return m + "m";
+    var h = Math.floor(m / 60), mm = m % 60;
+    if (h < 24) return h + "h" + (mm ? " " + mm + "m" : "");
+    var d = Math.floor(h / 24), hh = h % 24;
+    return d + "d" + (hh ? " " + hh + "h" : "");
+  }
+  function money(v) {
+    if (!v) return "—";
+    return v < 10 ? "$" + v.toFixed(2) : "$" + Math.round(v).toLocaleString("en-US");
+  }
+  function when(ts) {
+    if (!ts) return "—";
+    var d = new Date(ts);
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" }) + " " +
+      d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  }
+  function ago(ts) {
+    if (!ts) return "";
+    return duration((now - Date.parse(ts)) / 1000) + " ago";
+  }
+  function compact(n) {
+    if (!n) return "0";
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + "k";
+    return String(n);
+  }
+  function statusPill(t) {
+    return el("span", { class: "pill " + t.phase, text: STATUS_LABEL[t.status] || t.status });
+  }
+  function verdictPill(v) {
+    if (!v) return el("span", { class: "muted", text: "—" });
+    var cls = v === "PASS" ? "pass" : v === "FAIL" ? "fail" : "insufficient";
+    return el("span", { class: "pill " + cls, text: v === "INSUFFICIENT_EVIDENCE" ? "Insufficient evidence" : v });
+  }
+  function lastVerdict(t) { return t.evaluations.length ? t.evaluations[t.evaluations.length - 1].verdict : null; }
+  function sprintName(t) { return t.sprint ? t.sprint.name : null; }
+  function epicLabel(t) { return t.epic ? t.epic.name || t.epic.key : null; }
+  function workType(t) { return t.work_type || (t.issue_type === "Bug" ? "bug" : t.issue_type ? "feature" : null); }
+
+  // ------------------------------------------------------------ filters
+  function fillSelect(id, label, values) {
+    var sel = document.getElementById(id);
+    clear(sel);
+    sel.appendChild(el("option", { value: "", text: "All " + label }));
+    values.forEach(function (v) { sel.appendChild(el("option", { value: v, text: v })); });
+  }
+  function unique(fn) {
+    var seen = {};
+    tickets.forEach(function (t) { var v = fn(t); if (v) seen[v] = true; });
+    return Object.keys(seen).sort();
+  }
+  fillSelect("f-sprint", "sprints", unique(sprintName));
+  fillSelect("f-epic", "epics", unique(epicLabel));
+  fillSelect("f-type", "types", unique(workType));
+  [["f-sprint", "sprint"], ["f-epic", "epic"], ["f-type", "type"]].forEach(function (pair) {
+    document.getElementById(pair[0]).addEventListener("change", function (e) {
+      state[pair[1]] = e.target.value;
+      var list = visible();
+      if (!list.some(function (t) { return t.id === state.selected; })) state.selected = list.length ? list[0].id : null;
+      render();
+    });
+  });
+
+  function visible() {
+    return tickets.filter(function (t) {
+      return (!state.sprint || sprintName(t) === state.sprint) &&
+        (!state.epic || epicLabel(t) === state.epic) &&
+        (!state.type || workType(t) === state.type);
+    });
+  }
+
+  function select(id, scroll) {
+    state.selected = id;
+    render();
+    if (scroll) {
+      var target = document.getElementById("detail-section");
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    }
+  }
+
+  // ------------------------------------------------------------ sections
+  function renderKpis(list) {
+    var box = clear(document.getElementById("kpis"));
+    var evaluated = list.filter(function (t) { return t.evaluations.length; });
+    var firstPass = evaluated.filter(function (t) { return t.evaluations[0].verdict === "PASS"; });
+    var waiting = list.filter(function (t) { return t.phase === "waiting"; });
+    var working = list.filter(function (t) { return t.phase === "working"; });
+    var done = list.filter(function (t) { return t.phase === "done"; });
+    var work = list.reduce(function (a, t) { return a + t.working_seconds; }, 0);
+    var cost = list.reduce(function (a, t) { return a + t.cost_usd; }, 0);
+    var kpis = [
+      [String(list.length), "Tickets", done.length + " delivered"],
+      [String(working.length), "Claude working now", ""],
+      [String(waiting.length), "Waiting on people", waiting.length ? "longest " + duration(Math.max.apply(null, waiting.map(function (t) { return t.waiting_since ? (now - Date.parse(t.waiting_since)) / 1000 : 0; }))) : ""],
+      [evaluated.length ? Math.round(100 * firstPass.length / evaluated.length) + "%" : "—", "Passed first evaluation", evaluated.length ? firstPass.length + " of " + evaluated.length + " evaluated" : "none evaluated yet"],
+      [duration(work), "Claude working time", "recorded stage time"],
+      [money(cost), "API-equivalent cost", "at list API prices"]
+    ];
+    kpis.forEach(function (k) {
+      box.appendChild(el("div", { class: "kpi" }, [
+        el("div", { class: "value", text: k[0] }),
+        el("div", { class: "label", text: k[1] }),
+        k[2] ? el("div", { class: "sub", text: k[2] }) : null
+      ]));
+    });
+  }
+
+  function renderBoard(list) {
+    var board = clear(document.getElementById("board"));
+    PHASES.forEach(function (phase) {
+      var items = list.filter(function (t) { return t.phase === phase.id; });
+      var lane = el("div", { class: "lane" }, [
+        el("div", { class: "lane-head" }, [el("h3", { text: phase.label }), el("span", { class: "count", text: String(items.length) })])
+      ]);
+      if (!items.length) lane.appendChild(el("div", { class: "lane-empty", text: "None" }));
+      items.forEach(function (t) {
+        var meta = el("div", { class: "meta" }, [statusPill(t)]);
+        if (t.waiting_on) meta.appendChild(el("span", { class: "pill plain waiting", text: "on " + (WAIT_LABEL[t.waiting_on] || t.waiting_on) + (t.waiting_since ? " · " + duration((now - Date.parse(t.waiting_since)) / 1000) : "") }));
+        lane.appendChild(el("button", {
+          class: "card", type: "button", "aria-current": t.id === state.selected ? "true" : null,
+          onclick: function () { select(t.id, true); }
+        }, [
+          el("span", { class: "key", text: t.id }),
+          el("span", { class: "title", text: t.title || "(title not recorded)" }),
+          meta,
+          sprintName(t) ? el("span", { class: "small muted", text: sprintName(t) }) : null
+        ]));
+      });
+      board.appendChild(lane);
+    });
+  }
+
+  function renderBars(list) {
+    var time = {}, cost = {}, waitTotal = 0;
+    list.forEach(function (t) {
+      t.stages.forEach(function (s) { time[s.stage] = (time[s.stage] || 0) + s.seconds; });
+      Object.keys(t.cost_by_stage).forEach(function (s) { cost[s] = (cost[s] || 0) + t.cost_by_stage[s]; });
+      waitTotal += t.waiting_seconds;
+    });
+    var timeRows = STAGES.filter(function (s) { return time[s]; }).map(function (s) { return { label: STAGE_LABEL[s], value: time[s], text: duration(time[s]), color: STAGE_COLOR[s] }; });
+    if (waitTotal) timeRows.push({ label: "Waiting", value: waitTotal, text: duration(waitTotal), wait: true });
+    var costRows = Object.keys(cost).sort(function (a, b) { return STAGES.indexOf(a) - STAGES.indexOf(b); })
+      .filter(function (s) { return cost[s] > 0; })
+      .map(function (s) { return { label: STAGE_LABEL[s] || s, value: cost[s], text: money(cost[s]), color: STAGE_COLOR[s] }; });
+    drawBars("bars-time", timeRows, "No stage time recorded yet");
+    drawBars("bars-cost", costRows, "No token usage recorded yet");
+  }
+  function drawBars(id, rows, emptyText) {
+    var box = clear(document.getElementById(id));
+    if (!rows.length) { box.appendChild(el("p", { class: "empty", text: emptyText })); return; }
+    var max = Math.max.apply(null, rows.map(function (r) { return r.value; }));
+    rows.forEach(function (r) {
+      box.appendChild(el("div", { class: "bar-row" }, [
+        el("span", { text: r.label }),
+        el("div", { class: "bar-track" }, [el("div", { class: "bar-fill" + (r.wait ? " wait" : ""), style: "width:" + Math.max(1.5, 100 * r.value / max).toFixed(1) + "%" + (r.color ? ";background:" + r.color : "") })]),
+        el("span", { class: "num", text: r.text })
+      ]));
+    });
+  }
+
+  function renderTable(list) {
+    var body = clear(document.getElementById("rows"));
+    document.getElementById("table-count").textContent = list.length + " of " + tickets.length + " tickets";
+    if (!list.length) {
+      body.appendChild(el("tr", null, [el("td", { colspan: "11", class: "empty", text: "No tickets match these filters." })]));
+      return;
+    }
+    list.forEach(function (t) {
+      var row = el("tr", {
+        tabindex: "0", "aria-current": t.id === state.selected ? "true" : null,
+        onclick: function () { select(t.id, true); },
+        onkeydown: function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(t.id, true); } }
+      }, [
+        el("td", { class: "num", style: "text-align:left;color:var(--accent)", text: t.id }),
+        el("td", null, [el("div", { class: "t-title", text: t.title || "—" })]),
+        el("td", { text: sprintName(t) || "—" }),
+        el("td", { text: epicLabel(t) || "—" }),
+        el("td", null, [statusPill(t)]),
+        el("td", { class: "num", text: t.evaluations.length + " / " + t.max_iterations }),
+        el("td", null, [verdictPill(lastVerdict(t))]),
+        el("td", { class: "num", text: duration(t.working_seconds) }),
+        el("td", { class: "num", text: duration(t.waiting_seconds) }),
+        el("td", { class: "num", text: money(t.cost_usd) }),
+        el("td", { class: "small muted", text: ago(t.updated_at) })
+      ]);
+      body.appendChild(row);
+    });
+  }
+
+  // ------------------------------------------------------------ detail
+  function eventText(e) {
+    switch (e.event) {
+      case "ticket_started": return "Harness started work on the ticket";
+      case "session_resumed": return "A new session resumed the ticket" + (e.from_status ? " from " + (STATUS_LABEL[e.from_status] || e.from_status) : "");
+      case "stage_start": return null;
+      case "stage_end": return null;
+      case "iteration_start": return "Iteration " + e.iteration + " started" + (e.reason ? ": " + e.reason : "");
+      case "human_confirmed": return "Developer confirmed " + String(e.what || "").replace(/_/g, " ") + (typeof e.value === "string" ? ": " + e.value : Array.isArray(e.value) ? ": " + e.value.join(", ") : "");
+      case "input_requested": return "Stopped for answers from " + (WAIT_LABEL[e.audience] || e.audience || "people") + (e.questions ? " (" + e.questions + " questions)" : "");
+      case "input_received": return "Answers received from " + (WAIT_LABEL[e.audience] || e.audience || "people");
+      case "decision_locked": return e.id + " locked: " + (e.summary || "");
+      case "decision_superseded": return e.id + " superseded by " + e.superseded_by;
+      case "branch_created": return (e.reused ? "Reused" : "Created") + " branch in " + e.repo;
+      case "evaluation": return "Evaluation " + (e.iteration || "") + ": " + e.verdict + " — " + (e.blocking || 0) + " blocking, " + (e.non_blocking || 0) + " non-blocking";
+      case "pr_prepared": return "PR prepared for " + e.repo + " → " + e.target;
+      case "escalated": return "Escalated" + (e.reason ? ": " + e.reason : "");
+      case "ticket_closed": return "Ticket closed" + (e.outcome ? ": " + e.outcome : "");
+      default: return e.event.replace(/_/g, " ");
+    }
+  }
+
+  function timelineItems(t) {
+    var items = [];
+    t.events.forEach(function (e) {
+      var text = eventText(e);
+      if (text) items.push({ ts: e.ts, text: text });
+    });
+    t.stages.forEach(function (s) {
+      var label = (STAGE_LABEL[s.stage] || s.stage) + (s.iteration ? " (iteration " + s.iteration + ")" : "");
+      items.push({ ts: s.start, text: s.end ? label + " — " + (s.seconds >= 1 ? duration(s.seconds) : "recorded as a revision") : label + " — in progress" });
+    });
+    return items.sort(function (a, b) { return a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0; });
+  }
+
+  function renderDetail(list) {
+    var box = clear(document.getElementById("detail"));
+    var t = list.filter(function (x) { return x.id === state.selected; })[0];
+    if (!t) {
+      box.appendChild(el("p", { class: "empty", text: tickets.length ? "Select a ticket above." : "The harness has not recorded any tickets yet." }));
+      return;
+    }
+
+    box.appendChild(el("div", { class: "detail-head" }, [
+      el("div", { class: "eyebrow" }, [t.url ? el("a", { href: t.url, target: "_blank", rel: "noopener", text: t.id + " in Jira ↗" }) : t.id]),
+      el("h2", { text: t.title || t.id }),
+      el("div", { class: "meta", style: "display:flex;flex-wrap:wrap;gap:6px" }, [
+        statusPill(t),
+        workType(t) ? el("span", { class: "pill plain", text: workType(t) === "bug" ? "Bug" : "Feature" }) : null,
+        verdictPill(lastVerdict(t))
+      ])
+    ]));
+
+    var facts = [
+      ["Epic", t.epic ? (t.epic.name ? t.epic.name + " (" + t.epic.key + ")" : t.epic.key) : "—"],
+      ["Sprint", t.sprint ? t.sprint.name : "—"],
+      ["Assignee", t.assignee || "—"],
+      ["Started", when(t.created_at)],
+      ["Branch", t.branch ? t.branch + (t.source_branch ? " from " + t.source_branch : "") : "—"],
+      ["Repos changed", t.repos.filter(function (r) { return r.role === "change"; }).map(function (r) { return r.name; }).join(", ") || "not yet decided"]
+    ];
+    box.appendChild(el("dl", { class: "facts", style: "margin:0" }, facts.map(function (f) {
+      return el("div", { class: "fact" }, [el("dt", { text: f[0] }), el("dd", { text: f[1] })]);
+    })));
+
+    var stands = el("div", { class: "stands " + t.phase }, [
+      el("div", { class: "eyebrow", text: "Where it stands" }),
+      t.waiting_on ? el("p", null, [el("b", { text: "Waiting on " + (WAIT_LABEL[t.waiting_on] || t.waiting_on) }), t.waiting_since ? " for " + duration((now - Date.parse(t.waiting_since)) / 1000) : ""]) : null,
+      t.blocked_on ? el("p", { text: "Blocked on " + t.blocked_on }) : null,
+      el("p", { text: t.next_action ? "Next: " + t.next_action : "No next action recorded." })
+    ]);
+    box.appendChild(stands);
+
+    // lifecycle strip
+    var life = el("div", { class: "block" }, [el("h3", { text: "How the time went" })]);
+    var segs = t.stages.filter(function (s) { return s.seconds >= 1; }).map(function (s) { return { start: s.start, seconds: s.seconds, color: STAGE_COLOR[s.stage] || "#8a8f99", label: (STAGE_LABEL[s.stage] || s.stage) + " " + duration(s.seconds) }; });
+    t.waits.forEach(function (w) { if (w.seconds >= 1) segs.push({ start: w.start, seconds: w.seconds, color: "var(--wait)", label: "Waiting on " + (WAIT_LABEL[w.audience] || w.audience || "people") + " " + duration(w.seconds) + (w.end ? "" : " so far") }); });
+    segs.sort(function (a, b) { return a.start < b.start ? -1 : 1; });
+    if (segs.length) {
+      var total = segs.reduce(function (a, s) { return a + s.seconds; }, 0);
+      life.appendChild(el("div", { class: "lifecycle", role: "img", "aria-label": segs.map(function (s) { return s.label; }).join(", ") },
+        segs.map(function (s) { return el("span", { title: s.label, style: "flex:" + (s.seconds / total).toFixed(4) + " 0 0;background:" + s.color + (s.color === "var(--wait)" ? ";opacity:.55" : "") }); })));
+      life.appendChild(el("div", { class: "legend" }, segs.map(function (s) {
+        return el("span", null, [el("i", { style: "background:" + s.color + (s.color === "var(--wait)" ? ";opacity:.55" : "") }), s.label]);
+      })));
+      life.appendChild(el("p", { class: "small muted", text: "Claude working " + duration(t.working_seconds) + " · waiting on people " + duration(t.waiting_seconds) + ". Proportions, not a calendar: gaps where nobody was working are left out." }));
+    } else {
+      life.appendChild(el("p", { class: "empty", text: "No stage time recorded yet." }));
+    }
+    box.appendChild(life);
+
+    var left = el("div", { class: "block" });
+    var right = el("div", { class: "block" });
+
+    // timeline
+    left.appendChild(el("h3", { text: "Timeline" }));
+    var items = timelineItems(t);
+    left.appendChild(items.length ? el("ol", { class: "timeline" }, items.map(function (i) {
+      return el("li", null, [el("time", { datetime: i.ts, text: when(i.ts) }), el("span", { text: i.text })]);
+    })) : el("p", { class: "empty", text: "No journal events recorded." }));
+
+    // decisions
+    right.appendChild(el("h3", { text: "Decisions locked (" + t.decisions.length + ")" }));
+    if (!t.decisions.length) right.appendChild(el("p", { class: "empty", text: "No decisions recorded yet." }));
+    var decWrap = el("div");
+    t.decisions.forEach(function (d) {
+      var superseded = /^SUPERSEDED/i.test(d.status);
+      decWrap.appendChild(el("details", { class: "decision" + (superseded ? " superseded" : "") }, [
+        el("summary", null, [
+          el("span", { class: "id", text: d.id }),
+          el("span", { class: "d-title", text: d.title }),
+          el("span", { class: "pill plain " + (superseded ? "" : "done"), text: superseded ? "Superseded" : "Locked" })
+        ]),
+        el("div", { class: "body" }, [
+          d.stage ? el("p", null, [el("b", { text: "Stage: " }), d.stage]) : null,
+          d.decided_by ? el("p", null, [el("b", { text: "Decided by: " }), d.decided_by]) : null,
+          d.why ? el("p", null, [el("b", { text: "Why: " }), d.why]) : null,
+          d.options ? el("p", null, [el("b", { text: "Options considered: " }), d.options]) : null,
+          superseded ? el("p", { class: "muted", text: d.status }) : null
+        ])
+      ]));
+    });
+    right.appendChild(decWrap);
+
+    // evaluations
+    right.appendChild(el("h3", { text: "Evaluations" }));
+    right.appendChild(t.evaluations.length ? el("table", { class: "mini" }, [
+      el("thead", null, [el("tr", null, [el("th", { text: "Iteration" }), el("th", { text: "Verdict" }), el("th", { class: "num", text: "Blocking" }), el("th", { class: "num", text: "Other" })])]),
+      el("tbody", null, t.evaluations.map(function (e) {
+        return el("tr", null, [el("td", { text: String(e.iteration || "—") }), el("td", null, [verdictPill(e.verdict)]), el("td", { class: "num", text: String(e.blocking) }), el("td", { class: "num", text: String(e.non_blocking) })]);
+      }))
+    ]) : el("p", { class: "empty", text: "Not evaluated yet." }));
+
+    // PRs
+    right.appendChild(el("h3", { text: "Pull requests" }));
+    right.appendChild(t.prs.length ? el("table", { class: "mini" }, [
+      el("thead", null, [el("tr", null, [el("th", { text: "Repo" }), el("th", { text: "Target" }), el("th", { text: "Link" })])]),
+      el("tbody", null, t.prs.map(function (p) {
+        var link = p.url || p.compare_link;
+        return el("tr", null, [el("td", { text: p.repo }), el("td", { text: p.target }), el("td", null, [link ? el("a", { href: link, target: "_blank", rel: "noopener", text: p.url ? "Open PR ↗" : "Compare ↗" }) : "—"])]);
+      }))
+    ]) : el("p", { class: "empty", text: "No pull requests yet." }));
+
+    // cost
+    right.appendChild(el("h3", { text: "Tokens and cost by stage" }));
+    var stageKeys = Object.keys(t.tokens_by_stage || {});
+    right.appendChild(stageKeys.length ? el("table", { class: "mini" }, [
+      el("thead", null, [el("tr", null, [el("th", { text: "Stage" }), el("th", { class: "num", text: "Output" }), el("th", { class: "num", text: "Input + cache" }), el("th", { class: "num", text: "Cost" })])]),
+      el("tbody", null, stageKeys.map(function (s) {
+        var k = t.tokens_by_stage[s];
+        return el("tr", null, [
+          el("td", { text: STAGE_LABEL[s] || s }),
+          el("td", { class: "num", text: compact(k.output) }),
+          el("td", { class: "num", text: compact((k.input || 0) + (k.cache_read || 0) + (k.cache_creation || 0)) }),
+          el("td", { class: "num", text: money(t.cost_by_stage[s]) })
+        ]);
+      }))
+    ]) : el("p", { class: "empty", text: "No token usage recorded for this ticket." }));
+    if (t.unpriced_models && t.unpriced_models.length) right.appendChild(el("p", { class: "small muted", text: "No price for " + t.unpriced_models.join(", ") + "; priced at the default model." }));
+
+    // files
+    right.appendChild(el("h3", { text: "Record files" }));
+    right.appendChild(el("div", { class: "files" }, t.files.map(function (f) { return el("span", { text: f }); })));
+
+    box.appendChild(el("div", { class: "cols" }, [left, right]));
+  }
+
+  function renderFooter() {
+    var f = clear(document.getElementById("footer"));
+    f.appendChild(el("p", { text: "Built " + (data.generated_at ? when(data.generated_at) : "at an unknown time") + " from the sis-brain repository. As current as the last publish; run /brain publish to refresh." }));
+    f.appendChild(el("p", { text: "Cost is API-equivalent: " + (data.price_note || "") + (data.price_as_of ? " Prices as of " + data.price_as_of + "." : "") }));
+    f.appendChild(el("p", { text: "Claude working time is measured from recorded stage start and end; tokens only count sessions the harness attributed to a ticket." }));
+    if (data.unreadable && data.unreadable.length) f.appendChild(el("p", { text: "Unreadable ticket records: " + data.unreadable.join(", ") }));
+  }
+
+  function render() {
+    var list = visible();
+    renderKpis(list);
+    renderBoard(list);
+    renderBars(list);
+    renderTable(list);
+    renderDetail(list);
+  }
+
+  renderFooter();
+  render();
+})();
+</script>

@@ -1,7 +1,22 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "ticket": "GSIS-11010",
-  "jira_url": "https://gearsjira.atlassian.net/browse/GSIS-11010",
+  "jira": {
+    "url": "https://gearsjira.atlassian.net/browse/GSIS-11010",
+    "title": "User does not receive the \"Exam interview canceled\" Notification and \"Schedule exam interview applicant deleted\" Notification",
+    "issue_type": "Bug",
+    "epic": {
+      "key": "GSIS-2491",
+      "name": "Exam Controller App"
+    },
+    "sprint": {
+      "name": "Sustainment Sprint 21",
+      "start": "2026-09-16",
+      "end": "2026-09-29"
+    },
+    "assignee": "Ashoka Jayasekara",
+    "refreshed_at": "2026-09-17T04:24:47Z"
+  },
   "status": "NEEDS_INPUT",
   "next_action": "Developer pastes qa-packet.md into a GSIS-11010 Jira comment for QA. When QA replies (retest result by email on base-qa/gcet-qa/gutech-qa; remove-applicant recipients; supervisors = examiners; cancel recipients; applicant in-app), run /work GSIS-11010: close as fixed by GSIS-17509/25660/26324 if not reproducible, otherwise run the designer with the answers.",
   "blocked_on": "answers to qa-packet.md Q1-Q5 (posted as a Jira comment on GSIS-11010)",
