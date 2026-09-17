@@ -143,3 +143,21 @@
 - **Convention cited:** sis-development-guidelines.md → "Always use campus-based filtering via Structure Master"
 - **Evidence:** design.md Conventions That Apply
 - **Status:** LOCKED
+
+### D-17 — Repos to change: sis-product-sis-admin-backend and sis-product-sis-frontend; all other repos are context
+- **Stage:** design, iteration 1
+- **Decided by:** designer · confirmed by human 2026-09-17T11:09:25Z
+- **Options considered:** backend and frontend; backend only (no UI indicator or reset)
+- **Why:** backend carries S1–S4 (row-id guard, marker, cascade, sync, reset endpoints); frontend carries the S4 inherited/overridden indicator and reset, which AC-2 and AC-3 need on screen, plus the D-18 guard. The other six repos (business-config, notification-handler, attachment-handler, keycloak, scheduler, workflow-engine) contain no requisite or mutually-exclusive code.
+- **Convention cited:** workspace → touch only confirmed repos
+- **Evidence:** design.md Repositories; analysis.md repository search
+- **Status:** LOCKED
+
+### D-18 — Guard against an empty Module Master co-requisite save wiping rules down the cascade
+- **Stage:** design, iteration 1
+- **Decided by:** developer · confirmed by human 2026-09-17T11:09:25Z
+- **Options considered:** guard in S3 so a Module Master header save made before the co-requisite tab loaded neither deletes master co-requisites nor pushes; leave as a documented finding
+- **Why:** a pre-existing UI race (header Save before the co-requisite tab loads posts an empty list and CourseMasterServiceImpl deletes all master co-requisites) would, with the D-10 cascade, remove the rule from every non-overridden offering, study plan and student. The Implementor makes the frontend send the co-requisite list only once the tab has loaded, and leaves the master co-requisites untouched when the list is absent. A deliberate clear made on a loaded tab still saves and pushes.
+- **Convention cited:** none
+- **Evidence:** sis-product-sis-admin-backend/.../CourseMasterServiceImpl.java:279-342 (delete-all branch 330-341); sis-product-sis-frontend/.../course-co-requisite.component.ts init with setTimeout in courseRequisiteState; design.md Regression scenarios
+- **Status:** LOCKED

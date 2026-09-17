@@ -29,3 +29,9 @@
 {"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-14","summary":"Seed helper catch-all out of scope"}
 {"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-15","summary":"Test strategy: Mockito unit, PostgreSQL container for SQL, Karma spec"}
 {"ts":"2026-09-17T10:22:08Z","event":"decision_locked","id":"D-16","summary":"Deviation: cascade targets by parent FK plus tenant, not campus filter"}
+{"ts":"2026-09-17T11:09:25Z","event":"human_confirmed","what":"repos_to_change","value":["sis-product-sis-admin-backend","sis-product-sis-frontend"]}
+{"ts":"2026-09-17T11:09:25Z","event":"decision_locked","id":"D-17","summary":"Repos to change: admin-backend and frontend"}
+{"ts":"2026-09-17T11:09:25Z","event":"human_confirmed","what":"empty_master_save_guard","value":"Guard it"}
+{"ts":"2026-09-17T11:09:25Z","event":"decision_locked","id":"D-18","summary":"Guard empty Module Master co-requisite save from wiping rules down the cascade"}
+{"ts":"2026-09-17T11:09:25Z","event":"human_confirmed","what":"study_plan_inherits_unfiltered","value":"Unfiltered (D-13)"}
+{"ts":"2026-09-17T11:09:25Z","event":"human_confirmed","what":"push_student_plan_scope","value":"All live plans (D-10)"}
