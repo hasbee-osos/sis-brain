@@ -6,3 +6,9 @@
 {"ts":"2026-09-16T13:10:30Z","event":"decision_locked","id":"D-2","summary":"Root cause: null users aborted async sendNotifications before email; fixes 6c051d28c4/1b4f29ea57/af70c0d6ed already on base-development"}
 {"ts":"2026-09-16T14:21:41Z","event":"stage_start","stage":"analyze","iteration":1}
 {"ts":"2026-09-16T14:21:41Z","event":"stage_end","stage":"analyze","iteration":1}
+{"ts":"2026-09-17T09:59:38Z","event":"session_resumed","session_id":"df64f67e-4d13-4ade-84fb-226aeac5ce63","from_status":"NEEDS_INPUT"}
+{"ts":"2026-09-17T10:06:50Z","event":"human_confirmed","what":"qa-packet.md answers","value":"Q1 not reproducible on current build (applicant received cancel and applicant-deleted emails 2026-09-17; examiner inbox and in-app not shown); Q2-Q5 unanswered, not needed once no fix is required; QA note on missing Letter Template entries explained by GCET-395/GCET-338 rename to Placement Test notification templates"}
+{"ts":"2026-09-17T10:06:50Z","event":"input_received","audience":"qa","packet":"qa-packet.md"}
+{"ts":"2026-09-17T10:06:50Z","event":"decision_locked","id":"D-3","summary":"No code change: already fixed by GSIS-17509/25660/26324; close the ticket"}
+{"ts":"2026-09-17T10:06:50Z","event":"human_confirmed","what":"ticket_outcome","value":"Close as already fixed"}
+{"ts":"2026-09-17T10:06:50Z","event":"ticket_closed","outcome":"already fixed by GSIS-17509, GSIS-25660, GSIS-26324; not reproducible per QA retest 2026-09-17; no code change"}

@@ -14,14 +14,14 @@
       "start": "2026-09-16",
       "end": "2026-09-29"
     },
-    "assignee": "Ashoka Jayasekara",
-    "refreshed_at": "2026-09-17T04:24:47Z"
+    "assignee": "Navodya Oshani",
+    "refreshed_at": "2026-09-17T09:59:38Z"
   },
-  "status": "NEEDS_INPUT",
-  "next_action": "Developer pastes qa-packet.md into a GSIS-11010 Jira comment for QA. When QA replies (retest result by email on base-qa/gcet-qa/gutech-qa; remove-applicant recipients; supervisors = examiners; cancel recipients; applicant in-app), run /work GSIS-11010: close as fixed by GSIS-17509/25660/26324 if not reproducible, otherwise run the designer with the answers.",
-  "blocked_on": "answers to qa-packet.md Q1-Q5 (posted as a Jira comment on GSIS-11010)",
+  "status": "DONE",
+  "next_action": "Developer replies to QA on GSIS-11010 that the Schedule Exam emails use Notification Templates (renamed to Placement Test on GCET/OSOS by GCET-395/GCET-338), then closes the ticket in Jira as already fixed. No PR.",
+  "blocked_on": null,
   "created_at": "2026-09-16T10:33:30Z",
-  "updated_at": "2026-09-16T14:37:02Z",
+  "updated_at": "2026-09-17T10:06:50Z",
   "iteration": 1,
   "max_iterations": 3,
   "workspace": "C:/Projects/sis-repos",
@@ -53,6 +53,11 @@
       "session_id": "15aef57a-c4b0-4732-aeb3-80918d270a70",
       "started_at": "2026-09-16T10:33:30Z",
       "ended_at": null
+    },
+    {
+      "session_id": "df64f67e-4d13-4ade-84fb-226aeac5ce63",
+      "started_at": "2026-09-17T09:59:38Z",
+      "ended_at": "2026-09-17T10:06:50Z"
     }
   ],
   "human_confirmations": [
@@ -60,11 +65,22 @@
       "what": "flow_and_branch",
       "at": "2026-09-16T13:01:25Z",
       "value": "Flow A, base/bugfix/GSIS-11010-exam-interview-cancel-notifications, source base-development; stage 1 base-sandbox-qa; stage 2 gcet-sandbox-qa + gutech-sandbox-qa"
+    },
+    {
+      "what": "qa-packet.md answers",
+      "at": "2026-09-17T10:06:50Z",
+      "value": "Q1 not reproducible on current build (applicant received cancel and applicant-deleted emails 2026-09-17; examiner inbox and in-app not shown); Q2-Q5 unanswered, not needed once no fix is required; QA note on missing Letter Template entries explained by GCET-395/GCET-338 rename to Placement Test notification templates"
+    },
+    {
+      "what": "ticket_outcome",
+      "at": "2026-09-17T10:06:50Z",
+      "value": "Close as already fixed"
     }
   ],
   "decisions": [
     "D-1",
-    "D-2"
+    "D-2",
+    "D-3"
   ],
   "artifacts": {
     "analysis": "analysis-2.md",
@@ -72,7 +88,9 @@
   },
   "notes": [
     "Jira context read via getJiraIssue (GSIS-11010, linked GSIS-2701). The single ticket comment was manually provided by the human (comment-list tool blocked by jira-guard): developer states the notifications fail because null values are passed for the notification users, a pre-existing code issue unrelated to the version bump. Jira attachments (1 image, 2 mp4 screen recordings) could not be read.",
-    "Revision 2 of the analysis (2026-09-16T14:21:41Z) adds the Jira attachments: both screen recordings were downloaded via downloadJiraIssueAttachment and read as frames locally (not stored in the brain). The SVG attachment (1.2 KB status icon) was skipped."
+    "Revision 2 of the analysis (2026-09-16T14:21:41Z) adds the Jira attachments: both screen recordings were downloaded via downloadJiraIssueAttachment and read as frames locally (not stored in the brain). The SVG attachment (1.2 KB status icon) was skipped.",
+    "Session 2026-09-17: QA retest did not reproduce; QA screenshots read locally. Ticket closed per D-3 with no code change."
   ],
-  "analysis": "NEEDS_INPUT"
+  "analysis": "READY",
+  "work_type": "bug"
 }
