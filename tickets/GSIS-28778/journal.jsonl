@@ -5,3 +5,8 @@
 {"ts":"2026-09-17T05:26:56Z","event":"stage_end","stage":"analyze","iteration":1}
 {"ts":"2026-09-17T05:26:56Z","event":"input_requested","audience":"qa","packet":"qa-packet.md","questions":4}
 {"ts":"2026-09-17T05:26:56Z","event":"input_requested","audience":"developer","packet":null,"questions":1}
+{"ts":"2026-09-17T06:26:30Z","event":"stage_start","stage":"analyze","iteration":1}
+{"ts":"2026-09-17T06:41:04Z","event":"stage_end","stage":"analyze","iteration":1}
+{"ts":"2026-09-17T06:41:04Z","event":"decision_locked","id":"D-2","summary":"Root cause: offering/study-plan course creation posts parent rows with parent IDs; createList soft-deletes seeded rows and merges foreign IDs"}
+{"ts":"2026-09-17T06:41:04Z","event":"decision_locked","id":"D-3","summary":"Reported symptom is never-built behaviour: no push of master rules to existing records, no override marker"}
+{"ts":"2026-09-17T06:41:04Z","event":"input_requested","audience":"developer","packet":null,"questions":3}
