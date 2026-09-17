@@ -6,29 +6,63 @@
     "title": "Module Relationship Rules (Pre-Req / Co-Req / Mutually Exclusive) Defined at Module Master Not Propagating to Dept Offering, Programme Study Plan, and Student Study Plan",
     "issue_type": "Bug",
     "epic": null,
-    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "sprint": {
+      "name": "Sustainment Sprint 21",
+      "start": "2026-09-16",
+      "end": "2026-09-29"
+    },
     "assignee": "Ashoka Jayasekara",
     "refreshed_at": "2026-09-17T05:11:55Z"
   },
   "status": "ANALYZING",
-  "next_action": "Human confirms work type, flow and branch; then the Analyzer runs",
+  "next_action": "Analyzer runs against origin/base-development",
   "blocked_on": null,
   "created_at": "2026-09-17T05:11:55Z",
-  "updated_at": "2026-09-17T05:11:55Z",
+  "updated_at": "2026-09-17T05:16:24Z",
   "iteration": 1,
   "max_iterations": 3,
   "workspace": "C:/Projects/sis-repos",
-  "work_type": null,
-  "flow": null,
-  "source_branch": null,
-  "branch": null,
+  "work_type": "bug",
+  "flow": "A",
+  "source_branch": "base-development",
+  "branch": "base/bugfix/GSIS-28778-module-relationship-rule-propagation",
   "repos": {},
   "context_repos": [],
-  "pr_targets": [],
+  "pr_targets": [
+    {
+      "stage": 1,
+      "targets": [
+        "base-sandbox-qa"
+      ],
+      "status": "PENDING"
+    },
+    {
+      "stage": 2,
+      "targets": [
+        "gcet-sandbox-qa",
+        "gutech-sandbox-qa"
+      ],
+      "status": "PENDING"
+    }
+  ],
   "prs": [],
-  "sessions": [ { "session_id": "c55645c6-ba59-4cce-8d70-44e2ef68e5c1", "started_at": "2026-09-17T05:11:55Z", "ended_at": null } ],
-  "human_confirmations": [],
-  "decisions": [],
+  "sessions": [
+    {
+      "session_id": "c55645c6-ba59-4cce-8d70-44e2ef68e5c1",
+      "started_at": "2026-09-17T05:11:55Z",
+      "ended_at": null
+    }
+  ],
+  "human_confirmations": [
+    {
+      "what": "flow_and_branch",
+      "at": "2026-09-17T05:16:24Z",
+      "value": "Bug, Flow A, base/bugfix/GSIS-28778-module-relationship-rule-propagation, source base-development; stage 1 base-sandbox-qa; stage 2 gcet-sandbox-qa + gutech-sandbox-qa"
+    }
+  ],
+  "decisions": [
+    "D-1"
+  ],
   "artifacts": {},
   "notes": [
     "Jira context read via getJiraIssue (evidence view). No comments, no issue links, no parent set; the description names linked story GSIS-20628 and epic GSIS-2639 (Admin Review) in text only, so jira.epic is null. Label SIS-OSOS-QA, customer 'Product Core Feature', environment Staging.",
