@@ -1,3 +1,9 @@
 {"ts":"2026-09-18T14:20:00Z","event":"ticket_started","ticket":"GSIS-24201","session_id":"1a9e8080-ece3-498c-97a6-6aef03851d91"}
 {"ts":"2026-09-18T14:45:00Z","event":"human_confirmed","what":"work_type_flow_branch","value":"bug, Flow A, base/bugfix/GSIS-24201-corequisite-required-validation, source base-development"}
 {"ts":"2026-09-18T14:45:00Z","event":"decision_locked","id":"D-1","summary":"Work type bug, Flow A (base), branch base/bugfix/GSIS-24201-corequisite-required-validation"}
+{"ts":"2026-09-18T14:50:00Z","event":"stage_start","stage":"plan","iteration":1}
+{"ts":"2026-09-18T15:05:00Z","event":"stage_end","stage":"plan","iteration":1}
+{"ts":"2026-09-18T15:05:00Z","event":"decision_locked","id":"D-3","summary":"Root cause: Module-page save gate never validates co-requisite rows (separate FormGroup array not registered on parent form)"}
+{"ts":"2026-09-18T15:05:00Z","event":"decision_locked","id":"D-4","summary":"Fix: add row-validation method on shared component, call from AddViewEditCourseComponent's existing save gate"}
+{"ts":"2026-09-18T15:05:00Z","event":"decision_locked","id":"D-5","summary":"Reuse existing i18n key validation.message.notFilledRequiredField for the error message"}
+{"ts":"2026-09-18T15:05:00Z","event":"decision_locked","id":"D-6","summary":"Test strategy: harness-test unit tests + regression test on isValidToUpdate/Create, plus manual repro"}
