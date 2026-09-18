@@ -9,7 +9,7 @@ It is being piloted on `sis-product-sis-frontend` and `sis-product-sis-admin-bac
 | Path | What it holds | Committed |
 |---|---|---|
 | `<repo>.md` | Short hand-written notes per repo: layout, where things live, how to build and test it, known pitfalls | yes |
-| `repos.json` | The repos in the map and the ref each is read at (the code of record, e.g. `origin/base-development`) | yes |
+| `repos.json` | The repos in the map, the default ref each is read at when no `--ref` is given, and the customer-line refs its menu labels come from | yes |
 | `build.js` | Builds `generated/` from the repos through git. Node only, no dependencies, about 5 s | yes |
 | `generated/` | Indexes rebuilt after every fetch, stamped with the commit they were built from (`stamp.json`) | **no**, machine-local |
 
@@ -30,7 +30,7 @@ Generated indexes:
 
 - **Grep the indexes; don't read them whole.** Some run to thousands of rows. For example, `grep -i "module" generated/screens.md`, or `grep "/api/v1/courses" generated/*.endpoints.md`.
 - Read the repo's notes (`<repo>.md`) before planning or building in that repo.
-- Check `generated/stamp.json`. If a repo's commit is not the ref you are working from, run `node sis-brain/codebase/build.js` again.
+- Check `generated/stamp.json`. It names the branch and commit each repo was read at. If that isn't the branch you are working from, rebuild with `node sis-brain/codebase/build.js --ref origin/<source_branch>`. Without `--ref`, each repo is read at its `ref` in `repos.json`. A repo that lacks the `--ref` branch falls back to that ref, and the stamp records the branch it asked for.
 - If the map is wrong or missing something, say so in the artifact (plan or implementation report, section **Codebase map corrections**). The orchestrator fixes the notes, or, for a generated index, records the gap for the maintainers of `build.js`.
 
 ## Rules

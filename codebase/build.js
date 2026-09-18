@@ -2,10 +2,12 @@
 /**
  * Builds the codebase map's generated indexes from the product repos.
  *
- *   node sis-brain/codebase/build.js            (from the workspace, or anywhere)
+ *   node sis-brain/codebase/build.js [--ref origin/<source_branch>]
  *
- * Reads each repo in codebase/repos.json at its `ref` (the code of record, e.g.
- * origin/base-development) through git - never the working tree, never a checkout.
+ * Reads each repo in codebase/repos.json through git - never the working tree, never
+ * a checkout - at `--ref` when given (/work passes the ticket's source branch, so the
+ * map matches the code the Planner reads), else at the repo's `ref` in repos.json.
+ * A repo that has no `--ref` branch falls back to its repos.json ref, and says so.
  * Writes codebase/generated/*.md, which is gitignored: every machine rebuilds it
  * after a fetch. Node only, no dependencies. Extracts structure only - paths,
  * names, routes, endpoints, tables - never config values or code bodies.
@@ -387,20 +389,38 @@ function buildSpring(r) {
 
 // ---------------------------------------------------------------------- main
 
+function argRef() {
+  const args = process.argv.slice(2);
+  const i = args.findIndex((a) => a === "--ref" || a.startsWith("--ref="));
+  if (i < 0) return null;
+  const ref = args[i].includes("=") ? args[i].slice(6) : args[i + 1];
+  if (!ref || ref.startsWith("-")) throw new Error("--ref needs a branch, e.g. --ref origin/base-development");
+  return ref;
+}
+
 function main() {
   const config = JSON.parse(fs.readFileSync(path.join(HERE, "repos.json"), "utf8"));
+  const requested = argRef();
   fs.mkdirSync(OUT, { recursive: true });
   const results = {};
   const summary = [];
   const stamps = {};
+  const revParse = (dir, ref) => { try { return git(dir, ["rev-parse", "--verify", "--short=10", ref + "^{commit}"]).trim(); } catch { return null; } };
   for (const r of config.repos) {
     r.dir = path.join(WORKSPACE, r.repo);
     if (!fs.existsSync(path.join(r.dir, ".git"))) { summary.push(`${r.repo}: skipped (not cloned in this workspace)`); continue; }
-    let sha;
-    try { sha = git(r.dir, ["rev-parse", "--short=10", r.ref]).trim(); }
-    catch { summary.push(`${r.repo}: skipped (${r.ref} not found - run git fetch)`); continue; }
+    let sha = null;
+    let fallback = false;
+    if (requested) {
+      sha = revParse(r.dir, requested);
+      if (sha) r.ref = requested;
+      else fallback = true;
+    }
+    if (!sha) sha = revParse(r.dir, r.ref);
+    if (!sha) { summary.push(`${r.repo}: skipped (${requested || r.ref} not found - run git fetch)`); continue; }
+    if (fallback) summary.push(`${r.repo}: ${requested} not found, used ${r.ref} instead - the map may miss what exists only on ${requested}`);
     const stamp = `\`${r.repo}\` at \`${r.ref}\` = \`${sha}\``;
-    stamps[r.repo] = { ref: r.ref, commit: sha };
+    stamps[r.repo] = { ref: r.ref, commit: sha, ...(fallback ? { requested_ref: requested } : {}) };
     const t0 = Date.now();
     if (r.kind === "angular") {
       const a = buildAngular(r, stamp);
