@@ -15,10 +15,10 @@
     "refreshed_at": "2026-09-17T05:11:55Z"
   },
   "status": "NEEDS_INPUT",
-  "next_action": "Developer chooses: (a) supersede D-4 to re-scope GSIS-28778 to RC-2 + D-18 and run the tests on CI or another machine, (b) iteration 2 implements S2-S4 unverified in this environment, or (c) pause the ticket until the backend build and Docker work here. Iteration 2 of 3 has not started.",
+  "next_action": "Developer stopped this run: the harness pipeline took too long and was too complex, and they will simplify and relaunch the ticket fresh. Nothing is pushed to origin; the ticket branch base/bugfix/GSIS-28778-module-relationship-rule-propagation holds S1 (RC-2 row-id guard) and the D-18 empty-save guard as 2 backend + 1 frontend local commits. Iteration 1 evaluation is FAIL (evaluation-1.md, E-1 scope gap, E-2/E-3 no executed tests). A fresh run may reuse analysis-2.md, design.md and D-1..D-19, or start over; if it starts over, supersede the decisions it does not keep.",
   "blocked_on": "developer decision on E-1 (re-scope by superseding D-4, or implement S2-S4) and on how E-2/E-3 test evidence is obtained, which is impossible in this workspace (backend Gradle build never completes; Docker down; Karma blocked by ~22 pre-existing broken specs)",
   "created_at": "2026-09-17T05:11:55Z",
-  "updated_at": "2026-09-18T04:23:39Z",
+  "updated_at": "2026-09-18T05:16:40Z",
   "iteration": 1,
   "max_iterations": 3,
   "workspace": "C:/Projects/sis-repos",
@@ -66,7 +66,7 @@
     {
       "session_id": "c55645c6-ba59-4cce-8d70-44e2ef68e5c1",
       "started_at": "2026-09-17T05:11:55Z",
-      "ended_at": null
+      "ended_at": "2026-09-18T05:16:40Z"
     }
   ],
   "human_confirmations": [
@@ -152,7 +152,8 @@
     "The Analyzer could not read Jira; the orchestrator read GSIS-20628 and its comments. The agreed design (comments 2026-05-20/21) copies rules downward Master -> Offering -> Programme Study Plan -> Student Study Plan, with validation reading only the student plan; it does not say whether later Master changes push to existing records. Summarised in the analysis addendum.",
     "qa-packet.md was never posted and is superseded: analysis-2.md answered Q1-Q5 from the ticket ACs, the GSIS-20628 thread, the recording, code and branch history, at the developer request to minimise cross-team back-and-forth.",
     "Developer's local config edits (admin-backend application.yml, application-boldreports.yml; frontend package.json, package-lock.json) are in a git stash on base-sandbox-qa in each repo; restore with git stash pop after switching back.",
-    "Iteration 1 executed no tests: the admin-backend Gradle build never completes in this workspace (three attempts, one left ~9.75 h, always stalling in annotation processing with no compiler error), Docker's Linux engine is not running, and the frontend Karma suite cannot start because of ~22 pre-existing broken specs. Frontend ng build passed."
+    "Iteration 1 executed no tests: the admin-backend Gradle build never completes in this workspace (three attempts, one left ~9.75 h, always stalling in annotation processing with no compiler error), Docker's Linux engine is not running, and the frontend Karma suite cannot start because of ~22 pre-existing broken specs. Frontend ng build passed.",
+    "Run stopped by the developer on 2026-09-18 without starting iteration 2: too slow and too complex for the value returned. Environment blockers stand: the admin-backend Gradle build never completes in this workspace, Docker's Linux engine is down, and the frontend Karma suite cannot start because of ~22 pre-existing broken specs. Stalled java processes were terminated."
   ],
   "analysis": "READY",
   "design": "READY",
