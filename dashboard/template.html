@@ -100,7 +100,7 @@
   .panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
   .split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .bars { display: grid; gap: 9px; margin-top: 10px; }
-  .bar-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) 84px; gap: 10px; align-items: center; font-size: 12px; }
+  .bar-row { display: grid; grid-template-columns: 148px minmax(0, 1fr) 104px; gap: 10px; align-items: center; font-size: 12px; }
   .bar-track { height: 10px; background: var(--sunken); border-radius: 3px; overflow: hidden; }
   .bar-fill { height: 100%; background: var(--bar); border-radius: 3px; }
   .bar-fill.wait { background: var(--wait); opacity: 0.55; }
@@ -172,7 +172,7 @@
     .filters label { flex: 1 1 140px; }
     .filters select { min-width: 0; width: 100%; }
     .timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-    .bar-row { grid-template-columns: 76px minmax(0, 1fr) 70px; }
+    .bar-row { grid-template-columns: 112px minmax(0, 1fr) 88px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -205,19 +205,19 @@
 
   <section>
     <div class="section-head">
-      <h2>Where the time and cost go</h2>
-      <span class="small muted">Across the tickets shown, by harness stage</span>
+      <h2>Where the time goes</h2>
+      <span class="small muted">Across the tickets shown</span>
     </div>
     <div class="split">
       <div class="panel">
-        <h3>Time</h3>
-        <p class="small muted">Claude working per stage, and time waiting on people for answers</p>
+        <h3>AI working time, by stage</h3>
+        <p class="small muted">How long the AI spent on each harness stage</p>
         <div class="bars" id="bars-time"></div>
       </div>
       <div class="panel">
-        <h3>API-equivalent cost</h3>
-        <p class="small muted">Tokens priced at list API rates per stage</p>
-        <div class="bars" id="bars-cost"></div>
+        <h3>Elapsed time, by what it was waiting on</h3>
+        <p class="small muted">From ticket start to close (or now): the AI working, waiting on QA or an SME for answers, waiting on the developer, or idle</p>
+        <div class="bars" id="bars-elapsed"></div>
       </div>
     </div>
   </section>
@@ -232,7 +232,7 @@
         <thead>
           <tr>
             <th>Ticket</th><th>Title</th><th>Sprint</th><th>Epic</th><th>Status</th>
-            <th class="num">Iterations</th><th>Last verdict</th><th class="num">Claude time</th><th class="num">Waiting</th><th class="num">Cost</th><th>Updated</th>
+            <th class="num">Iterations</th><th>Last verdict</th><th class="num">Dev estimate</th><th class="num">AI time</th><th class="num">Waiting on people</th><th class="num">Idle</th><th>Updated</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -266,6 +266,10 @@
     DONE: "Done", NEEDS_INPUT: "Needs input", ESCALATED: "Escalated"
   };
   var WAIT_LABEL = { qa: "QA", sme: "SME", developer: "Developer", reviewers: "PR reviewers" };
+  var KINDS = ["working", "qa", "sme", "developer", "idle"];
+  var KIND_LABEL = { working: "AI working", qa: "Waiting on QA", sme: "Waiting on SME", developer: "Waiting on developer", idle: "Idle" };
+  var KIND_COLOR = { working: "#4a90b8", qa: "#b95796", sme: "#d08a2e", developer: "#6f8f3a", idle: "#b3bac5" };
+  var RATE_MIN = 10; // show percentages only once there are enough tickets to mean something
   var PHASES = [
     { id: "working", label: "Claude working" },
     { id: "waiting", label: "Waiting on people" },
@@ -304,10 +308,11 @@
     var d = Math.floor(h / 24), hh = h % 24;
     return d + "d" + (hh ? " " + hh + "h" : "");
   }
-  function money(v) {
-    if (!v) return "—";
-    return v < 10 ? "$" + v.toFixed(2) : "$" + Math.round(v).toLocaleString("en-US");
+  function hours(h) {
+    if (h == null) return "—";
+    return (h < 10 ? Math.round(h * 10) / 10 : Math.round(h)) + "h";
   }
+  function peopleWait(t) { return t.time.qa + t.time.sme + t.time.developer; }
   function when(ts) {
     if (!ts) return "—";
     var d = new Date(ts);
@@ -317,12 +322,6 @@
   function ago(ts) {
     if (!ts) return "";
     return duration((now - Date.parse(ts)) / 1000) + " ago";
-  }
-  function compact(n) {
-    if (!n) return "0";
-    if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
-    if (n >= 1e3) return (n / 1e3).toFixed(1) + "k";
-    return String(n);
   }
   function statusPill(t) {
     return el("span", { class: "pill " + t.phase, text: STATUS_LABEL[t.status] || t.status });
@@ -388,14 +387,20 @@
     var working = list.filter(function (t) { return t.phase === "working"; });
     var done = list.filter(function (t) { return t.phase === "done"; });
     var work = list.reduce(function (a, t) { return a + t.working_seconds; }, 0);
-    var cost = list.reduce(function (a, t) { return a + t.cost_usd; }, 0);
+    var prs = list.reduce(function (a, t) { return a + t.prs.length; }, 0);
+    var noCode = list.filter(function (t) { return t.resolved_without_code; });
+    var caught = list.reduce(function (a, t) { return a + t.evaluations.reduce(function (b, e) { return b + e.blocking; }, 0); }, 0);
+    var decisions = list.reduce(function (a, t) { return a + t.decisions.length; }, 0);
+    var estimated = list.filter(function (t) { return t.estimate_hours != null; });
+    var firstPassValue = !evaluated.length ? "—" : evaluated.length >= RATE_MIN ? Math.round(100 * firstPass.length / evaluated.length) + "%" : firstPass.length + " of " + evaluated.length;
     var kpis = [
-      [String(list.length), "Tickets", done.length + " delivered"],
-      [String(working.length), "Claude working now", ""],
-      [String(waiting.length), "Waiting on people", waiting.length ? "longest " + duration(Math.max.apply(null, waiting.map(function (t) { return t.waiting_since ? (now - Date.parse(t.waiting_since)) / 1000 : 0; }))) : ""],
-      [evaluated.length ? Math.round(100 * firstPass.length / evaluated.length) + "%" : "—", "Passed first evaluation", evaluated.length ? firstPass.length + " of " + evaluated.length + " evaluated" : "none evaluated yet"],
-      [duration(work), "Claude working time", "recorded stage time"],
-      [money(cost), "API-equivalent cost", "at list API prices"]
+      [String(list.length), "Tickets", done.length + " delivered · " + working.length + " in progress · " + waiting.length + " waiting on people"],
+      [String(prs), "PRs raised", prs ? "each reviewed and merged by a person" : "none yet"],
+      [String(noCode.length), "Resolved without a code change", "investigated and shown not to need a fix"],
+      [String(caught), "Issues caught before any PR", "blocking findings from the independent Evaluator"],
+      [firstPassValue, "Passed first evaluation", evaluated.length ? (evaluated.length < RATE_MIN ? "shown as a % from " + RATE_MIN + " evaluated tickets" : evaluated.length + " evaluated") : "none evaluated yet"],
+      [String(decisions), "Decisions recorded", "each with its reason and evidence"],
+      [duration(work), "AI working time", estimated.length ? "dev estimates on " + estimated.length + " of them: " + hours(estimated.reduce(function (a, t) { return a + t.estimate_hours; }, 0)) : "excludes developer review and QA"]
     ];
     kpis.forEach(function (k) {
       box.appendChild(el("div", { class: "kpi" }, [
@@ -432,19 +437,17 @@
   }
 
   function renderBars(list) {
-    var time = {}, cost = {}, waitTotal = 0;
+    var time = {}, elapsed = {}, total = 0;
     list.forEach(function (t) {
       t.stages.forEach(function (s) { time[s.stage] = (time[s.stage] || 0) + s.seconds; });
-      Object.keys(t.cost_by_stage).forEach(function (s) { cost[s] = (cost[s] || 0) + t.cost_by_stage[s]; });
-      waitTotal += t.waiting_seconds;
+      KINDS.forEach(function (k) { elapsed[k] = (elapsed[k] || 0) + (t.time[k] || 0); total += t.time[k] || 0; });
     });
     var timeRows = STAGES.filter(function (s) { return time[s]; }).map(function (s) { return { label: STAGE_LABEL[s], value: time[s], text: duration(time[s]), color: STAGE_COLOR[s] }; });
-    if (waitTotal) timeRows.push({ label: "Waiting", value: waitTotal, text: duration(waitTotal), wait: true });
-    var costRows = Object.keys(cost).sort(function (a, b) { return STAGES.indexOf(a) - STAGES.indexOf(b); })
-      .filter(function (s) { return cost[s] > 0; })
-      .map(function (s) { return { label: STAGE_LABEL[s] || s, value: cost[s], text: money(cost[s]), color: STAGE_COLOR[s] }; });
+    var elapsedRows = KINDS.filter(function (k) { return elapsed[k] >= 60; }).map(function (k) {
+      return { label: KIND_LABEL[k], value: elapsed[k], text: duration(elapsed[k]) + " · " + Math.round(100 * elapsed[k] / total) + "%", color: KIND_COLOR[k] };
+    });
     drawBars("bars-time", timeRows, "No stage time recorded yet");
-    drawBars("bars-cost", costRows, "No token usage recorded yet");
+    drawBars("bars-elapsed", elapsedRows, "No elapsed time recorded yet");
   }
   function drawBars(id, rows, emptyText) {
     var box = clear(document.getElementById(id));
@@ -463,7 +466,7 @@
     var body = clear(document.getElementById("rows"));
     document.getElementById("table-count").textContent = list.length + " of " + tickets.length + " tickets";
     if (!list.length) {
-      body.appendChild(el("tr", null, [el("td", { colspan: "11", class: "empty", text: "No tickets match these filters." })]));
+      body.appendChild(el("tr", null, [el("td", { colspan: "12", class: "empty", text: "No tickets match these filters." })]));
       return;
     }
     list.forEach(function (t) {
@@ -479,9 +482,10 @@
         el("td", null, [statusPill(t)]),
         el("td", { class: "num", text: t.evaluations.length + " / " + t.max_iterations }),
         el("td", null, [verdictPill(lastVerdict(t))]),
+        el("td", { class: "num", text: t.estimate || "—" }),
         el("td", { class: "num", text: duration(t.working_seconds) }),
-        el("td", { class: "num", text: duration(t.waiting_seconds) }),
-        el("td", { class: "num", text: money(t.cost_usd) }),
+        el("td", { class: "num", text: duration(peopleWait(t)) }),
+        el("td", { class: "num", text: duration(t.time.idle) }),
         el("td", { class: "small muted", text: ago(t.updated_at) })
       ]);
       body.appendChild(row);
@@ -546,6 +550,7 @@
       ["Epic", t.epic ? (t.epic.name ? t.epic.name + " (" + t.epic.key + ")" : t.epic.key) : "—"],
       ["Sprint", t.sprint ? t.sprint.name : "—"],
       ["Assignee", t.assignee || "—"],
+      ["Dev lead estimate", t.estimate ? t.estimate + " (Jira)" : "not recorded"],
       ["Started", when(t.created_at)],
       ["Branch", t.branch ? t.branch + (t.source_branch ? " from " + t.source_branch : "") : "—"],
       ["Repos changed", t.repos.filter(function (r) { return r.role === "change"; }).map(function (r) { return r.name; }).join(", ") || "not yet decided"]
@@ -564,17 +569,15 @@
 
     // lifecycle strip
     var life = el("div", { class: "block" }, [el("h3", { text: "How the time went" })]);
-    var segs = t.stages.filter(function (s) { return s.seconds >= 1; }).map(function (s) { return { start: s.start, seconds: s.seconds, color: STAGE_COLOR[s.stage] || "#8a8f99", label: (STAGE_LABEL[s.stage] || s.stage) + " " + duration(s.seconds) }; });
-    t.waits.forEach(function (w) { if (w.seconds >= 1) segs.push({ start: w.start, seconds: w.seconds, color: "var(--wait)", label: "Waiting on " + (WAIT_LABEL[w.audience] || w.audience || "people") + " " + duration(w.seconds) + (w.end ? "" : " so far") }); });
-    segs.sort(function (a, b) { return a.start < b.start ? -1 : 1; });
+    var segs = (t.time_segments || []).filter(function (s) { return s.seconds >= 1; });
     if (segs.length) {
-      var total = segs.reduce(function (a, s) { return a + s.seconds; }, 0);
-      life.appendChild(el("div", { class: "lifecycle", role: "img", "aria-label": segs.map(function (s) { return s.label; }).join(", ") },
-        segs.map(function (s) { return el("span", { title: s.label, style: "flex:" + (s.seconds / total).toFixed(4) + " 0 0;background:" + s.color + (s.color === "var(--wait)" ? ";opacity:.55" : "") }); })));
-      life.appendChild(el("div", { class: "legend" }, segs.map(function (s) {
-        return el("span", null, [el("i", { style: "background:" + s.color + (s.color === "var(--wait)" ? ";opacity:.55" : "") }), s.label]);
+      life.appendChild(el("div", { class: "lifecycle", role: "img", "aria-label": segs.map(function (s) { return KIND_LABEL[s.kind] + " " + duration(s.seconds); }).join(", ") },
+        segs.map(function (s) { return el("span", { title: KIND_LABEL[s.kind] + " " + duration(s.seconds) + " from " + when(s.start), style: "flex:" + (s.seconds / t.elapsed_seconds).toFixed(4) + " 0 0;background:" + KIND_COLOR[s.kind] }); })));
+      life.appendChild(el("div", { class: "legend" }, KINDS.filter(function (k) { return t.time[k] >= 1; }).map(function (k) {
+        return el("span", null, [el("i", { style: "background:" + KIND_COLOR[k] }), KIND_LABEL[k] + " " + duration(t.time[k])]);
       })));
-      life.appendChild(el("p", { class: "small muted", text: "Claude working " + duration(t.working_seconds) + " · waiting on people " + duration(t.waiting_seconds) + ". Proportions, not a calendar: gaps where nobody was working are left out." }));
+      life.appendChild(el("p", { class: "small muted", text: "The whole " + duration(t.elapsed_seconds) + " from start to " + (t.status === "DONE" ? "close" : "now") + ", left to right." +
+        (t.estimate_hours != null ? " Dev lead estimate in Jira: " + t.estimate + "; AI working time: " + duration(t.working_seconds) + " (developer review and QA not included)." : "") }));
     } else {
       life.appendChild(el("p", { class: "empty", text: "No stage time recorded yet." }));
     }
@@ -632,23 +635,6 @@
       }))
     ]) : el("p", { class: "empty", text: "No pull requests yet." }));
 
-    // cost
-    right.appendChild(el("h3", { text: "Tokens and cost by stage" }));
-    var stageKeys = Object.keys(t.tokens_by_stage || {});
-    right.appendChild(stageKeys.length ? el("table", { class: "mini" }, [
-      el("thead", null, [el("tr", null, [el("th", { text: "Stage" }), el("th", { class: "num", text: "Output" }), el("th", { class: "num", text: "Input + cache" }), el("th", { class: "num", text: "Cost" })])]),
-      el("tbody", null, stageKeys.map(function (s) {
-        var k = t.tokens_by_stage[s];
-        return el("tr", null, [
-          el("td", { text: STAGE_LABEL[s] || s }),
-          el("td", { class: "num", text: compact(k.output) }),
-          el("td", { class: "num", text: compact((k.input || 0) + (k.cache_read || 0) + (k.cache_creation || 0)) }),
-          el("td", { class: "num", text: money(t.cost_by_stage[s]) })
-        ]);
-      }))
-    ]) : el("p", { class: "empty", text: "No token usage recorded for this ticket." }));
-    if (t.unpriced_models && t.unpriced_models.length) right.appendChild(el("p", { class: "small muted", text: "No price for " + t.unpriced_models.join(", ") + "; priced at the default model." }));
-
     // files
     right.appendChild(el("h3", { text: "Record files" }));
     right.appendChild(el("div", { class: "files" }, t.files.map(function (f) { return el("span", { text: f }); })));
@@ -659,8 +645,9 @@
   function renderFooter() {
     var f = clear(document.getElementById("footer"));
     f.appendChild(el("p", { text: "Built " + (data.generated_at ? when(data.generated_at) : "at an unknown time") + " from the sis-brain repository. As current as the last publish; run /brain publish to refresh." }));
-    f.appendChild(el("p", { text: "Cost is API-equivalent: " + (data.price_note || "") + (data.price_as_of ? " Prices as of " + data.price_as_of + "." : "") }));
-    f.appendChild(el("p", { text: "Claude working time is measured from recorded stage start and end; tokens only count sessions the harness attributed to a ticket." }));
+    f.appendChild(el("p", { text: "AI working time is measured from each stage's recorded start and end. It does not include the developer's review or QA, so compare it with a Jira estimate only as a guide." }));
+    f.appendChild(el("p", { text: "Waiting on QA or an SME means questions sent as a Jira comment were open; waiting on the developer means a confirmation, an answer or a paused run; idle means nobody was working and no answer was awaited." }));
+    f.appendChild(el("p", { text: "The AI runs within the team's Claude subscription." }));
     if (data.unreadable && data.unreadable.length) f.appendChild(el("p", { text: "Unreadable ticket records: " + data.unreadable.join(", ") }));
   }
 

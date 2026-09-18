@@ -19,17 +19,17 @@ Every ticket starts the same way. The Jira ticket names a screen, such as "Admin
 
 It does this by searching and opening files, from scratch on every ticket.
 
-That search is expensive, because an AI session re-reads everything it has opened so far each time it takes a step. Every file opened while hunting for the starting point is paid for again through the rest of the planning. The record so far shows where the money goes (API-equivalent at list prices, from each ticket's `metrics.json`):
+That search is heavy, because an AI session re-reads everything it has opened so far each time it takes a step. Every file opened while hunting for the starting point is carried through the rest of the planning. The record so far shows where the AI's effort goes (tokens processed, from each ticket's `metrics.json`; the AI runs within the team's Claude subscription, so this is usage, not money):
 
-| Ticket | Understanding and design (planning) | Rest of the ticket | Planning share |
+| Ticket | Understanding and design (planning) | Rest of the ticket | Planning share of AI usage |
 |---|---|---|---|
-| GSIS-28778 | **$26.92**, 45 min, about 25 M tokens read | $9.89 | **73 %** |
+| GSIS-28778 | 25.5 M tokens, 45 min | 8.7 M tokens | **75 %** |
 
-Most of a ticket's cost goes on working out *where* and *what* before any code changes. That is the part the map targets.
+Most of a ticket's AI effort goes on working out *where* and *what* before any code changes. That is the part the map targets.
 
 The words also differ. The same screen is "Module" on GCET, "Course Master Catalogue" on base and GUtech, and `course` in the code. Without that link, the AI can plan confidently against the wrong screen or endpoint.
 
-## What it costs
+## What it takes to run
 
 - **Building the map costs no AI tokens.** It is a Node.js script reading git on the developer's machine, and takes about 5 seconds for both repositories.
 - It runs automatically each time `/work` plans a ticket, built from **the ticket's own branch**. A GCET ticket sees GCET's screens and endpoints: `gcet-sandbox-qa` has 114 endpoints and 16 tables that `base-development` does not.
@@ -38,10 +38,10 @@ The words also differ. The same screen is "Module" on GCET, "Course Master Catal
 
 ## The benefits
 
-1. **Lower cost and faster planning.**
+1. **Less effort and faster planning.**
    - The AI goes straight from the ticket's wording to the right files, instead of opening files to find them.
    - One grep chain replaces the search: screen → component → API service → controller → endpoint and its permission.
-   - Because every file opened is paid for again on each later step, cutting the search early saves more than the search itself.
+   - Because every file opened is carried through each later step, cutting the search early saves more than the search itself.
 2. **Fewer wrong turns, fewer rework rounds.**
    - The map gives exact endpoint paths and the link between customer labels and code.
    - Example: a plan written without the map cited `/api/v1/course`; the real path is `/api/v1/courses`.
@@ -55,11 +55,11 @@ The words also differ. The same screen is "Module" on GCET, "Course Master Catal
 
 ## How we will know
 
-The dashboard already records tokens, time and cost per stage for every ticket. For the next frontend or admin-backend tickets, compare against GSIS-28778 and GSIS-24201:
+The harness already records AI usage (tokens) and time per stage for every ticket. For the next frontend or admin-backend tickets, compare against GSIS-28778 and GSIS-24201:
 
 | Measure | Where it comes from | What success looks like |
 |---|---|---|
-| Planning cost and tokens per ticket | dashboard → cost by stage | clearly lower on comparable tickets |
+| Planning tokens per ticket | `/brain <ticket>` → tokens by stage | clearly lower on comparable tickets |
 | Planning time | dashboard → time by stage | shorter |
 | Evaluator blocking findings about wrong files, paths or screens | `evaluation-<n>.md` | fewer, ideally none |
 | Implementation stalled on build or test | implementation reports | reported within minutes, not hours |

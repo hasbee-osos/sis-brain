@@ -1,6 +1,6 @@
 # The brain
 
-This repository is written by the Claude Code engineering harness. It is the **record of every ticket the team's harness sessions have worked on** — what was done, what was decided, why, and what it cost.
+This repository is written by the Claude Code engineering harness. It is the **record of every ticket the team's harness sessions have worked on** — what was done, what was decided, why, and what it took.
 
 It is cloned into each developer's workspace as `sis-brain`, beside their product repo clones. Every session pulls it, records as it works, and pushes at each milestone, so it stays current for everyone.
 
@@ -13,7 +13,7 @@ It is cloned into each developer's workspace as `sis-brain`, beside their produc
 | Path | What it holds |
 |---|---|
 | `index.jsonl` | One line per ticket milestone — the quickest way to see recent work |
-| `tickets/<TICKET-ID>/` | One folder per ticket: `state.json` (where it stands and `next_action`), `journal.jsonl` (what happened, when), `decisions.md` (why), the per-iteration artifacts, and `metrics.json` (what it cost) |
+| `tickets/<TICKET-ID>/` | One folder per ticket: `state.json` (where it stands and `next_action`), `journal.jsonl` (what happened, when), `decisions.md` (why), the per-iteration artifacts, and `metrics.json` (tokens and time it used) |
 | `dashboard/` | The leadership dashboard: `build.js` turns this repository into one page, published on claude.ai with `/brain publish`. The page link is in `dashboard/artifact.json` |
 | `codebase/` | The codebase map: short notes per product repo and indexes rebuilt after every fetch (screen → route → component → API → controller, endpoints, tables). Harness agents start from it; see `codebase/README.md` |
 

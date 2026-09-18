@@ -4,7 +4,7 @@
  *
  *   node dashboard/build.js
  *
- * Reads only committed files (tickets/*, index.jsonl, dashboard/prices.json), so every
+ * Reads only committed files (tickets/*), so every
  * clone builds the same page. Writes dashboard/dist/index.html: template.html with the
  * data embedded. Node only, no dependencies.
  *
@@ -74,27 +74,101 @@ function stageRuns(events) {
   return runs;
 }
 
-/** Periods spent waiting on people for answers, from input_requested / input_received. */
+/**
+ * Periods spent waiting on people for answers, from input_requested / input_received.
+ * Several audiences can be waited on at once (a QA packet and a developer question);
+ * an input_received closes the waits for its audience, or all of them if it names none.
+ */
 function waits(events, state, now) {
   const periods = [];
-  let open = null;
+  const open = new Map();
   for (const e of events) {
-    if (e.event === "input_requested") open = { audience: e.audience || null, packet: e.packet || null, start: e.ts, end: null };
-    else if (e.event === "input_received" && open) {
-      open.end = e.ts;
-      periods.push(open);
-      open = null;
+    if (e.event === "input_requested") {
+      const key = e.audience || "unknown";
+      if (!open.has(key)) open.set(key, { audience: e.audience || null, packet: e.packet || null, start: e.ts, end: null });
+    } else if (e.event === "input_received") {
+      const keys = e.audience && open.has(e.audience) ? [e.audience] : [...open.keys()];
+      if (!keys.length) {
+        // Answer with no recorded request (records written before input_requested existed):
+        // the wait began when the previous stage ended.
+        const prev = events.filter((x) => x.event === "stage_end" && x.ts <= e.ts).pop();
+        if (prev) periods.push({ audience: e.audience || null, packet: e.packet || null, start: prev.ts, end: e.ts, inferred: true });
+      }
+      for (const k of keys) { const p = open.get(k); p.end = e.ts; periods.push(p); open.delete(k); }
+    } else if (e.event === "stage_start" && open.size) {
+      // Work resumed, so nothing asked earlier is still blocking, even if its answer was never recorded.
+      for (const [k, p] of open) { p.end = e.ts; periods.push(p); open.delete(k); }
     }
   }
   // Records written before input_requested existed: infer an open wait from state.
-  if (!open && state.status === "NEEDS_INPUT" && !periods.length) {
+  if (!open.size && state.status === "NEEDS_INPUT" && !periods.length) {
     const artifacts = state.artifacts || {};
     const audience = artifacts.sme_packet ? "sme" : artifacts.qa_packet ? "qa" : "developer";
     const lastEnd = [...events].reverse().find((e) => e.event === "stage_end");
-    open = { audience, packet: artifacts.sme_packet || artifacts.qa_packet || null, start: (lastEnd && lastEnd.ts) || state.updated_at, end: null, inferred: true };
+    open.set(audience, { audience, packet: artifacts.sme_packet || artifacts.qa_packet || null, start: (lastEnd && lastEnd.ts) || state.updated_at, end: null, inferred: true });
   }
-  if (open) periods.push(open);
-  return periods.map((p) => ({ ...p, seconds: seconds(p.start, p.end || now) }));
+  for (const p of open.values()) periods.push(p);
+  return periods.map((p) => ({ ...p, seconds: seconds(p.start, p.end || now) })).sort((a, b) => (a.start < b.start ? -1 : 1));
+}
+
+/**
+ * Splits a ticket's whole elapsed time, from start to close (or now), into what was
+ * happening: the AI working a stage, waiting on QA or an SME for packet answers, waiting
+ * on the developer (their questions, confirmations, or a run they paused), or idle
+ * (nobody working and no answer awaited). A gap that ends in a human confirmation counts
+ * as waiting on the developer; after the last event, the ticket's status decides.
+ */
+const TIME_KINDS = ["working", "qa", "sme", "developer", "idle"];
+
+function timeBreakdown(events, runs, waitPeriods, state, now) {
+  const closed = events.find((e) => e.event === "ticket_closed");
+  const startTs = state.created_at || (events[0] && events[0].ts);
+  const endTs = state.status === "DONE" ? (closed ? closed.ts : state.updated_at) : now;
+  const start = Date.parse(startTs);
+  const end = Date.parse(endTs);
+  const totals = Object.fromEntries(TIME_KINDS.map((k) => [k, 0]));
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return { totals, segments: [], elapsed: 0 };
+
+  const span = (a, b) => [Date.parse(a), b ? Date.parse(b) : end];
+  const work = runs.filter((r) => r.end).map((r) => span(r.start, r.end));
+  const waitsBy = (aud) => waitPeriods.filter((w) => aud.includes(w.audience)).map((w) => span(w.start, w.end));
+  const qa = waitsBy(["qa"]), sme = waitsBy(["sme"]), dev = waitsBy(["developer", null, "unknown"]);
+  const inside = (list, t) => list.some(([a, b]) => t > a && t < b);
+  const confirmAt = new Set(events.filter((e) => e.event === "human_confirmed").map((e) => Date.parse(e.ts)));
+  const lastEvent = events.length ? Date.parse(events[events.length - 1].ts) : start;
+  const tailKind = ["AWAITING_REPO_CONFIRMATION", "NEEDS_INPUT", "ESCALATED"].includes(state.status) || /^PR_STAGE_/.test(state.status || "") ? "developer" : "idle";
+
+  const cuts = new Set([start, end]);
+  for (const e of events) { const t = Date.parse(e.ts); if (t > start && t < end) cuts.add(t); }
+  for (const [a, b] of [...work, ...qa, ...sme, ...dev]) for (const t of [a, b]) if (t > start && t < end) cuts.add(t);
+  const points = [...cuts].sort((a, b) => a - b);
+
+  const segments = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i], b = points[i + 1], mid = (a + b) / 2;
+    let kind;
+    if (inside(work, mid)) kind = "working";
+    else if (inside(qa, mid)) kind = "qa";
+    else if (inside(sme, mid)) kind = "sme";
+    else if (inside(dev, mid)) kind = "developer";
+    else if (a >= lastEvent) kind = tailKind;
+    else kind = confirmAt.has(b) ? "developer" : "idle";
+    const secs = (b - a) / 1000;
+    totals[kind] += secs;
+    const last = segments[segments.length - 1];
+    if (last && last.kind === kind) last.seconds += secs;
+    else segments.push({ kind, start: new Date(a).toISOString(), seconds: secs });
+  }
+  return { totals, segments, elapsed: (end - start) / 1000 };
+}
+
+/** Dev lead estimate as written in Jira ("3h", "1d 4h", "2w"), in working hours (1d = 8h, 1w = 5d). */
+function estimateHours(text) {
+  if (!text || typeof text !== "string") return null;
+  const unit = { w: 40, d: 8, h: 1, m: 1 / 60 };
+  let hours = 0, found = false;
+  for (const m of text.matchAll(/(\d+(?:\.\d+)?)\s*([wdhm])/gi)) { hours += Number(m[1]) * unit[m[2].toLowerCase()]; found = true; }
+  return found ? hours : null;
 }
 
 // ---------------------------------------------------------------- decisions
@@ -129,46 +203,6 @@ function parseDecisions(file) {
     .filter(Boolean);
 }
 
-// --------------------------------------------------------------------- cost
-
-function priceTokens(tokens, price) {
-  if (!tokens || !price) return 0;
-  // thinking is already inside output; never add it.
-  return (
-    ((tokens.input || 0) * price.input +
-      (tokens.output || 0) * price.output +
-      (tokens.cache_read || 0) * price.cache_read +
-      (tokens.cache_creation || 0) * price.cache_write) /
-    1e6
-  );
-}
-
-function costs(metrics, prices) {
-  const fallback = prices.models[prices.default_model];
-  const byModel = metrics.tokens_by_model || {};
-  const models = Object.keys(byModel);
-  let total = 0;
-  const unpriced = [];
-  if (models.length) {
-    for (const model of models) {
-      const price = prices.models[model];
-      if (!price) unpriced.push(model);
-      total += priceTokens(byModel[model], price || fallback);
-    }
-  } else {
-    total = priceTokens(metrics.tokens, fallback);
-  }
-  // Stages are priced at the ticket's blended rate per token, so they add up to the total.
-  const allTokens = metrics.tokens || {};
-  const fallbackTotal = priceTokens(allTokens, fallback);
-  const ratio = fallbackTotal > 0 ? total / fallbackTotal : 1;
-  const byStage = {};
-  for (const [stage, tokens] of Object.entries(metrics.tokens_by_stage || {})) {
-    byStage[stage] = priceTokens(tokens, fallback) * ratio;
-  }
-  return { total, byStage, unpriced };
-}
-
 // ------------------------------------------------------------------- ticket
 
 function phaseOf(status) {
@@ -185,7 +219,7 @@ function waitingOn(status, openWait) {
   return null;
 }
 
-function buildTicket(dir, prices, now) {
+function buildTicket(dir, now) {
   const id = path.basename(dir);
   const state = readJson(path.join(dir, "state.json"), null);
   if (!state) return { id, broken: true };
@@ -196,8 +230,10 @@ function buildTicket(dir, prices, now) {
   const runs = stageRuns(events);
   const waitPeriods = waits(events, state, now);
   const openWait = waitPeriods.find((w) => !w.end) || null;
-  const cost = costs(metrics, prices);
   const evaluations = events.filter((e) => e.event === "evaluation");
+  const time = timeBreakdown(events, runs, waitPeriods, state, now);
+  const changed = Object.values(state.repos || {}).filter((r) => r && r.role === "change").length;
+  const lastStageEnd = [...events].reverse().find((e) => e.event === "stage_end");
 
   let files = [];
   try {
@@ -221,7 +257,9 @@ function buildTicket(dir, prices, now) {
     next_action: state.next_action || null,
     blocked_on: state.blocked_on || null,
     waiting_on: waitingOn(state.status, openWait),
-    waiting_since: openWait ? openWait.start : null,
+    waiting_since: openWait ? openWait.start : state.status === "AWAITING_REPO_CONFIRMATION" && lastStageEnd ? lastStageEnd.ts : null,
+    estimate: jira.estimate || null,
+    estimate_hours: estimateHours(jira.estimate),
     created_at: state.created_at || (events[0] && events[0].ts) || null,
     updated_at: state.updated_at || (events.length ? events[events.length - 1].ts : null),
     iteration: state.iteration ?? 0,
@@ -246,9 +284,10 @@ function buildTicket(dir, prices, now) {
     tokens_by_stage: metrics.tokens_by_stage || {},
     turns: metrics.turns || 0,
     sessions: Object.keys(metrics.sessions || {}).length || (state.sessions || []).length,
-    cost_usd: cost.total,
-    cost_by_stage: cost.byStage,
-    unpriced_models: cost.unpriced,
+    time: time.totals,
+    time_segments: time.segments,
+    elapsed_seconds: time.elapsed,
+    resolved_without_code: state.status === "DONE" && changed === 0 && !(state.prs || []).length,
     has_metrics: Boolean(metrics.tokens),
   };
 }
@@ -256,10 +295,6 @@ function buildTicket(dir, prices, now) {
 // --------------------------------------------------------------------- main
 
 function main() {
-  const prices = readJson(path.join(__dirname, "prices.json"), null);
-  if (!prices || !prices.models || !prices.models[prices.default_model]) {
-    throw new Error("dashboard/prices.json is missing or has no price for its default_model");
-  }
   const template = fs.readFileSync(path.join(__dirname, "template.html"), "utf8");
   const marker = "__BRAIN_DATA__";
   if (!template.includes(marker)) throw new Error("template.html has no " + marker + " placeholder");
@@ -271,14 +306,12 @@ function main() {
   } catch {
     /* no tickets yet */
   }
-  const tickets = dirs.map((d) => buildTicket(d, prices, now));
+  const tickets = dirs.map((d) => buildTicket(d, now));
   const broken = tickets.filter((t) => t.broken).map((t) => t.id);
   const good = tickets.filter((t) => !t.broken).sort((a, b) => ((a.updated_at || "") < (b.updated_at || "") ? 1 : -1));
 
   const data = {
     generated_at: now,
-    price_note: prices.note,
-    price_as_of: prices.as_of,
     tickets: good,
     unreadable: broken,
   };
@@ -288,12 +321,12 @@ function main() {
   const out = path.join(OUT_DIR, "index.html");
   fs.writeFileSync(out, template.replace(marker, () => json));
 
-  const cost = good.reduce((a, t) => a + t.cost_usd, 0);
+  const hours = good.reduce((a, t) => a + t.working_seconds, 0) / 3600;
   console.log(out);
   console.log(
     `${good.length} ticket(s)` +
       (broken.length ? `, ${broken.length} unreadable (${broken.join(", ")})` : "") +
-      `, API-equivalent cost $${cost.toFixed(2)}`
+      `, ${hours.toFixed(1)} h of AI working time`
   );
 }
 
