@@ -2,6 +2,8 @@
 
 A shortcut into the product code for harness sessions, so each ticket does not start by rediscovering the same screens, endpoints and tables. **The map is a hint, not evidence.** Use it to find the right files quickly, then read and cite the code itself.
 
+Why it exists and what it should save, in plain terms for leadership: [`BENEFITS.md`](BENEFITS.md).
+
 It is being piloted on `sis-product-sis-frontend` and `sis-product-sis-admin-backend`. Other repos are added to `repos.json` once the pilot shows it helps.
 
 ## What is in here
