@@ -309,7 +309,7 @@ function buildTicket(dir, now) {
     created_at: state.created_at || (events[0] && events[0].ts) || null,
     updated_at: state.updated_at || (events.length ? events[events.length - 1].ts : null),
     iteration: state.iteration ?? 0,
-    max_iterations: state.max_iterations ?? (state.track === "light" ? 2 : 3),
+    max_iterations: state.max_iterations ?? (state.track === "light" ? 1 : 2), // evaluation rounds (harness 0.6+)
     flow: state.flow || null,
     source_branch: state.source_branch || null,
     branch: state.branch || null,
