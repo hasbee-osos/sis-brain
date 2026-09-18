@@ -34,7 +34,7 @@ The words also differ. The same screen is called "Module" on GCET, "Course Maste
 It lives in the brain repository, `sis-brain/codebase/`, and has two parts.
 
 1. **Generated indexes**, rebuilt automatically by a script:
-   - **Screens:** menu label (per customer line) → page → component.
+   - **Screens:** menu label (per customer line) → page → component → the API services it calls.
    - **API:** frontend service → backend controller.
    - **Endpoints:** every endpoint, with the permission it requires.
    - **Tables, routes and components.**

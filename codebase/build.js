@@ -257,6 +257,31 @@ function buildAngular(r, stamp) {
   }
   apiRows.sort((a, b) => a[0].localeCompare(b[0]));
 
+  // Component → the API services it injects (gap between screens and api.md). The service the
+  // component hands to super(...) is its primary one, marked *. Services it inherits or that
+  // embedded child components use are not listed; follow the child's tag in the components index.
+  const contextOf = new Map(apiRows.map(([ctx, cls]) => [cls, ctx]));
+  const servicesOf = new Map();
+  for (const [, cls, file] of components) {
+    const text = contents.get(file) || "";
+    const at = text.search(new RegExp(`class\\s+${cls}\\b`));
+    const ctor = at < 0 ? -1 : text.indexOf("constructor(", at);
+    if (ctor < 0) { servicesOf.set(cls, ""); continue; }
+    const open = ctor + "constructor".length;
+    const params = text.slice(open + 1, matchBracket(text, open));
+    const typeOf = new Map();
+    for (const m of params.matchAll(/(\w+)\s*\??\s*:\s*([A-Z]\w*)/g)) typeOf.set(m[1], m[2]);
+    const body = text.slice(matchBracket(text, open), matchBracket(text, text.indexOf("{", matchBracket(text, open))) + 1);
+    const sup = body.match(/super\(\s*(?:this\.)?(\w+)/);
+    const primary = sup ? typeOf.get(sup[1]) : null;
+    const list = [...new Set(typeOf.values())].filter((t) => contextOf.has(t))
+      .sort((a, b) => (b === primary) - (a === primary) || a.localeCompare(b))
+      .map((t) => `${t}${t === primary ? "*" : ""} (/${contextOf.get(t)})`);
+    servicesOf.set(cls, list.join(", "));
+  }
+  for (const c of components) c.push(servicesOf.get(c[1]) || null);
+  for (const rrow of routeRows) rrow.push(servicesOf.get(rrow[1]) || null);
+
   components.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
   return { routeRows, apiRows, components };
 }
@@ -425,8 +450,8 @@ function main() {
     if (r.kind === "angular") {
       const a = buildAngular(r, stamp);
       results[r.repo] = { kind: "angular", ...a };
-      const n1 = writeIndex(`${r.repo}.routes.md`, `${r.repo} - routes`, "Full URL path (after the `#`) → routed component. Menu labels for these paths are in the backend's `menus` index.", ["Route", "Component", "File"], a.routeRows, stamp);
-      const n2 = writeIndex(`${r.repo}.components.md`, `${r.repo} - components`, "Template tag → component class → file. Use it to find what a `<sis-…>` tag in a template is.", ["Selector", "Class", "File"], a.components, stamp);
+      const n1 = writeIndex(`${r.repo}.routes.md`, `${r.repo} - routes`, "Full URL path (after the `#`) → routed component → the API services it injects. Menu labels for these paths are in the backend's `menus` index.", ["Route", "Component", "File", "API services"], a.routeRows, stamp);
+      const n2 = writeIndex(`${r.repo}.components.md`, `${r.repo} - components`, "Template tag → component class → file → the API services it injects (primary one marked *, with its context path; `api.md` gives the controller). Use it to find what a `<sis-…>` tag in a template is and what it calls.", ["Selector", "Class", "File", "API services"], a.components, stamp);
       summary.push(`${r.repo} @ ${sha}: ${n1} routes, ${n2} components (${Date.now() - t0} ms)`);
     } else if (r.kind === "spring") {
       const s = buildSpring(r);
@@ -449,10 +474,10 @@ function main() {
     const apis = [];
     const controllers = spring.flatMap(([repo, v]) => v.controllers.map((c) => ({ repo, base: c[0], cls: c[1], file: c[2] })));
     for (const [repo, v] of angular) {
-      for (const [route, comp, file] of v.routeRows) {
+      for (const [route, comp, file, services] of v.routeRows) {
         const top = route.replace(/\/:[^/]+.*$/, "");
         const menu = menuByRoute.get(route) || menuByRoute.get(top);
-        screens.push([menu ? menu.label : null, route, comp, `${repo}/${file || "?"}`]);
+        screens.push([menu ? menu.label : null, route, comp, `${repo}/${file || "?"}`, services]);
       }
       for (const [ctx, cls, file] of v.apiRows) {
         const want = "/api/v1/" + ctx.replace(/^\//, "");
@@ -461,7 +486,7 @@ function main() {
       }
     }
     const stampAll = Object.entries(stamps).map(([repo, s]) => `\`${repo}\` at \`${s.ref}\` = \`${s.commit}\``).join(", ");
-    const n1 = writeIndex("screens.md", "Screens", "Start here when a ticket names a screen: menu label → route → routed component. Customer lines may label a screen differently - e.g. `Module (gcet)` - so search for the ticket's own word. A label is shown only where a menu row links that route (or its parent); screens reached only by buttons have none.", ["Menu label", "Route", "Component", "File"], screens, stampAll);
+    const n1 = writeIndex("screens.md", "Screens", "Start here when a ticket names a screen: menu label → route → routed component → the API services it injects (primary marked *, with its context path; grep `api.md` for the controller). Services used only by embedded child components are not listed: look up the child's `<sis-…>` tag in the components index. Customer lines may label a screen differently - e.g. `Module (gcet)` - so search for the ticket's own word. A label is shown only where a menu row links that route (or its parent); screens reached only by buttons have none.", ["Menu label", "Route", "Component", "File", "API services"], screens, stampAll);
     const n2 = writeIndex("api.md", "Frontend API services → backend controllers", "Frontend service `getContextPath()` → the backend controller whose base path is `/api/v1/<contextPath>`. A service with no match calls another service or builds its URL differently.", ["Context path", "Frontend service", "Frontend file", "Backend controller"], apis, stampAll);
     summary.push(`joins: ${n1} screens, ${n2} API services`);
   }

@@ -19,10 +19,10 @@ Generated indexes:
 
 | File | Answers |
 |---|---|
-| `screens.md` | Ticket names a screen → route → routed component. Labels per customer line (GCET calls the Course master "Module") |
+| `screens.md` | Ticket names a screen → route → routed component → the API services it injects (primary marked `*`). Labels per customer line (GCET calls the Course master "Module") |
 | `api.md` | Frontend API service → backend controller |
 | `sis-product-sis-frontend.routes.md` | Every route → component → file |
-| `sis-product-sis-frontend.components.md` | Template tag (`<sis-…>`) → component → file |
+| `sis-product-sis-frontend.components.md` | Template tag (`<sis-…>`) → component → file → the API services it injects |
 | `sis-product-sis-admin-backend.endpoints.md` | Verb + path → controller method, file:line, `@PreAuthorizeGrant` |
 | `sis-product-sis-admin-backend.tables.md` | Table → JPA entity → file |
 | `sis-product-sis-admin-backend.menus.md` | Menu label → translation key → route, and where the menu row is defined |
