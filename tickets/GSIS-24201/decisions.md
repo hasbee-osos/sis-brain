@@ -7,6 +7,15 @@
 - **Evidence:** GSIS-24201 description ("Administration → Master → Module → Co-Requisite section"); no customer-specific field/module referenced
 - **Status:** LOCKED
 
+### D-2 — Repos to change and track: `sis-product-sis-frontend` only, light track
+- **Stage:** plan (repo/track confirmation), iteration 1
+- **Decided by:** planner · confirmed by human 2026-09-18T15:20:00Z
+- **Options considered:** frontend-only fix (chosen) vs. also changing `sis-product-sis-admin-backend` to add a server-side guard on `coReqCoursesSMIds` (rejected for this ticket, recorded as Finding F-1 for a separate hardening ticket)
+- **Why:** the entire defect is in `sis-product-sis-frontend`; the backend already receives no invalid payload today and needs no change to fix this bug. 1 repo changes, no cross-repo contract change, no new entity/table/workflow, nothing touching auth or existing rows — meets every light-track criterion in `harness-core` → Tracks.
+- **Convention cited:** `harness-core` → Tracks (light-track criteria)
+- **Evidence:** `plan.md` → Repositories, → Backend: defense in depth
+- **Status:** LOCKED
+
 ### D-3 — Root cause: Module-page save gate never validates the co-requisite rows
 - **Stage:** plan, iteration 1
 - **Decided by:** planner
