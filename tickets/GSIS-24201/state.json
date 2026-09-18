@@ -10,11 +10,11 @@
     "assignee": "Ashoka Jayasekara",
     "refreshed_at": "2026-09-18T14:20:00Z"
   },
-  "status": "EVALUATING",
-  "next_action": "Dispatch the Evaluator for iteration 1",
+  "status": "PR_STAGE_1",
+  "next_action": "Raise the stage-1 PR for sis-product-sis-frontend to base-sandbox-qa",
   "blocked_on": null,
   "created_at": "2026-09-18T14:20:00Z",
-  "updated_at": "2026-09-18T15:50:00Z",
+  "updated_at": "2026-09-19T09:05:00Z",
   "iteration": 1,
   "max_iterations": 2,
   "track": "light",
@@ -24,7 +24,7 @@
   "source_branch": "base-development",
   "branch": "base/bugfix/GSIS-24201-corequisite-required-validation",
   "repos": {
-    "sis-product-sis-frontend": { "role": "change", "branch_created": true }
+    "sis-product-sis-frontend": { "role": "change", "branch_created": true, "evaluated_head": "22285220abcf7ce9ff93b234e89278fdfb547a4d" }
   },
   "context_repos": ["sis-product-sis-admin-backend"],
   "pr_targets": [
@@ -40,9 +40,9 @@
     { "what": "repos_to_change", "at": "2026-09-18T15:20:00Z", "value": ["sis-product-sis-frontend"] },
     { "what": "track", "at": "2026-09-18T15:20:00Z", "value": "light" }
   ],
-  "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5", "D-6"],
-  "artifacts": { "plan": "plan.md", "implementation": "implementation-report-1.md" },
+  "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5", "D-6", "D-7"],
+  "artifacts": { "plan": "plan.md", "implementation": "implementation-report-1.md", "evaluation": "evaluation-1.md" },
   "plan": "READY",
   "implementation": "COMPLETE",
-  "evaluation": null
+  "evaluation": "PASS"
 }

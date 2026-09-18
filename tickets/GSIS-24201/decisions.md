@@ -51,3 +51,12 @@
 - **Convention cited:** `sis-product-sis-frontend/.../review-program-sponsor.component.spec.ts` harness-test pattern
 - **Evidence:** n/a — forward-looking test plan, see `plan.md` → Tests
 - **Status:** LOCKED
+
+### D-7 — Evaluator verdict: PASS (iteration 1)
+- **Stage:** evaluate, iteration 1
+- **Decided by:** evaluator
+- **Options considered:** PASS vs INSUFFICIENT_EVIDENCE (given 4 of 5 manual browser steps unrun)
+- **Why:** the reported defect is a client-side save-gate code path; the evaluator independently reproduced a fail-before/pass-after regression test at that exact gate, verified 10/10 targeted unit tests, a clean build, zero new lint issues, and confirmed by grep that no other host of the shared component is affected. This is executed evidence the root cause is removed. The unrun manual steps verify presentation/cross-screen non-regression, not the fix's mechanism — recorded as a required pre-merge human check (NB-1) and non-blocking, not a confidence gap in the fix.
+- **Convention cited:** `harness-core` — bug standard: "is the bug fixed, with evidence and no regression"
+- **Evidence:** `evaluation-1.md` — E-1 through E-8
+- **Status:** LOCKED
