@@ -20,7 +20,7 @@ const TICKETS = path.join(BRAIN, "tickets");
 const OUT_DIR = path.join(__dirname, "dist");
 
 const RECORD_FILES = new Set(["state.json", "journal.jsonl", "metrics.json"]);
-const WORKING_STATUSES = new Set(["ANALYZING", "DESIGNING", "IMPLEMENTING", "EVALUATING"]);
+const WORKING_STATUSES = new Set(["PLANNING", "IMPLEMENTING", "EVALUATING", "ANALYZING", "DESIGNING"]); // ANALYZING and DESIGNING: tickets recorded before v0.4
 
 function readJson(file, fallback) {
   try {
@@ -215,6 +215,7 @@ function buildTicket(dir, prices, now) {
     sprint: jira.sprint || null,
     assignee: jira.assignee || null,
     work_type: state.work_type || null,
+    track: state.track || null,
     status: state.status || "UNKNOWN",
     phase: phaseOf(state.status),
     next_action: state.next_action || null,
@@ -224,7 +225,7 @@ function buildTicket(dir, prices, now) {
     created_at: state.created_at || (events[0] && events[0].ts) || null,
     updated_at: state.updated_at || (events.length ? events[events.length - 1].ts : null),
     iteration: state.iteration ?? 0,
-    max_iterations: state.max_iterations ?? 3,
+    max_iterations: state.max_iterations ?? (state.track === "light" ? 2 : 3),
     flow: state.flow || null,
     source_branch: state.source_branch || null,
     branch: state.branch || null,

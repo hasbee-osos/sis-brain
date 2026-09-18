@@ -257,11 +257,11 @@
   var tickets = data.tickets || [];
   var now = data.generated_at ? Date.parse(data.generated_at) : Date.now();
 
-  var STAGES = ["analyze", "design", "implement", "evaluate", "pr", "publish"];
-  var STAGE_LABEL = { analyze: "Analyze", design: "Design", implement: "Implement", evaluate: "Evaluate", pr: "Pull requests", publish: "Publish" };
-  var STAGE_COLOR = { analyze: "#5b7be0", design: "#3fa3a0", implement: "#d08a2e", evaluate: "#b95796", pr: "#6f8f3a", publish: "#8a8f99" };
+  var STAGES = ["analyze", "design", "plan", "implement", "evaluate", "pr", "publish"];
+  var STAGE_LABEL = { analyze: "Analyze", design: "Design", plan: "Plan", implement: "Implement", evaluate: "Evaluate", pr: "Pull requests", publish: "Publish" };
+  var STAGE_COLOR = { analyze: "#5b7be0", design: "#3fa3a0", plan: "#4a90b8", implement: "#d08a2e", evaluate: "#b95796", pr: "#6f8f3a", publish: "#8a8f99" };
   var STATUS_LABEL = {
-    ANALYZING: "Analyzing", DESIGNING: "Designing", AWAITING_REPO_CONFIRMATION: "Awaiting repo confirmation",
+    PLANNING: "Planning", ANALYZING: "Analyzing", DESIGNING: "Designing", AWAITING_REPO_CONFIRMATION: "Awaiting repo confirmation",
     IMPLEMENTING: "Implementing", EVALUATING: "Evaluating", PR_STAGE_1: "PRs · stage 1", PR_STAGE_2: "PRs · stage 2",
     DONE: "Done", NEEDS_INPUT: "Needs input", ESCALATED: "Escalated"
   };
@@ -537,6 +537,7 @@
       el("div", { class: "meta", style: "display:flex;flex-wrap:wrap;gap:6px" }, [
         statusPill(t),
         workType(t) ? el("span", { class: "pill plain", text: workType(t) === "bug" ? "Bug" : "Feature" }) : null,
+        t.track ? el("span", { class: "pill plain", text: t.track === "light" ? "Light track" : "Full track" }) : null,
         verdictPill(lastVerdict(t))
       ])
     ]));
