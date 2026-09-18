@@ -1,0 +1,76 @@
+{
+  "ticket": "GSIS-24201",
+  "updated_at": "2026-09-18T17:48:09.233Z",
+  "sessions": {
+    "1a9e8080-ece3-498c-97a6-6aef03851d91": {
+      "turns": 62,
+      "tokens_by_stage": {
+        "plan": {
+          "input": 46,
+          "output": 12134,
+          "cache_read": 3074752,
+          "cache_creation": 27246,
+          "thinking": 1970
+        },
+        "implement": {
+          "input": 76,
+          "output": 20484,
+          "cache_read": 7582013,
+          "cache_creation": 82880,
+          "thinking": 7537
+        }
+      },
+      "tokens_by_model": {
+        "claude-sonnet-5": {
+          "input": 122,
+          "output": 32618,
+          "cache_read": 10656765,
+          "cache_creation": 110126,
+          "thinking": 9507
+        }
+      }
+    }
+  },
+  "tokens": {
+    "input": 122,
+    "output": 32618,
+    "cache_read": 10656765,
+    "cache_creation": 110126,
+    "thinking": 9507
+  },
+  "tokens_by_stage": {
+    "plan": {
+      "input": 46,
+      "output": 12134,
+      "cache_read": 3074752,
+      "cache_creation": 27246,
+      "thinking": 1970
+    },
+    "implement": {
+      "input": 76,
+      "output": 20484,
+      "cache_read": 7582013,
+      "cache_creation": 82880,
+      "thinking": 7537
+    }
+  },
+  "tokens_by_model": {
+    "claude-sonnet-5": {
+      "input": 122,
+      "output": 32618,
+      "cache_read": 10656765,
+      "cache_creation": 110126,
+      "thinking": 9507
+    }
+  },
+  "turns": 62,
+  "stage_seconds": {
+    "plan": 900
+  },
+  "iterations": 0,
+  "verdicts": {},
+  "findings": {
+    "blocking": 0,
+    "non_blocking": 0
+  }
+}
