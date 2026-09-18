@@ -15,6 +15,7 @@ It is cloned into each developer's workspace as `sis-brain`, beside their produc
 | `index.jsonl` | One line per ticket milestone — the quickest way to see recent work |
 | `tickets/<TICKET-ID>/` | One folder per ticket: `state.json` (where it stands and `next_action`), `journal.jsonl` (what happened, when), `decisions.md` (why), the per-iteration artifacts, and `metrics.json` (what it cost) |
 | `dashboard/` | The leadership dashboard: `build.js` turns this repository into one page, published on claude.ai with `/brain publish`. The page link is in `dashboard/artifact.json` |
+| `codebase/` | The codebase map: short notes per product repo and indexes rebuilt after every fetch (screen → route → component → API → controller, endpoints, tables). Harness agents start from it; see `codebase/README.md` |
 
 ## How to use it
 

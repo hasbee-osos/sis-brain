@@ -1,0 +1,19 @@
+{
+  "repos": [
+    {
+      "repo": "sis-product-sis-frontend",
+      "kind": "angular",
+      "ref": "origin/base-development"
+    },
+    {
+      "repo": "sis-product-sis-admin-backend",
+      "kind": "spring",
+      "ref": "origin/base-development",
+      "label_refs": {
+        "base": "origin/base-development",
+        "gcet": "origin/gcet-sandbox-qa",
+        "gutech": "origin/gutech-sandbox-qa"
+      }
+    }
+  ]
+}
