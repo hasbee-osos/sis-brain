@@ -1,0 +1,39 @@
+{
+  "schema_version": 3,
+  "ticket": "GSIS-24201",
+  "jira": {
+    "url": "https://gearsjira.atlassian.net/browse/GSIS-24201",
+    "title": "Empty Co-Requisite Record Can Be Saved Without Module Selection",
+    "issue_type": "Bug",
+    "epic": { "key": "GSIS-3301", "name": "Student Review" },
+    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "assignee": "Ashoka Jayasekara",
+    "refreshed_at": "2026-09-18T14:20:00Z"
+  },
+  "status": "PLANNING",
+  "next_action": "Confirm work type, flow and branch with the human, then dispatch the Planner",
+  "blocked_on": null,
+  "created_at": "2026-09-18T14:20:00Z",
+  "updated_at": "2026-09-18T14:20:00Z",
+  "iteration": 0,
+  "max_iterations": null,
+  "track": null,
+  "workspace": "E:/Projects",
+  "work_type": "bug",
+  "flow": null,
+  "source_branch": null,
+  "branch": null,
+  "repos": {},
+  "context_repos": [],
+  "pr_targets": [],
+  "prs": [],
+  "sessions": [
+    { "session_id": "1a9e8080-ece3-498c-97a6-6aef03851d91", "started_at": "2026-09-18T14:20:00Z", "ended_at": null }
+  ],
+  "human_confirmations": [],
+  "decisions": [],
+  "artifacts": {},
+  "plan": null,
+  "implementation": null,
+  "evaluation": null
+}
