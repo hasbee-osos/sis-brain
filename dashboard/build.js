@@ -109,7 +109,7 @@ function parseDecisions(file) {
   const blocks = text.split(/^### /m).slice(1);
   return blocks
     .map((block) => {
-      const [heading, ...rest] = block.split("\n");
+      const [heading, ...rest] = block.split(/\r?\n/); // records written on Windows may have CRLF endings
       const m = heading.match(/^(D-\d+)\s*[—–-]+\s*(.+)$/);
       if (!m) return null;
       const field = (name) => {
