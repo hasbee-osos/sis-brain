@@ -4,9 +4,10 @@
  *
  *   node dashboard/build.js
  *
- * Reads only committed files (tickets/*), so every
+ * Reads only committed files (tickets/*, dashboard/prices.json), so every
  * clone builds the same page. Writes dashboard/dist/index.html: template.html with the
- * data embedded. Node only, no dependencies.
+ * data embedded, and dashboard/dist/costs.json (API-equivalent cost, never shown on the
+ * page). Node only, no dependencies.
  *
  * The files it reads are specified in the harness's skills/brain/SKILL.md.
  */
@@ -203,6 +204,51 @@ function parseDecisions(file) {
     .filter(Boolean);
 }
 
+// --------------------------------------------------------------------- cost
+//
+// API-equivalent cost: what the recorded tokens would cost at list API prices
+// (dashboard/prices.json). The team runs on a Claude subscription, so this is never
+// shown on the page, where leadership would read it as a bill. It is written to
+// dashboard/dist/costs.json and printed in the build summary for the harness maintainers.
+
+function priceTokens(tokens, price) {
+  if (!tokens || !price) return 0;
+  // thinking is already inside output; never add it.
+  return (
+    ((tokens.input || 0) * price.input +
+      (tokens.output || 0) * price.output +
+      (tokens.cache_read || 0) * price.cache_read +
+      (tokens.cache_creation || 0) * price.cache_write) /
+    1e6
+  );
+}
+
+function costs(metrics, prices) {
+  const fallback = prices.models[prices.default_model];
+  const byModel = metrics.tokens_by_model || {};
+  const models = Object.keys(byModel);
+  let total = 0;
+  const unpriced = [];
+  if (models.length) {
+    for (const model of models) {
+      const price = prices.models[model];
+      if (!price) unpriced.push(model);
+      total += priceTokens(byModel[model], price || fallback);
+    }
+  } else {
+    total = priceTokens(metrics.tokens, fallback);
+  }
+  // Stages are priced at the ticket's blended rate per token, so they add up to the total.
+  const allTokens = metrics.tokens || {};
+  const fallbackTotal = priceTokens(allTokens, fallback);
+  const ratio = fallbackTotal > 0 ? total / fallbackTotal : 1;
+  const byStage = {};
+  for (const [stage, tokens] of Object.entries(metrics.tokens_by_stage || {})) {
+    byStage[stage] = priceTokens(tokens, fallback) * ratio;
+  }
+  return { total, byStage, unpriced };
+}
+
 // ------------------------------------------------------------------- ticket
 
 function phaseOf(status) {
@@ -292,6 +338,27 @@ function buildTicket(dir, now) {
   };
 }
 
+/** Writes dashboard/dist/costs.json from each ticket's committed metrics.json; skipped without prices.json. */
+function writeCosts(tickets, now) {
+  const prices = readJson(path.join(__dirname, "prices.json"), null);
+  if (!prices || !prices.models || !prices.models[prices.default_model]) return null;
+  const rows = tickets.map((t) => {
+    const c = costs(readJson(path.join(TICKETS, t.id, "metrics.json"), {}), prices);
+    return { ticket: t.id, usd: round(c.total), by_stage_usd: Object.fromEntries(Object.entries(c.byStage).map(([k, v]) => [k, round(v)])), unpriced_models: c.unpriced };
+  });
+  const report = {
+    generated_at: now,
+    note: "API-equivalent: what the recorded tokens would cost at list API prices. The team uses a Claude subscription, so this is not a bill, and it is never shown on the dashboard page.",
+    prices_as_of: prices.as_of,
+    total_usd: round(rows.reduce((a, r) => a + r.usd, 0)),
+    tickets: rows,
+  };
+  fs.writeFileSync(path.join(OUT_DIR, "costs.json"), JSON.stringify(report, null, 2) + "\n");
+  return report;
+}
+
+const round = (v) => Math.round(v * 100) / 100;
+
 // --------------------------------------------------------------------- main
 
 function main() {
@@ -322,11 +389,13 @@ function main() {
   fs.writeFileSync(out, template.replace(marker, () => json));
 
   const hours = good.reduce((a, t) => a + t.working_seconds, 0) / 3600;
+  const costReport = writeCosts(good, now);
   console.log(out);
   console.log(
     `${good.length} ticket(s)` +
       (broken.length ? `, ${broken.length} unreadable (${broken.join(", ")})` : "") +
-      `, ${hours.toFixed(1)} h of AI working time`
+      `, ${hours.toFixed(1)} h of AI working time` +
+      (costReport ? `; API-equivalent $${costReport.total_usd.toFixed(2)} in dashboard/dist/costs.json (not on the page)` : "")
   );
 }
 
