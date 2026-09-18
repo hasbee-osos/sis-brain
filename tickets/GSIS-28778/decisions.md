@@ -161,3 +161,12 @@
 - **Convention cited:** none
 - **Evidence:** sis-product-sis-admin-backend/.../CourseMasterServiceImpl.java:279-342 (delete-all branch 330-341); sis-product-sis-frontend/.../course-co-requisite.component.ts init with setTimeout in courseRequisiteState; design.md Regression scenarios
 - **Status:** LOCKED
+
+### D-19 — Evaluator verdict for iteration 1: FAIL (3 blocking findings)
+- **Stage:** evaluate, iteration 1
+- **Decided by:** evaluator · confirmed by human: not required
+- **Options considered:** PASS; FAIL; INSUFFICIENT_EVIDENCE
+- **Why:** the locked scope of D-4 (RC-2 plus AC-1 to AC-5 as phases S1-S4) is only partly delivered and the gap is recorded only as a report note, not as a superseding decision (E-1); no test was executed anywhere, so the RC-2 fix and the D-18 guard are unproven and the D-15 fails-before/passes-after flip was argued rather than run (E-2); the frontend guard that matters, AddViewEditCourseComponent.generateReq, has no test at all (E-3). What was built (the S1 guard in six createList methods and the D-18 restructure) is correct on inspection, conventions and cross-repo consistency pass, and the build failures are environmental rather than defects in the new code. INSUFFICIENT_EVIDENCE was rejected because E-1 is a substantive scope gap that holds regardless of what evidence the environment could produce.
+- **Convention cited:** ground-rules → evidence-based verification; a locked decision contradicted without supersession is a blocking finding
+- **Evidence:** evaluation-1.md; backend build/classes/java/main holds 0 class files and build/test-results is absent; frontend Karma reported "Executed 0 of 0"; frontend ng build exit 0
+- **Status:** LOCKED
