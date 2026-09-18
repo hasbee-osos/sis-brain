@@ -11,27 +11,32 @@
     "refreshed_at": "2026-09-18T14:20:00Z"
   },
   "status": "PLANNING",
-  "next_action": "Confirm work type, flow and branch with the human, then dispatch the Planner",
+  "next_action": "Fetch workspace repos and dispatch the Planner",
   "blocked_on": null,
   "created_at": "2026-09-18T14:20:00Z",
-  "updated_at": "2026-09-18T14:20:00Z",
+  "updated_at": "2026-09-18T14:45:00Z",
   "iteration": 0,
   "max_iterations": null,
   "track": null,
   "workspace": "E:/Projects",
   "work_type": "bug",
-  "flow": null,
-  "source_branch": null,
-  "branch": null,
+  "flow": "A",
+  "source_branch": "base-development",
+  "branch": "base/bugfix/GSIS-24201-corequisite-required-validation",
   "repos": {},
   "context_repos": [],
-  "pr_targets": [],
+  "pr_targets": [
+    { "stage": 1, "targets": ["base-sandbox-qa"], "status": "PENDING" },
+    { "stage": 2, "targets": ["gcet-sandbox-qa", "gutech-sandbox-qa"], "status": "PENDING" }
+  ],
   "prs": [],
   "sessions": [
     { "session_id": "1a9e8080-ece3-498c-97a6-6aef03851d91", "started_at": "2026-09-18T14:20:00Z", "ended_at": null }
   ],
-  "human_confirmations": [],
-  "decisions": [],
+  "human_confirmations": [
+    { "what": "work_type_flow_branch", "at": "2026-09-18T14:45:00Z", "value": "bug, Flow A, base/bugfix/GSIS-24201-corequisite-required-validation, source base-development" }
+  ],
+  "decisions": ["D-1"],
   "artifacts": {},
   "plan": null,
   "implementation": null,
