@@ -1,0 +1,60 @@
+{
+  "ticket": "GSIS-22560",
+  "updated_at": "2026-09-21T18:09:02.311Z",
+  "sessions": {
+    "6917b26b-57d4-4146-a9ac-9acf730f9afb": {
+      "turns": 61,
+      "tokens_by_stage": {
+        "plan": {
+          "input": 132,
+          "output": 43980,
+          "cache_read": 4687070,
+          "cache_creation": 278353,
+          "thinking": 14103
+        }
+      },
+      "tokens_by_model": {
+        "claude-sonnet-5": {
+          "input": 132,
+          "output": 43980,
+          "cache_read": 4687070,
+          "cache_creation": 278353,
+          "thinking": 14103
+        }
+      }
+    }
+  },
+  "tokens": {
+    "input": 132,
+    "output": 43980,
+    "cache_read": 4687070,
+    "cache_creation": 278353,
+    "thinking": 14103
+  },
+  "tokens_by_stage": {
+    "plan": {
+      "input": 132,
+      "output": 43980,
+      "cache_read": 4687070,
+      "cache_creation": 278353,
+      "thinking": 14103
+    }
+  },
+  "tokens_by_model": {
+    "claude-sonnet-5": {
+      "input": 132,
+      "output": 43980,
+      "cache_read": 4687070,
+      "cache_creation": 278353,
+      "thinking": 14103
+    }
+  },
+  "turns": 61,
+  "stage_seconds": {},
+  "iterations": 0,
+  "verdicts": {},
+  "findings": {
+    "blocking": 0,
+    "non_blocking": 0
+  }
+}
