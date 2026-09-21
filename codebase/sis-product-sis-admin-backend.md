@@ -15,6 +15,7 @@ The main SIS backend: one Spring Boot service serving the whole `/api/v1` REST A
 | Menus | Navigation rows in `3-navigations` (tables `sis_admin_auth_module`, `sis_admin_auth_component`, `sis_admin_auth_grant`); index in `generated/…menus.md` |
 | Translations (for the frontend too) | `src/main/resources/i18n/en.json` / `ar.json` (shared: `navigation`, `component`, `validation`, …) and `i18n/<domain>/{en,ar}.json`. **Customer lines override labels** on their own branches; for example `gcet-sandbox-qa` renames `component.course` to "Module" |
 | Calls to other services | `generated/sis-product-sis-admin-backend.clients.md` (nine classes) |
+| Where a master's generated ID comes from (`CMP-`, `ATY-`, `ME-`, …) | Each `*ServiceImpl.preCreateEntity` mints it from a per-assignment `COUNT(*) + 1` native query. The UI's "Component ID" / "Assessment ID" columns are these `*_code` columns, not the DB `id` (`i18n/examination/en.json:915`) |
 | A field's max length / required rule shown on a screen | `V2/2-headers/<NNN-domain>/…` Liquibase seeds (`field_validation.max_length`, `is_required`) — not enforced by the entity or DTO unless separately annotated, so the UI limit and the column limit can silently disagree |
 
 ## Build and test
