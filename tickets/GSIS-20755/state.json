@@ -7,9 +7,9 @@
     "issue_type": "Bug",
     "epic": { "key": "GSIS-2491", "name": "Exam Controller App" },
     "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
-    "assignee": null,
+    "assignee": "Ashoka Jayasekara",
     "estimate": null,
-    "refreshed_at": "2026-09-21T05:19:54Z"
+    "refreshed_at": "2026-09-21T09:15:30Z"
   },
   "status": "PR_STAGE_1",
   "next_action": "Human reviews PR #7704 (non-blocking findings: changeset author, fixture type value), merges after review, runs manual QA on base-sandbox-qa after promotion, and handles the post-QA merge into base-development",
