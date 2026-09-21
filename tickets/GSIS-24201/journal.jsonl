@@ -30,3 +30,4 @@
 {"ts":"2026-09-21T11:16:42Z","event":"ts_corrected","original_ts":"2026-09-19T09:05:00Z","corrected_ts":"2026-09-18T18:37:52Z","reason":"the journal clock was wrong; time taken from the brain commit for this milestone"}
 {"ts":"2026-09-21T11:16:42Z","event":"ts_corrected","original_ts":"2026-09-19T09:15:00Z","corrected_ts":"2026-09-18T18:39:55Z","reason":"the journal clock was wrong; time taken from the brain commit for this milestone"}
 {"ts":"2026-09-21T11:16:42Z","event":"ts_corrected","original_ts":"2026-09-21T00:00:00Z","corrected_ts":"2026-09-21T09:25:43Z","reason":"the journal clock was wrong; time taken from the brain commit for this milestone"}
+{"ts":"2026-09-21T11:24:08Z","event":"pr_prepared","repo":"sis-product-sis-frontend","stage":1,"target":"base-sandbox-qa","url":"https://github.com/pbsgears/sis-product-sis-frontend/pull/7338"}

@@ -15,7 +15,7 @@
   "next_action": "Human opens the compare link, creates the PR, QA runs the 5 manual verification steps, then merges and promotes to base-qa; once verified there, re-run /work to confirm stage 1 done and raise stage 2",
   "blocked_on": null,
   "created_at": "2026-09-18T12:42:24Z",
-  "updated_at": "2026-09-21T09:26:10Z",
+  "updated_at": "2026-09-21T11:24:08Z",
   "iteration": 1,
   "max_iterations": 2,
   "track": "light",
@@ -40,7 +40,7 @@
       "head": "base/bugfix/GSIS-24201-corequisite-required-validation",
       "resolve_branch": null,
       "compare_link": "https://github.com/pbsgears/sis-product-sis-frontend/compare/base-sandbox-qa...base/bugfix/GSIS-24201-corequisite-required-validation?expand=1&title=GSIS-24201%3A%20block%20Module%20save%20when%20a%20co-requisite%20row%20has%20no%20module%20selected",
-      "url": null
+      "url": "https://github.com/pbsgears/sis-product-sis-frontend/pull/7338"
     }
   ],
   "sessions": [
