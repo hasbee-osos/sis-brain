@@ -499,6 +499,7 @@
       case "session_resumed": return "A new session resumed the ticket" + (e.from_status ? " from " + (STATUS_LABEL[e.from_status] || e.from_status) : "");
       case "stage_start": return null;
       case "stage_end": return null;
+      case "stage_corrected": return null;
       case "iteration_start": return "Iteration " + e.iteration + " started" + (e.reason ? ": " + e.reason : "");
       case "human_confirmed": return "Developer confirmed " + String(e.what || "").replace(/_/g, " ") + (typeof e.value === "string" ? ": " + e.value : Array.isArray(e.value) ? ": " + e.value.join(", ") : "");
       case "input_requested": return "Stopped for answers from " + (WAIT_LABEL[e.audience] || e.audience || "people") + (e.questions ? " (" + e.questions + " questions)" : "");
@@ -522,7 +523,7 @@
     });
     t.stages.forEach(function (s) {
       var label = (STAGE_LABEL[s.stage] || s.stage) + (s.iteration ? " (iteration " + s.iteration + ")" : "");
-      items.push({ ts: s.start, text: s.end ? label + " — " + (s.seconds >= 1 ? duration(s.seconds) : "recorded as a revision") : label + " — in progress" });
+      items.push({ ts: s.start, text: s.end ? label + " — " + (s.seconds >= 1 ? duration(s.seconds) : "recorded as a revision") + (s.corrected ? " (corrected: " + s.corrected + ")" : "") : label + " — in progress" });
     });
     return items.sort(function (a, b) { return a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0; });
   }
@@ -619,11 +620,12 @@
     // evaluations
     right.appendChild(el("h3", { text: "Evaluations" }));
     right.appendChild(t.evaluations.length ? el("table", { class: "mini" }, [
-      el("thead", null, [el("tr", null, [el("th", { text: "Iteration" }), el("th", { text: "Verdict" }), el("th", { class: "num", text: "Blocking" }), el("th", { class: "num", text: "Other" })])]),
+      el("thead", null, [el("tr", null, [el("th", { text: "Iteration" }), el("th", { text: "Verdict" }), el("th", { class: "num", text: "Must fix", title: "Blocking findings: problems the Evaluator requires fixed before a PR can be raised" }), el("th", { class: "num", text: "Advisory", title: "Non-blocking findings: recorded for the reviewer, do not stop the PR" })])]),
       el("tbody", null, t.evaluations.map(function (e) {
         return el("tr", null, [el("td", { text: String(e.iteration || "—") }), el("td", null, [verdictPill(e.verdict)]), el("td", { class: "num", text: String(e.blocking) }), el("td", { class: "num", text: String(e.non_blocking) })]);
       }))
     ]) : el("p", { class: "empty", text: "Not evaluated yet." }));
+    if (t.evaluations.length) right.appendChild(el("p", { class: "small muted", text: "Must fix: findings the independent Evaluator requires fixed before any PR; any one fails the evaluation. Advisory: findings noted for the PR reviewer that do not stop the PR." }));
 
     // PRs
     right.appendChild(el("h3", { text: "Pull requests" }));

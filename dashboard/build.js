@@ -72,6 +72,17 @@ function stageRuns(events) {
   for (const start of open.values()) {
     runs.push({ stage: start.stage, iteration: start.iteration ?? null, start: start.ts, end: null, seconds: 0 });
   }
+  // stage_corrected replaces the recorded times of the run that began at original_start,
+  // and takes out any spans in which the AI recorded no activity (a stalled build, say).
+  for (const c of events.filter((e) => e.event === "stage_corrected")) {
+    const run = runs.find((r) => r.stage === c.stage && r.start === c.original_start);
+    if (!run) continue;
+    run.start = c.start || run.start;
+    run.end = c.end || run.end;
+    run.excluded = (c.excluded || []).filter((x) => x && x.start && x.end);
+    run.corrected = c.reason || true;
+    run.seconds = seconds(run.start, run.end) - run.excluded.reduce((a, x) => a + seconds(x.start, x.end), 0);
+  }
   return runs;
 }
 
@@ -123,7 +134,8 @@ const TIME_KINDS = ["working", "qa", "sme", "developer", "idle"];
 
 function timeBreakdown(events, runs, waitPeriods, state, now) {
   const closed = events.find((e) => e.event === "ticket_closed");
-  const startTs = state.created_at || (events[0] && events[0].ts);
+  // a corrected stage can begin before the recorded start; the strip starts at whichever is first
+  const startTs = [state.created_at, events[0] && events[0].ts, ...runs.map((r) => r.start)].filter(Boolean).sort()[0];
   const endTs = state.status === "DONE" ? (closed ? closed.ts : state.updated_at) : now;
   const start = Date.parse(startTs);
   const end = Date.parse(endTs);
@@ -131,7 +143,17 @@ function timeBreakdown(events, runs, waitPeriods, state, now) {
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return { totals, segments: [], elapsed: 0 };
 
   const span = (a, b) => [Date.parse(a), b ? Date.parse(b) : end];
-  const work = runs.filter((r) => r.end).map((r) => span(r.start, r.end));
+  const work = runs.filter((r) => r.end).flatMap((r) => {
+    // a run with excluded spans counts as working only between them
+    const pieces = [];
+    let from = r.start;
+    for (const x of [...(r.excluded || [])].sort((a, b) => (a.start < b.start ? -1 : 1))) {
+      pieces.push(span(from, x.start));
+      from = x.end;
+    }
+    pieces.push(span(from, r.end));
+    return pieces;
+  });
   const waitsBy = (aud) => waitPeriods.filter((w) => aud.includes(w.audience)).map((w) => span(w.start, w.end));
   const qa = waitsBy(["qa"]), sme = waitsBy(["sme"]), dev = waitsBy(["developer", null, "unknown"]);
   const inside = (list, t) => list.some(([a, b]) => t > a && t < b);
@@ -269,11 +291,13 @@ function buildTicket(dir, now) {
   const id = path.basename(dir);
   const state = readJson(path.join(dir, "state.json"), null);
   if (!state) return { id, broken: true };
-  const events = readJsonl(path.join(dir, "journal.jsonl")).filter((e) => e && e.ts && e.event);
+  let events = readJsonl(path.join(dir, "journal.jsonl")).filter((e) => e && e.ts && e.event);
   events.sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0));
   const metrics = readJson(path.join(dir, "metrics.json"), {});
   const jira = state.jira || {};
   const runs = stageRuns(events);
+  // corrections are dated when they were written, not when anything happened on the ticket
+  events = events.filter((e) => e.event !== "stage_corrected");
   const waitPeriods = waits(events, state, now);
   const openWait = waitPeriods.find((w) => !w.end) || null;
   const evaluations = events.filter((e) => e.event === "evaluation");
