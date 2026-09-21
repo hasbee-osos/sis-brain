@@ -11,11 +11,11 @@
     "estimate": null,
     "refreshed_at": "2026-09-21T05:19:54Z"
   },
-  "status": "IMPLEMENTING",
-  "next_action": "Dispatch the Implementor for iteration 1",
+  "status": "EVALUATING",
+  "next_action": "Dispatch the Evaluator for iteration 1",
   "blocked_on": null,
   "created_at": "2026-09-21T05:19:54Z",
-  "updated_at": "2026-09-21T06:05:00Z",
+  "updated_at": "2026-09-21T06:20:00Z",
   "iteration": 1,
   "max_iterations": 1,
   "track": "light",
@@ -40,8 +40,8 @@
     { "what": "track", "at": "2026-09-21T05:50:00Z", "value": "light" }
   ],
   "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5"],
-  "artifacts": { "plan": "plan.md" },
+  "artifacts": { "plan": "plan.md", "implementation": "implementation-report-1.md" },
   "plan": "READY",
-  "implementation": null,
+  "implementation": "COMPLETE",
   "evaluation": null
 }
