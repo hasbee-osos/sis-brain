@@ -5,11 +5,33 @@
     "url": "https://gearsjira.atlassian.net/browse/GSIS-20755",
     "title": "\"Some entities assign to this program\" message displayed when click on save by entering lengthy description for the GPA scale master description",
     "issue_type": "Bug",
-    "epic": { "key": "GSIS-2491", "name": "Exam Controller App" },
-    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "epic": {
+      "key": "GSIS-2491",
+      "name": "Exam Controller App"
+    },
+    "sprint": {
+      "name": "Sustainment Sprint 21",
+      "start": "2026-09-16",
+      "end": "2026-09-29"
+    },
     "assignee": "Ashoka Jayasekara",
     "estimate": null,
-    "refreshed_at": "2026-09-21T09:15:30Z"
+    "refreshed_at": "2026-09-21T15:36:22Z",
+    "customer_name": [
+      "Product Core Feature"
+    ],
+    "labels": [
+      "SIS-GCET-QA",
+      "SIS-GUTECH-QA"
+    ],
+    "subtasks": [
+      {
+        "key": "GSIS-28700",
+        "type": "Dev Sub-task",
+        "estimate": "4h",
+        "logged": null
+      }
+    ]
   },
   "status": "PR_STAGE_1",
   "next_action": "Human reviews PR #7704 (non-blocking findings: changeset author, fixture type value), merges after review, runs manual QA on base-sandbox-qa after promotion, and handles the post-QA merge into base-development",
@@ -26,9 +48,16 @@
   "source_branch": "base-development",
   "branch": "base/bugfix/GSIS-20755-gpa-scale-description-save-error",
   "repos": {
-    "sis-product-sis-admin-backend": { "role": "change", "branch_created": true, "evaluated_head": "30504a0cf329c7651a1eda9186d7448303a7ef43", "final_head": null }
+    "sis-product-sis-admin-backend": {
+      "role": "change",
+      "branch_created": true,
+      "evaluated_head": "30504a0cf329c7651a1eda9186d7448303a7ef43",
+      "final_head": null
+    }
   },
-  "context_repos": ["sis-product-sis-frontend"],
+  "context_repos": [
+    "sis-product-sis-frontend"
+  ],
   "pr_target": "base-sandbox-qa",
   "prs": [
     {
@@ -42,15 +71,44 @@
     }
   ],
   "sessions": [
-    { "session_id": "43918959-718f-4b63-8ded-28ff101a9194", "started_at": "2026-09-21T05:19:54Z", "ended_at": null }
+    {
+      "session_id": "43918959-718f-4b63-8ded-28ff101a9194",
+      "started_at": "2026-09-21T05:19:54Z",
+      "ended_at": null
+    }
   ],
   "human_confirmations": [
-    { "what": "line_and_branch", "at": "2026-09-21T05:24:00Z", "value": "Customer Name 'Product Core Feature' → line base, base/bugfix/GSIS-20755-gpa-scale-description-save-error, source base-development, PR to base-sandbox-qa" },
-    { "what": "repos_to_change", "at": "2026-09-21T05:50:00Z", "value": ["sis-product-sis-admin-backend"] },
-    { "what": "track", "at": "2026-09-21T05:50:00Z", "value": "light" }
+    {
+      "what": "line_and_branch",
+      "at": "2026-09-21T05:24:00Z",
+      "value": "Customer Name 'Product Core Feature' → line base, base/bugfix/GSIS-20755-gpa-scale-description-save-error, source base-development, PR to base-sandbox-qa"
+    },
+    {
+      "what": "repos_to_change",
+      "at": "2026-09-21T05:50:00Z",
+      "value": [
+        "sis-product-sis-admin-backend"
+      ]
+    },
+    {
+      "what": "track",
+      "at": "2026-09-21T05:50:00Z",
+      "value": "light"
+    }
   ],
-  "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5", "D-6"],
-  "artifacts": { "plan": "plan.md", "implementation": "implementation-report-1.md", "evaluation": "evaluation-1.md" },
+  "decisions": [
+    "D-1",
+    "D-2",
+    "D-3",
+    "D-4",
+    "D-5",
+    "D-6"
+  ],
+  "artifacts": {
+    "plan": "plan.md",
+    "implementation": "implementation-report-1.md",
+    "evaluation": "evaluation-1.md"
+  },
   "plan": "READY",
   "implementation": "COMPLETE",
   "evaluation": "PASS"
