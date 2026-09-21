@@ -45,3 +45,4 @@
 {"ts":"2026-09-18T04:23:39Z","event":"evaluation","verdict":"FAIL","blocking":3,"non_blocking":7,"iteration":1}
 {"ts":"2026-09-18T04:23:39Z","event":"decision_locked","id":"D-19","summary":"Evaluator verdict iteration 1: FAIL (E-1 scope gap unsuperseded, E-2/E-3 no executed tests)"}
 {"ts":"2026-09-18T04:23:39Z","event":"input_requested","audience":"developer","packet":null,"questions":2}
+{"ts":"2026-09-21T11:10:16Z","event":"stage_corrected","stage":"implement","iteration":1,"original_start":"2026-09-17T11:15:11Z","start":"2026-09-17T11:15:11Z","end":"2026-09-18T04:06:19Z","excluded":[{"start":"2026-09-17T12:29:18Z","end":"2026-09-18T03:54:50Z"}],"reason":"15.4 h stall with no Implementor activity (backend build never completed) removed"}
