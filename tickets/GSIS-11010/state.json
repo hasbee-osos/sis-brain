@@ -15,7 +15,23 @@
       "end": "2026-09-29"
     },
     "assignee": "Navodya Oshani",
-    "refreshed_at": "2026-09-17T09:59:38Z"
+    "refreshed_at": "2026-09-21T15:36:22Z",
+    "estimate": "4h 30m",
+    "customer_name": [
+      "Product Core Feature"
+    ],
+    "labels": [
+      "SIS-GCET-QA",
+      "SIS-GUTECH-QA"
+    ],
+    "subtasks": [
+      {
+        "key": "GSIS-28841",
+        "type": "QA Sub-task",
+        "estimate": null,
+        "logged": "20m"
+      }
+    ]
   },
   "status": "DONE",
   "next_action": "Developer replies to QA on GSIS-11010 that the Schedule Exam emails use Notification Templates (renamed to Placement Test on GCET/OSOS by GCET-395/GCET-338), then closes the ticket in Jira as already fixed. No PR.",
