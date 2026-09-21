@@ -69,7 +69,7 @@
   .filters select, .filters input { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; min-width: 150px; max-width: 100%; font: inherit; color: inherit; }
 
   /* KPIs */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
   .kpi { background: var(--surface); padding: 14px 16px; display: grid; gap: 2px; align-content: start; }
   .kpi .value { font-family: var(--mono); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
   .kpi .label { font-size: 12px; color: var(--muted); }
@@ -109,6 +109,9 @@
   .pill.outside { background: var(--sunken); color: var(--ink); }
   .pill.plain::before { display: none; }
   .pill.round { background: var(--warn-soft); color: var(--warn); }
+  .pill.carried { background: var(--accent-soft); color: var(--accent); }
+  .linked { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .linked button { font: inherit; font-family: var(--mono); font-size: 12px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
 
   /* stage breakdown */
   .panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
@@ -416,6 +419,8 @@
     } else if (h.lane === "closed") {
       pills.push(el("span", { class: withLane ? "pill plain" : cls, text: t.resolved_without_code ? "No code change" : "Closed" }));
     }
+    if (t.defect_of && t.defect_of.length) pills.push(el("span", { class: "pill plain carried", text: "Defect of " + t.defect_of.map(function (x) { return x.id; }).join(", ") }));
+    if (carriedFrom(t)) pills.push(el("span", { class: "pill plain carried", text: "Carried over from " + carriedFrom(t) }));
     if (t.round > 1) pills.push(el("span", { class: "pill plain round", text: "↻ Round " + t.round, title: "Came back " + (t.round - 1) + " time" + (t.round > 2 ? "s" : "") + " after being handed off or closed" }));
     return pills;
   }
@@ -426,6 +431,20 @@
   }
   function lastVerdict(t) { return t.evaluations.length ? t.evaluations[t.evaluations.length - 1].verdict : null; }
   function sprintName(t) { return t.sprint ? t.sprint.name : null; }
+  // every sprint the ticket was in, oldest first
+  function sprintNames(t) {
+    var names = (t.sprints || []).map(function (x) { return x.name; });
+    return names.length ? names : sprintName(t) ? [sprintName(t)] : [];
+  }
+  // AI working time, counted only in the chosen sprint when a sprint filter is set
+  function stagesIn(t) { return state.sprint ? t.stages.filter(function (x) { return x.sprint === state.sprint; }) : t.stages; }
+  function workIn(t) { return state.sprint ? stagesIn(t).reduce(function (a, x) { return a + x.seconds; }, 0) : t.working_seconds; }
+  // the sprint a spilled ticket came over from: the one before the chosen (or current) sprint
+  function carriedFrom(t) {
+    var names = sprintNames(t);
+    var i = state.sprint ? names.indexOf(state.sprint) : names.length - 1;
+    return i > 0 ? names[i - 1] : null;
+  }
   function epicLabel(t) { return t.epic ? t.epic.name || t.epic.key : null; }
   function workType(t) { return t.work_type || (t.issue_type === "Bug" ? "bug" : t.issue_type ? "feature" : null); }
 
@@ -442,7 +461,11 @@
     return Object.keys(seen).sort();
   }
   var state = { sprint: "", epic: "", type: "", q: "", group: null, selected: tickets.length ? tickets[0].id : null };
-  fillSelect("f-sprint", "sprints", unique(sprintName));
+  fillSelect("f-sprint", "sprints", (function () {
+    var seen = {};
+    tickets.forEach(function (t) { sprintNames(t).forEach(function (n) { seen[n] = true; }); });
+    return Object.keys(seen).sort();
+  })());
   fillSelect("f-epic", "epics", unique(epicLabel));
   fillSelect("f-type", "types", unique(workType));
   [["f-sprint", "sprint"], ["f-epic", "epic"], ["f-type", "type"]].forEach(function (pair) {
@@ -462,7 +485,7 @@
   // tickets matching the filters and search; the board's group chips are counted over these
   function visible() {
     return tickets.filter(function (t) {
-      return (!state.sprint || sprintName(t) === state.sprint) &&
+      return (!state.sprint || sprintNames(t).indexOf(state.sprint) >= 0) &&
         (!state.epic || epicLabel(t) === state.epic) &&
         (!state.type || workType(t) === state.type) &&
         (!state.q || (t.id + " " + (t.title || "")).toLowerCase().indexOf(state.q) >= 0);
@@ -508,7 +531,7 @@
     var box = clear(document.getElementById("kpis"));
     var evaluated = list.filter(function (t) { return t.evaluations.length; });
     var firstPass = evaluated.filter(function (t) { return t.evaluations[0].verdict === "PASS"; });
-    var work = list.reduce(function (a, t) { return a + t.working_seconds; }, 0);
+    var work = list.reduce(function (a, t) { return a + workIn(t); }, 0);
     var prs = list.reduce(function (a, t) { return a + t.prs.length; }, 0);
     var noCode = list.filter(function (t) { return t.resolved_without_code; });
     var cameBack = list.filter(function (t) { return t.round > 1; });
@@ -586,7 +609,7 @@
   function renderBars(list) {
     var time = {}, stageOrder = [], elapsed = {}, total = 0;
     list.forEach(function (t) {
-      t.stages.forEach(function (s) {
+      stagesIn(t).forEach(function (s) {
         if (!(s.stage in time)) { time[s.stage] = 0; stageOrder.push(s.stage); }
         time[s.stage] += s.seconds;
       });
@@ -642,7 +665,7 @@
           t.estimate_source === "dev sub-tasks" ? el("div", { class: "small muted", text: "sub-tasks" }) : null
         ]),
         el("td", { class: "num", text: t.dev_logged_hours != null ? duration(t.dev_logged_hours * 3600) : "—" }),
-        el("td", { class: "num", text: duration(t.working_seconds) }),
+        el("td", { class: "num", text: duration(workIn(t)) }),
         el("td", { class: "num", text: duration(peopleWait(t)) }),
         el("td", { class: "num", text: duration((t.time || {}).idle) })
       ]);
@@ -660,6 +683,9 @@
     t.stages.forEach(function (s) {
       var name = stageLabel(s.stage) + (s.iteration ? " (iteration " + s.iteration + ")" : "");
       items.push({ ts: s.start, text: s.end ? name + " — " + (s.seconds >= 1 ? duration(s.seconds) : "recorded as a revision") + (s.corrected ? " (corrected: " + s.corrected + ")" : "") : name + " — in progress" });
+    });
+    (t.sprints || []).slice(1).forEach(function (x) {
+      if (x.start && x.start > (t.created_at || "") && Date.parse(x.start) <= now) items.push({ ts: x.start, text: x.name + " starts", divider: true });
     });
     return items.sort(function (a, b) { return a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0; });
   }
@@ -708,7 +734,7 @@
 
     var facts = [
       ["Epic", t.epic ? (t.epic.name ? t.epic.name + " (" + t.epic.key + ")" : t.epic.key) : "—"],
-      ["Sprint", t.sprint ? t.sprint.name : "—"],
+      ["Sprint", sprintNames(t).length ? sprintNames(t).join(" → ") : "—"],
       ["Assignee", t.assignee || "—"],
       ["Customer", t.customer_name && t.customer_name.length ? t.customer_name.join(", ") : "—"],
       ["Jira labels", t.labels && t.labels.length ? t.labels.join(", ") : "—"],
@@ -723,6 +749,17 @@
     })));
 
     box.appendChild(standsBox(t));
+
+    // tickets tied to this one through Jira links
+    var linkRows = [["Defect of", t.defect_of], ["QA defects", t.defects], ["Related", t.related]].filter(function (r) { return r[1] && r[1].length; });
+    if (linkRows.length) box.appendChild(el("dl", { class: "facts", style: "margin:0" }, linkRows.map(function (r) {
+      return el("div", { class: "fact" }, [el("dt", { text: r[0] }), el("dd", null, [el("div", { class: "linked" }, r[1].map(function (x) {
+        return el("span", null, [
+          el("button", { type: "button", title: x.title || x.id, onclick: function () { state.group = null; state.sprint = ""; document.getElementById("f-sprint").value = ""; select(x.id, true); }, text: x.id }),
+          " " + laneLabel(x.lane) + (x.who && x.lane === "person" ? " · " + whoLabel(x.who) : "")
+        ]);
+      }))])]);
+    })));
 
     // lifecycle strip
     var life = el("div", { class: "block" }, [el("h3", { text: "How the time went" })]);

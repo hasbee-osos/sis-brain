@@ -472,6 +472,17 @@ function buildTicket(dir, now) {
   const waitPeriods = waits(events, state, now);
   const handoffSpans = handoffs(events);
   const back = returns(events);
+  // every sprint the issue was in (records before sprints existed have only the current one);
+  // each stage run and each return belongs to the last sprint that had started by then
+  const sprints = (Array.isArray(jira.sprints) && jira.sprints.length ? jira.sprints : jira.sprint ? [jira.sprint] : [])
+    .filter((x) => x && x.name).sort((a, b) => ((a.start || "") < (b.start || "") ? -1 : 1));
+  const sprintAt = (ts) => {
+    let hit = null;
+    for (const x of sprints) if (!x.start || Date.parse(x.start) <= Date.parse(ts)) hit = x.name;
+    return hit || (sprints[0] && sprints[0].name) || null;
+  };
+  for (const r of runs) r.sprint = r.start ? sprintAt(r.start) : null;
+  for (const r of back) r.sprint = sprintAt(r.ts);
   const hold = holder(events, runs, waitPeriods, handoffSpans, state);
   const evaluations = events.filter((e) => e.event === "evaluation");
   const time = timeBreakdown(events, runs, waitPeriods, handoffSpans, hold, state, now);
@@ -532,6 +543,8 @@ function buildTicket(dir, now) {
       findings: parseFindings(path.join(dir, `evaluation-${e.iteration || i + 1}.md`)),
     })),
     stages: runs,
+    sprints,
+    links: Array.isArray(jira.links) ? jira.links.filter((l) => l && l.key) : [],
     waits: waitPeriods,
     working_seconds: runs.reduce((a, r) => a + r.seconds, 0),
     waiting_seconds: waitPeriods.reduce((a, w) => a + w.seconds, 0),
@@ -570,6 +583,29 @@ function writeCosts(tickets, now) {
 
 const round = (v) => Math.round(v * 100) / 100;
 
+/**
+ * Ties tickets the brain holds to each other through their Jira links. A Bug started after
+ * the ticket it links to is recorded as a defect of it (and listed among that ticket's
+ * defects); any other link between two harness tickets is shown as related.
+ */
+function linkTickets(tickets) {
+  const byId = new Map(tickets.map((t) => [t.id, t]));
+  for (const t of tickets) { t.defect_of = []; t.defects = []; t.related = []; }
+  for (const t of tickets) {
+    for (const l of t.links) {
+      const other = byId.get(l.key);
+      if (!other || other === t) continue;
+      const brief = (x) => ({ id: x.id, title: x.title, lane: x.holder.lane, who: x.holder.who });
+      if (t.issue_type === "Bug" && (other.created_at || "") < (t.created_at || "")) {
+        if (!t.defect_of.some((x) => x.id === other.id)) t.defect_of.push(brief(other));
+        if (!other.defects.some((x) => x.id === t.id)) other.defects.push(brief(t));
+      } else if (!t.related.some((x) => x.id === other.id) && !t.defects.some((x) => x.id === other.id)) {
+        t.related.push(brief(other));
+      }
+    }
+  }
+}
+
 // --------------------------------------------------------------------- main
 
 function main() {
@@ -587,6 +623,7 @@ function main() {
   const tickets = dirs.map((d) => buildTicket(d, now));
   const broken = tickets.filter((t) => t.broken).map((t) => t.id);
   const good = tickets.filter((t) => !t.broken).sort((a, b) => ((a.updated_at || "") < (b.updated_at || "") ? 1 : -1));
+  linkTickets(good);
 
   const data = {
     generated_at: now,
