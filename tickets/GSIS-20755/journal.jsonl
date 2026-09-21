@@ -1,1 +1,3 @@
 {"ts":"2026-09-21T05:19:54Z","event":"ticket_started","ticket":"GSIS-20755","session_id":"43918959-718f-4b63-8ded-28ff101a9194"}
+{"ts":"2026-09-21T05:24:00Z","event":"human_confirmed","what":"line_and_branch","value":"base/bugfix/GSIS-20755-gpa-scale-description-save-error"}
+{"ts":"2026-09-21T05:24:00Z","event":"decision_locked","id":"D-1","summary":"Routing: base line, bugfix, base-development -> base-sandbox-qa"}
