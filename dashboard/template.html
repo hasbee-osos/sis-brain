@@ -62,7 +62,7 @@
   .masthead .lede { max-width: 62ch; color: var(--muted); margin-top: 6px; }
   .filters { display: flex; flex-wrap: wrap; gap: 10px; }
   .filters label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); font-weight: 500; }
-  .filters select { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; min-width: 150px; max-width: 100%; }
+  .filters select, .filters input { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; min-width: 150px; max-width: 100%; font: inherit; color: inherit; }
 
   /* KPIs */
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
@@ -76,7 +76,15 @@
 
   /* board */
   .board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-  .lane { background: var(--sunken); border-radius: 10px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 96px; }
+  .lane { background: var(--sunken); border-radius: 10px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 96px; min-width: 0; }
+  .lane-body { display: grid; gap: 8px; align-content: start; max-height: 540px; overflow-y: auto; overscroll-behavior: contain; padding: 1px; }
+  .groups { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 2px; }
+  .chip { font-size: 11px; border: 1px solid var(--rule); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 1px 8px; cursor: pointer; }
+  .chip b { font-family: var(--mono); font-weight: 500; color: var(--ink); margin-left: 4px; }
+  .chip:hover { border-color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .filter-note { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+  .filter-note button { font-size: 12px; border: 0; background: none; color: var(--accent); cursor: pointer; padding: 0; text-decoration: underline; }
   .lane-head { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 4px; }
   .lane-head .count { font-family: var(--mono); color: var(--muted); font-size: 12px; }
   .lane-empty { color: var(--faint); font-size: 12px; padding: 4px; }
@@ -84,7 +92,7 @@
   .card:hover { border-color: var(--accent); }
   .card[aria-current="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
   .card .key { font-family: var(--mono); font-size: 12px; color: var(--accent); }
-  .card .title { font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .card .title { font-size: 13px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .card .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 
   .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; white-space: nowrap; background: var(--sunken); color: var(--muted); }
@@ -109,10 +117,10 @@
   .bar-row .num { text-align: right; }
 
   /* table */
-  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; }
+  .table-wrap { overflow: auto; max-height: 560px; overscroll-behavior: contain; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; }
   table { border-collapse: collapse; width: 100%; min-width: 1080px; }
   th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
-  th { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: var(--sunken); white-space: nowrap; }
+  th { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: var(--sunken); white-space: nowrap; position: sticky; top: 0; z-index: 1; }
   tbody tr { cursor: pointer; }
   tbody tr:hover td { background: var(--accent-soft); }
   tbody tr[aria-current="true"] td { background: var(--accent-soft); }
@@ -160,7 +168,18 @@
 
   .mini { width: 100%; border-collapse: collapse; min-width: 0; font-size: 12.5px; }
   .mini th, .mini td { padding: 6px 8px; }
-  .mini th { background: transparent; }
+  .mini th { background: transparent; position: static; }
+  .findings { display: grid; gap: 10px; }
+  .findings h4 { margin: 0; font-size: 12px; font-weight: 600; }
+  .findings ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 4px; }
+  .findings li details { border-left: 2px solid var(--rule); padding: 2px 0 2px 10px; font-size: 12.5px; }
+  .findings li details[open] { padding-bottom: 6px; }
+  .findings li.blocking details { border-left-color: var(--bad); }
+  .findings summary { cursor: pointer; }
+  .findings .fid { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-right: 6px; }
+  .findings .scope { font-size: 11px; color: var(--faint); margin-left: 6px; }
+  .findings .fdetail { margin-top: 4px; color: var(--muted); }
+  details.advisory > summary { cursor: pointer; font-size: 12px; font-weight: 600; }
   .files { display: flex; flex-wrap: wrap; gap: 6px; }
   .files span { font-family: var(--mono); font-size: 11.5px; background: var(--sunken); border-radius: 4px; padding: 2px 6px; }
   .empty { color: var(--faint); font-size: 13px; }
@@ -175,7 +194,7 @@
     .board { grid-template-columns: minmax(0, 1fr); }
     .filters { width: 100%; }
     .filters label { flex: 1 1 140px; }
-    .filters select { min-width: 0; width: 100%; }
+    .filters select, .filters input { min-width: 0; width: 100%; }
     .timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
     .bar-row { grid-template-columns: 112px minmax(0, 1fr) 88px; }
   }
@@ -195,6 +214,7 @@
       <label for="f-sprint">Sprint<select id="f-sprint"></select></label>
       <label for="f-epic">Epic<select id="f-epic"></select></label>
       <label for="f-type">Work type<select id="f-type"></select></label>
+      <label for="f-search">Search<input id="f-search" type="search" placeholder="Ticket or title" autocomplete="off"></label>
     </div>
   </header>
 
@@ -205,6 +225,7 @@
       <h2>Where things stand</h2>
       <span class="small muted">Who holds each ticket now. Select one to see how it was worked</span>
     </div>
+    <div class="filter-note" id="group-note" hidden></div>
     <div class="board" id="board"></div>
   </section>
 
@@ -415,7 +436,7 @@
     tickets.forEach(function (t) { var v = fn(t); if (v) seen[v] = true; });
     return Object.keys(seen).sort();
   }
-  var state = { sprint: "", epic: "", type: "", selected: tickets.length ? tickets[0].id : null };
+  var state = { sprint: "", epic: "", type: "", q: "", group: null, selected: tickets.length ? tickets[0].id : null };
   fillSelect("f-sprint", "sprints", unique(sprintName));
   fillSelect("f-epic", "epics", unique(epicLabel));
   fillSelect("f-type", "types", unique(workType));
@@ -428,12 +449,43 @@
     });
   });
 
+  document.getElementById("f-search").addEventListener("input", function (e) {
+    state.q = e.target.value.trim().toLowerCase();
+    render();
+  });
+
+  // tickets matching the filters and search; the board's group chips are counted over these
   function visible() {
     return tickets.filter(function (t) {
       return (!state.sprint || sprintName(t) === state.sprint) &&
         (!state.epic || epicLabel(t) === state.epic) &&
-        (!state.type || workType(t) === state.type);
+        (!state.type || workType(t) === state.type) &&
+        (!state.q || (t.id + " " + (t.title || "")).toLowerCase().indexOf(state.q) >= 0);
     });
+  }
+  // ... narrowed further to one group chip, when one is chosen
+  function narrowed(list) {
+    if (!state.group) return list;
+    return list.filter(function (t) { return lane(t) === state.group.lane && groupOf(t).key === state.group.key; });
+  }
+
+  /** The sub-group a ticket counts under in its lane's summary: its stage, who it waits on, or its outcome. */
+  function groupOf(t) {
+    var h = t.holder || {};
+    if (h.lane === "claude") return { key: "stage:" + h.stage, label: stageLabel(h.stage) };
+    if (h.lane === "person") return { key: "who:" + h.who, label: whoLabel(h.who) };
+    if (h.lane === "outside") {
+      var unopened = (h.refs || []).some(function (r) { return !r.opened; });
+      return unopened ? { key: "unopened", label: "PR not opened yet" } : { key: "who:" + h.who, label: "With " + whoLabel(h.who) };
+    }
+    return t.resolved_without_code ? { key: "no-code", label: "No code change" } : { key: "closed", label: "Closed" };
+  }
+  // longest waiting first; most recently closed first
+  function laneOrder(id) {
+    return function (a, b) {
+      var x = (a.holder && a.holder.since) || "", y = (b.holder && b.holder.since) || "";
+      return id === "closed" ? (x < y ? 1 : x > y ? -1 : 0) : (x < y ? -1 : x > y ? 1 : 0);
+    };
   }
 
   function select(id, scroll) {
@@ -479,17 +531,40 @@
     });
   }
 
-  function renderBoard(list) {
+  function renderBoard(all, list) {
     var board = clear(document.getElementById("board"));
+    var note = clear(document.getElementById("group-note"));
+    note.hidden = !state.group;
+    if (state.group) {
+      note.appendChild(el("span", { text: "Showing " + laneLabel(state.group.lane) + ": " + state.group.label + " (" + list.length + ")" }));
+      note.appendChild(el("button", { type: "button", text: "Show all", onclick: function () { state.group = null; render(); } }));
+    }
     LANES.forEach(function (id) {
-      var items = list.filter(function (t) { return lane(t) === id; });
+      var inLane = all.filter(function (t) { return lane(t) === id; });
+      var items = list.filter(function (t) { return lane(t) === id; }).sort(laneOrder(id));
       var hint = entry("lanes", id) && entry("lanes", id).hint;
+      var groups = [], seen = {};
+      inLane.forEach(function (t) {
+        var g = groupOf(t);
+        if (!seen[g.key]) { seen[g.key] = { key: g.key, label: g.label, n: 0 }; groups.push(seen[g.key]); }
+        seen[g.key].n++;
+      });
+      groups.sort(function (a, b) { return b.n - a.n; });
+      var body = el("div", { class: "lane-body" });
       var box = el("div", { class: "lane" }, [
-        el("div", { class: "lane-head", title: hint || null }, [el("h3", { text: laneLabel(id) }), el("span", { class: "count", text: String(items.length) })])
+        el("div", { class: "lane-head", title: hint || null }, [el("h3", { text: laneLabel(id) }), el("span", { class: "count", text: String(inLane.length) })]),
+        groups.length ? el("div", { class: "groups" }, groups.map(function (g) {
+          var on = state.group && state.group.lane === id && state.group.key === g.key;
+          return el("button", {
+            class: "chip", type: "button", "aria-pressed": on ? "true" : "false", title: on ? "Show all tickets" : "Show only these tickets",
+            onclick: function () { state.group = on ? null : { lane: id, key: g.key, label: g.label }; render(); }
+          }, [g.label, el("b", { text: String(g.n) })]);
+        })) : null,
+        body
       ]);
-      if (!items.length) box.appendChild(el("div", { class: "lane-empty", text: "None" }));
+      if (!items.length) body.appendChild(el("div", { class: "lane-empty", text: inLane.length ? "Filtered out" : "None" }));
       items.forEach(function (t) {
-        box.appendChild(el("button", {
+        body.appendChild(el("button", {
           class: "card", type: "button", "aria-current": t.id === state.selected ? "true" : null,
           onclick: function () { select(t.id, true); }
         }, [
@@ -667,6 +742,30 @@
       return el("li", { class: i.divider ? "divider" : null }, [el("time", { datetime: i.ts, text: when(i.ts) }), el("span", { text: i.text })]);
     })) : el("p", { class: "empty", text: "No journal events recorded." }));
 
+    // evaluations, shown only when the ticket went through that stage
+    if (t.evaluations.length) {
+      right.appendChild(el("h3", { text: "Evaluations" }));
+      right.appendChild(el("p", { class: "small muted", text: "Before any PR, an independent Evaluator reviews the finished work. Must fix: a problem that stops the PR until it is fixed; any one fails the evaluation. Advisory: a note for the PR reviewer that does not stop the PR." }));
+      t.evaluations.forEach(function (e) {
+        var f = e.findings || { blocking: [], advisory: [] };
+        var item = function (x, cls) {
+          return el("li", { class: cls }, [el("details", null, [
+            el("summary", null, [x.id ? el("span", { class: "fid", text: x.id }) : null, x.title, x.scope ? el("span", { class: "scope", text: x.scope }) : null]),
+            x.detail ? el("p", { class: "fdetail", text: x.detail }) : null
+          ])]);
+        };
+        right.appendChild(el("div", { class: "findings" }, [
+          el("div", { style: "display:flex;gap:8px;align-items:center;flex-wrap:wrap" }, [
+            el("h4", { text: "Evaluation " + (e.iteration || "") }), verdictPill(e.verdict),
+            el("span", { class: "small muted", text: e.blocking + " must fix · " + e.non_blocking + " advisory" })
+          ]),
+          f.blocking.length ? el("div", null, [el("h4", { text: "Must fix (" + f.blocking.length + ")" }), el("ul", null, f.blocking.map(function (x) { return item(x, "blocking"); }))]) : null,
+          f.advisory.length ? el("details", { class: "advisory" }, [el("summary", { text: "Advisory (" + f.advisory.length + ")" }), el("ul", null, f.advisory.map(function (x) { return item(x, "advisory"); }))]) : null,
+          !f.blocking.length && !f.advisory.length && (e.blocking || e.non_blocking) ? el("p", { class: "small muted", text: "The findings are listed in the evaluation file." }) : null
+        ]));
+      });
+    }
+
     // decisions
     right.appendChild(el("h3", { text: "Decisions locked (" + t.decisions.length + ")" }));
     if (!t.decisions.length) right.appendChild(el("p", { class: "empty", text: "No decisions recorded yet." }));
@@ -689,18 +788,6 @@
       ]));
     });
     right.appendChild(decWrap);
-
-    // evaluations, shown only when the ticket went through that stage
-    if (t.evaluations.length) {
-      right.appendChild(el("h3", { text: "Evaluations" }));
-      right.appendChild(el("table", { class: "mini" }, [
-        el("thead", null, [el("tr", null, [el("th", { text: "Iteration" }), el("th", { text: "Verdict" }), el("th", { class: "num", text: "Must fix", title: "Blocking findings: problems the Evaluator requires fixed before a PR can be raised" }), el("th", { class: "num", text: "Advisory", title: "Non-blocking findings: recorded for the reviewer, do not stop the PR" })])]),
-        el("tbody", null, t.evaluations.map(function (e) {
-          return el("tr", null, [el("td", { text: String(e.iteration || "—") }), el("td", null, [verdictPill(e.verdict)]), el("td", { class: "num", text: String(e.blocking) }), el("td", { class: "num", text: String(e.non_blocking) })]);
-        }))
-      ]));
-      right.appendChild(el("p", { class: "small muted", text: "Must fix: findings the independent Evaluator requires fixed before any PR; any one fails the evaluation. Advisory: findings noted for the PR reviewer that do not stop the PR." }));
-    }
 
     // PRs
     right.appendChild(el("h3", { text: "Pull requests" }));
@@ -730,9 +817,11 @@
   }
 
   function render() {
-    var list = visible();
+    var all = visible();
+    var list = narrowed(all);
+    if (!list.some(function (t) { return t.id === state.selected; })) state.selected = list.length ? list[0].id : null;
     renderKpis(list);
-    renderBoard(list);
+    renderBoard(all, list);
     renderBars(list);
     renderTable(list);
     renderDetail(list);

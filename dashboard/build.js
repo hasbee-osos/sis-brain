@@ -326,6 +326,62 @@ function parseDecisions(file) {
     .filter(Boolean);
 }
 
+// -------------------------------------------------------------- evaluations
+
+/**
+ * The findings listed in an evaluation-<n>.md, under its "Blocking Findings" and
+ * "Non-Blocking Findings" headings: one per top-level list item, with its ID (E-1, NB-2, …)
+ * when it has one, its title (the bold lead-in, or else the first sentence) and the rest.
+ */
+function parseFindings(file) {
+  let text;
+  try {
+    text = fs.readFileSync(file, "utf8");
+  } catch {
+    return null;
+  }
+  const out = { blocking: [], advisory: [] };
+  let bucket = null;
+  let item = null;
+  const plain = (s) => s.replace(/\*\*|`/g, "").replace(/\s+/g, " ").trim();
+  const finish = () => {
+    if (!item || !bucket) return;
+    let body = item.join(" ").trim();
+    if (/^none\.?$/i.test(plain(body))) return;
+    let title;
+    const bold = body.match(/^\*\*(.+?)\*\*\s*(.*)$/);
+    if (bold) { title = bold[1]; body = bold[2]; }
+    else {
+      const m = body.match(/^(.+?[.:])(\s|$)(.*)$/);
+      title = m ? m[1] : body;
+      body = m ? m[3] : "";
+    }
+    title = plain(title);
+    const id = title.match(/^(?:([A-Z]{1,3}-\d+)\s*)?(?:\[([^\]]*)\])?\s*(?:[—–:-]\s*)?(.*)$/);
+    out[bucket].push({
+      id: id[1] || null,
+      scope: id[2] || null,
+      title: (id[3] || title).replace(/[.:]$/, ""),
+      detail: plain(body).replace(/^[,;:]s*/, "").slice(0, 700) || null,
+    });
+  };
+  for (const line of text.split(/\r?\n/)) {
+    const h = line.match(/^#{2,3}\s+(.*)$/);
+    if (h) {
+      finish(); item = null;
+      const name = h[1].toLowerCase();
+      bucket = /non[- ]?blocking|advisory/.test(name) ? "advisory" : /blocking|must fix/.test(name) ? "blocking" : null;
+      continue;
+    }
+    if (!bucket) continue;
+    const li = line.match(/^(?:[-*]|\d+\.)\s+(.*)$/);
+    if (li) { finish(); item = [li[1]]; }
+    else if (item && line.trim()) item.push(line.trim());
+  }
+  finish();
+  return out;
+}
+
 // --------------------------------------------------------------------- cost
 //
 // API-equivalent cost: what the recorded tokens would cost at list API prices
@@ -443,7 +499,10 @@ function buildTicket(dir, now) {
     pr_targets: state.pr_targets || [],
     human_confirmations: state.human_confirmations || [],
     decisions: parseDecisions(path.join(dir, "decisions.md")),
-    evaluations: evaluations.map((e) => ({ ts: e.ts, iteration: e.iteration, verdict: e.verdict, blocking: e.blocking || 0, non_blocking: e.non_blocking || 0 })),
+    evaluations: evaluations.map((e, i) => ({
+      ts: e.ts, iteration: e.iteration, verdict: e.verdict, blocking: e.blocking || 0, non_blocking: e.non_blocking || 0,
+      findings: parseFindings(path.join(dir, `evaluation-${e.iteration || i + 1}.md`)),
+    })),
     stages: runs,
     waits: waitPeriods,
     working_seconds: runs.reduce((a, r) => a + r.seconds, 0),
