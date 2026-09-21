@@ -33,3 +33,12 @@
 - **Convention cited:** `engineering-standards` → testing (risk-based; regression test for a bug fix)
 - **Evidence:** `sis-product-sis-admin-backend/src/test/resources/application.yml` (H2, `ddl-auto: create`, Liquibase disabled in tests); existing IT style `administration/service/StructureMasterServiceIT.java`
 - **Status:** LOCKED
+
+### D-5 — Repos and track confirmed: sis-product-sis-admin-backend only, light track
+- **Stage:** plan, iteration 1
+- **Decided by:** planner · confirmed by human 2026-09-21T05:50:00Z
+- **Options considered:** light (chosen) vs full
+- **Why:** exactly 1 repo changes (sis-product-sis-admin-backend), the fix is a single additive schema widening with no contract change, no new entity/table/workflow/notification, and nothing touching authentication, `@PreAuthorizeGrant`, deletion checks or existing row data — meets every light-track criterion in `harness-core` → Tracks
+- **Convention cited:** `harness-core` → Tracks
+- **Evidence:** plan.md → Repositories, → Regression Surface
+- **Status:** LOCKED
