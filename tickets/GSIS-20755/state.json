@@ -1,0 +1,41 @@
+{
+  "schema_version": 3,
+  "ticket": "GSIS-20755",
+  "jira": {
+    "url": "https://gearsjira.atlassian.net/browse/GSIS-20755",
+    "title": "\"Some entities assign to this program\" message displayed when click on save by entering lengthy description for the GPA scale master description",
+    "issue_type": "Bug",
+    "epic": { "key": "GSIS-2491", "name": "Exam Controller App" },
+    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "assignee": null,
+    "estimate": null,
+    "refreshed_at": "2026-09-21T05:19:54Z"
+  },
+  "status": "PLANNING",
+  "next_action": "Confirm work type, line and branch, then dispatch the Planner",
+  "blocked_on": null,
+  "created_at": "2026-09-21T05:19:54Z",
+  "updated_at": "2026-09-21T05:19:54Z",
+  "iteration": 1,
+  "max_iterations": null,
+  "track": null,
+  "workspace": "E:/Projects",
+  "work_type": "bug",
+  "line": null,
+  "customer_name": "Product Core Feature",
+  "source_branch": null,
+  "branch": null,
+  "repos": {},
+  "context_repos": [],
+  "pr_target": null,
+  "prs": [],
+  "sessions": [
+    { "session_id": "43918959-718f-4b63-8ded-28ff101a9194", "started_at": "2026-09-21T05:19:54Z", "ended_at": null }
+  ],
+  "human_confirmations": [],
+  "decisions": [],
+  "artifacts": {},
+  "plan": null,
+  "implementation": null,
+  "evaluation": null
+}
