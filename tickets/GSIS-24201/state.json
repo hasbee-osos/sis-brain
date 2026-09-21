@@ -5,11 +5,33 @@
     "url": "https://gearsjira.atlassian.net/browse/GSIS-24201",
     "title": "Empty Co-Requisite Record Can Be Saved Without Module Selection",
     "issue_type": "Bug",
-    "epic": { "key": "GSIS-3301", "name": "Student Review" },
-    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "epic": {
+      "key": "GSIS-3301",
+      "name": "Student Review"
+    },
+    "sprint": {
+      "name": "Sustainment Sprint 21",
+      "start": "2026-09-16",
+      "end": "2026-09-29"
+    },
     "assignee": "Ashoka Jayasekara",
     "estimate": "3h",
-    "refreshed_at": "2026-09-21T00:00:00Z"
+    "refreshed_at": "2026-09-21T15:36:22Z",
+    "customer_name": [
+      "Product Core Feature"
+    ],
+    "labels": [
+      "SIS-GCET-QA",
+      "SIS-GUTECH-QA"
+    ],
+    "subtasks": [
+      {
+        "key": "GSIS-28701",
+        "type": "Dev Sub-task",
+        "estimate": "2h",
+        "logged": null
+      }
+    ]
   },
   "status": "PR_STAGE_1",
   "next_action": "Local commit 0e6de953a4 (Copilot review fix, D-8) is ahead of evaluated_head and NOT pushed - developer to confirm before pushing to PR #7338; light track's single evaluation round is used, so this fix goes to the human/QA reviewer unevaluated, same as a final-fix-round commit",
@@ -25,12 +47,31 @@
   "source_branch": "base-development",
   "branch": "base/bugfix/GSIS-24201-corequisite-required-validation",
   "repos": {
-    "sis-product-sis-frontend": { "role": "change", "branch_created": true, "evaluated_head": "22285220abcf7ce9ff93b234e89278fdfb547a4d" }
+    "sis-product-sis-frontend": {
+      "role": "change",
+      "branch_created": true,
+      "evaluated_head": "22285220abcf7ce9ff93b234e89278fdfb547a4d"
+    }
   },
-  "context_repos": ["sis-product-sis-admin-backend"],
+  "context_repos": [
+    "sis-product-sis-admin-backend"
+  ],
   "pr_targets": [
-    { "stage": 1, "targets": ["base-sandbox-qa"], "status": "OPEN" },
-    { "stage": 2, "targets": ["gcet-sandbox-qa", "gutech-sandbox-qa"], "status": "PENDING" }
+    {
+      "stage": 1,
+      "targets": [
+        "base-sandbox-qa"
+      ],
+      "status": "OPEN"
+    },
+    {
+      "stage": 2,
+      "targets": [
+        "gcet-sandbox-qa",
+        "gutech-sandbox-qa"
+      ],
+      "status": "PENDING"
+    }
   ],
   "prs": [
     {
@@ -44,16 +85,52 @@
     }
   ],
   "sessions": [
-    { "session_id": "1a9e8080-ece3-498c-97a6-6aef03851d91", "started_at": "2026-09-18T12:42:24Z", "ended_at": null },
-    { "session_id": "a04c3fd9-0fb0-4498-8e79-79c779168b29", "started_at": "2026-09-21T09:25:43Z", "ended_at": null }
+    {
+      "session_id": "1a9e8080-ece3-498c-97a6-6aef03851d91",
+      "started_at": "2026-09-18T12:42:24Z",
+      "ended_at": null
+    },
+    {
+      "session_id": "a04c3fd9-0fb0-4498-8e79-79c779168b29",
+      "started_at": "2026-09-21T09:25:43Z",
+      "ended_at": null
+    }
   ],
   "human_confirmations": [
-    { "what": "work_type_flow_branch", "at": "2026-09-18T13:01:25Z", "value": "bug, Flow A, base/bugfix/GSIS-24201-corequisite-required-validation, source base-development" },
-    { "what": "repos_to_change", "at": "2026-09-18T17:45:50Z", "value": ["sis-product-sis-frontend"] },
-    { "what": "track", "at": "2026-09-18T17:45:50Z", "value": "light" }
+    {
+      "what": "work_type_flow_branch",
+      "at": "2026-09-18T13:01:25Z",
+      "value": "bug, Flow A, base/bugfix/GSIS-24201-corequisite-required-validation, source base-development"
+    },
+    {
+      "what": "repos_to_change",
+      "at": "2026-09-18T17:45:50Z",
+      "value": [
+        "sis-product-sis-frontend"
+      ]
+    },
+    {
+      "what": "track",
+      "at": "2026-09-18T17:45:50Z",
+      "value": "light"
+    }
   ],
-  "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5", "D-6", "D-7", "D-8"],
-  "artifacts": { "plan": "plan.md", "implementation": "implementation-report-1.md", "evaluation": "evaluation-1.md", "pr_sis_product_sis_frontend_base_sandbox_qa": "pr-sis-product-sis-frontend-base-sandbox-qa.md" },
+  "decisions": [
+    "D-1",
+    "D-2",
+    "D-3",
+    "D-4",
+    "D-5",
+    "D-6",
+    "D-7",
+    "D-8"
+  ],
+  "artifacts": {
+    "plan": "plan.md",
+    "implementation": "implementation-report-1.md",
+    "evaluation": "evaluation-1.md",
+    "pr_sis_product_sis_frontend_base_sandbox_qa": "pr-sis-product-sis-frontend-base-sandbox-qa.md"
+  },
   "plan": "READY",
   "implementation": "COMPLETE",
   "evaluation": "PASS"
