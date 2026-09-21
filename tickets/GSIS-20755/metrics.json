@@ -1,0 +1,94 @@
+{
+  "ticket": "GSIS-20755",
+  "updated_at": "2026-09-21T06:56:06.317Z",
+  "sessions": {
+    "43918959-718f-4b63-8ded-28ff101a9194": {
+      "turns": 180,
+      "tokens_by_stage": {
+        "plan": {
+          "input": 286,
+          "output": 102481,
+          "cache_read": 15872012,
+          "cache_creation": 337168,
+          "thinking": 28756
+        },
+        "implement": {
+          "input": 40,
+          "output": 7964,
+          "cache_read": 3377877,
+          "cache_creation": 8684,
+          "thinking": 604
+        },
+        "evaluate": {
+          "input": 32,
+          "output": 18176,
+          "cache_read": 2888884,
+          "cache_creation": 31954,
+          "thinking": 1575
+        }
+      },
+      "tokens_by_model": {
+        "claude-sonnet-5": {
+          "input": 358,
+          "output": 128621,
+          "cache_read": 22138773,
+          "cache_creation": 377806,
+          "thinking": 30935
+        }
+      }
+    }
+  },
+  "tokens": {
+    "input": 358,
+    "output": 128621,
+    "cache_read": 22138773,
+    "cache_creation": 377806,
+    "thinking": 30935
+  },
+  "tokens_by_stage": {
+    "plan": {
+      "input": 286,
+      "output": 102481,
+      "cache_read": 15872012,
+      "cache_creation": 337168,
+      "thinking": 28756
+    },
+    "implement": {
+      "input": 40,
+      "output": 7964,
+      "cache_read": 3377877,
+      "cache_creation": 8684,
+      "thinking": 604
+    },
+    "evaluate": {
+      "input": 32,
+      "output": 18176,
+      "cache_read": 2888884,
+      "cache_creation": 31954,
+      "thinking": 1575
+    }
+  },
+  "tokens_by_model": {
+    "claude-sonnet-5": {
+      "input": 358,
+      "output": 128621,
+      "cache_read": 22138773,
+      "cache_creation": 377806,
+      "thinking": 30935
+    }
+  },
+  "turns": 180,
+  "stage_seconds": {
+    "plan": 900,
+    "implement": 840,
+    "evaluate": 1140
+  },
+  "iterations": 1,
+  "verdicts": {
+    "PASS": 1
+  },
+  "findings": {
+    "blocking": 0,
+    "non_blocking": 5
+  }
+}
