@@ -60,6 +60,10 @@
   /* header */
   .masthead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--rule); padding-bottom: 18px; }
   .masthead .lede { max-width: 62ch; color: var(--muted); margin-top: 6px; }
+  .freshness { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+  .freshness b { font-weight: 600; color: var(--ink); }
+  .freshness.stale b { color: var(--warn); }
+  .freshness code { font-family: var(--mono); font-size: 11.5px; background: var(--sunken); border-radius: 4px; padding: 1px 5px; color: var(--ink); }
   .filters { display: flex; flex-wrap: wrap; gap: 10px; }
   .filters label { display: grid; gap: 3px; font-size: 11px; color: var(--muted); font-weight: 500; }
   .filters select, .filters input { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 8px; min-width: 150px; max-width: 100%; font: inherit; color: inherit; }
@@ -209,6 +213,7 @@
       <div class="eyebrow">SIS engineering harness</div>
       <h1>Harness Record</h1>
       <p class="lede">How Claude worked each Jira ticket: who holds it now, the decisions it locked, and what the work took. Built from the team's brain repository.</p>
+      <p class="freshness" id="freshness"></p>
     </div>
     <div class="filters">
       <label for="f-sprint">Sprint<select id="f-sprint"></select></label>
@@ -831,6 +836,17 @@
     renderDetail(list);
   }
 
+  // how old this copy is, against the viewer's clock; ticks so an open page stays honest
+  function renderFreshness() {
+    var box = clear(document.getElementById("freshness"));
+    if (!data.generated_at) { box.appendChild(document.createTextNode("Last updated: unknown")); return; }
+    var age = (Date.now() - Date.parse(data.generated_at)) / 1000;
+    box.className = "freshness" + (age > 24 * 3600 ? " stale" : "");
+    box.appendChild(el("span", null, ["Last updated ", el("b", { text: when(data.generated_at) + " (" + (age < 60 ? "just now" : duration(age) + " ago") + ")" })]));
+    box.appendChild(el("span", null, ["Run ", el("code", { text: "/brain publish" }), " in Claude Code to get the latest updates."]));
+  }
+  renderFreshness();
+  setInterval(renderFreshness, 60000);
   renderFooter();
   render();
 })();
