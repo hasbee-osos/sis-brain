@@ -5,35 +5,54 @@
     "url": "https://gearsjira.atlassian.net/browse/GSIS-22560",
     "title": "Component ID is not created in order when clicking Save multiple times",
     "issue_type": "Bug",
-    "epic": { "key": "GSIS-2491", "name": "Exam Controller App" },
-    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "epic": {
+      "key": "GSIS-2491",
+      "name": "Exam Controller App"
+    },
+    "sprint": {
+      "name": "Sustainment Sprint 21",
+      "start": "2026-09-16",
+      "end": "2026-09-29"
+    },
     "assignee": "Ashoka Jayasekara",
     "estimate": null,
     "refreshed_at": "2026-09-21T17:45:00Z"
   },
   "status": "PLANNING",
-  "next_action": "Confirm work type, line and branch (bug, base line, base/bugfix/GSIS-22560-..., source base-development, PR to base-sandbox-qa), then fetch and run the Planner",
+  "next_action": "Fetch all repos, rebuild the codebase map at origin/base-development and run the Planner (attachments already fetched locally)",
   "blocked_on": null,
   "created_at": "2026-09-21T17:45:00Z",
-  "updated_at": "2026-09-21T17:45:00Z",
+  "updated_at": "2026-09-21T17:54:07Z",
   "iteration": 1,
   "max_iterations": null,
   "track": null,
   "workspace": "E:/Projects",
-  "work_type": null,
-  "line": null,
+  "work_type": "bug",
+  "line": "base",
   "customer_name": "Product Core Feature",
-  "source_branch": null,
-  "branch": null,
+  "source_branch": "base-development",
+  "branch": "base/bugfix/GSIS-22560-component-id-save-order",
   "repos": {},
   "context_repos": [],
-  "pr_target": null,
+  "pr_target": "base-sandbox-qa",
   "prs": [],
   "sessions": [
-    { "session_id": "6917b26b-57d4-4146-a9ac-9acf730f9afb", "started_at": "2026-09-21T17:45:00Z", "ended_at": null }
+    {
+      "session_id": "6917b26b-57d4-4146-a9ac-9acf730f9afb",
+      "started_at": "2026-09-21T17:45:00Z",
+      "ended_at": null
+    }
   ],
-  "human_confirmations": [],
-  "decisions": [],
+  "human_confirmations": [
+    {
+      "what": "line_and_branch",
+      "at": "2026-09-21T17:54:07Z",
+      "value": "Customer Name 'Product Core Feature' → line base, base/bugfix/GSIS-22560-component-id-save-order, source base-development, PR to base-sandbox-qa"
+    }
+  ],
+  "decisions": [
+    "D-1"
+  ],
   "artifacts": {},
   "plan": null,
   "implementation": null,
