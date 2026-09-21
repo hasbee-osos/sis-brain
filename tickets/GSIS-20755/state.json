@@ -12,10 +12,10 @@
     "refreshed_at": "2026-09-21T05:19:54Z"
   },
   "status": "PR_STAGE_1",
-  "next_action": "Raise the PR for sis-product-sis-admin-backend against base-sandbox-qa",
+  "next_action": "Human opens the compare link, creates the PR, and replies with its URL; then reviews non-blocking findings, runs manual QA on base-sandbox-qa after promotion, and handles the post-QA merge",
   "blocked_on": null,
   "created_at": "2026-09-21T05:19:54Z",
-  "updated_at": "2026-09-21T06:40:00Z",
+  "updated_at": "2026-09-21T06:50:00Z",
   "iteration": 1,
   "max_iterations": 1,
   "track": "light",
@@ -30,7 +30,17 @@
   },
   "context_repos": ["sis-product-sis-frontend"],
   "pr_target": "base-sandbox-qa",
-  "prs": [],
+  "prs": [
+    {
+      "repo": "sis-product-sis-admin-backend",
+      "stage": 1,
+      "target": "base-sandbox-qa",
+      "head": "base/bugfix/GSIS-20755-gpa-scale-description-save-error",
+      "resolve_branch": null,
+      "compare_link": "https://github.com/pbsgears/sis-product-sis-admin-backend/compare/base-sandbox-qa...base/bugfix/GSIS-20755-gpa-scale-description-save-error?expand=1&title=GSIS-20755%3A%20Fix%20GPA%20Scale%20description%20save%20failure%20for%20lengthy%20text",
+      "url": null
+    }
+  ],
   "sessions": [
     { "session_id": "43918959-718f-4b63-8ded-28ff101a9194", "started_at": "2026-09-21T05:19:54Z", "ended_at": null }
   ],
