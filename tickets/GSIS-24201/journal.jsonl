@@ -18,3 +18,4 @@
 {"ts":"2026-09-19T09:05:00Z","event":"evaluation","verdict":"PASS","blocking":0,"non_blocking":8,"iteration":1}
 {"ts":"2026-09-19T09:05:00Z","event":"decision_locked","id":"D-7","summary":"Evaluator verdict: PASS (iteration 1) - regression test independently reproduced fail-before/pass-after, no blocking findings"}
 {"ts":"2026-09-19T09:15:00Z","event":"pr_prepared","repo":"sis-product-sis-frontend","stage":1,"target":"base-sandbox-qa","url":null}
+{"ts":"2026-09-21T00:00:00Z","event":"session_resumed","session_id":"a04c3fd9-0fb0-4498-8e79-79c779168b29","from_status":"PR_STAGE_1"}

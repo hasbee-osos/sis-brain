@@ -8,13 +8,14 @@
     "epic": { "key": "GSIS-3301", "name": "Student Review" },
     "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
     "assignee": "Ashoka Jayasekara",
-    "refreshed_at": "2026-09-18T14:20:00Z"
+    "estimate": "3h",
+    "refreshed_at": "2026-09-21T00:00:00Z"
   },
   "status": "PR_STAGE_1",
   "next_action": "Human opens the compare link, creates the PR, QA runs the 5 manual verification steps, then merges and promotes to base-qa; once verified there, re-run /work to confirm stage 1 done and raise stage 2",
   "blocked_on": null,
   "created_at": "2026-09-18T14:20:00Z",
-  "updated_at": "2026-09-19T09:15:00Z",
+  "updated_at": "2026-09-21T00:00:00Z",
   "iteration": 1,
   "max_iterations": 2,
   "track": "light",
@@ -43,7 +44,8 @@
     }
   ],
   "sessions": [
-    { "session_id": "1a9e8080-ece3-498c-97a6-6aef03851d91", "started_at": "2026-09-18T14:20:00Z", "ended_at": null }
+    { "session_id": "1a9e8080-ece3-498c-97a6-6aef03851d91", "started_at": "2026-09-18T14:20:00Z", "ended_at": null },
+    { "session_id": "a04c3fd9-0fb0-4498-8e79-79c779168b29", "started_at": "2026-09-21T00:00:00Z", "ended_at": null }
   ],
   "human_confirmations": [
     { "what": "work_type_flow_branch", "at": "2026-09-18T14:45:00Z", "value": "bug, Flow A, base/bugfix/GSIS-24201-corequisite-required-validation, source base-development" },
