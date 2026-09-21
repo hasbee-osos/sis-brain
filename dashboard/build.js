@@ -294,6 +294,33 @@ function estimateHours(text) {
   return found ? hours : null;
 }
 
+/**
+ * Developer time from Jira. The estimate is the ticket's Dev Lead Estimation, or, when that is
+ * empty, the sum of its developer sub-tasks' original estimates (developers often create a
+ * sub-task for the dev work and estimate or log time there). Logged time is summed from the
+ * sub-tasks; a sub-task whose type names QA counts as QA time, every other as developer time.
+ */
+function devTime(jira) {
+  const subtasks = Array.isArray(jira.subtasks) ? jira.subtasks : [];
+  const isQa = (s) => /\bqa\b/i.test(s.type || "");
+  const sum = (list, field) => {
+    const hs = list.map((s) => estimateHours(s[field])).filter((h) => h != null);
+    return hs.length ? hs.reduce((a, h) => a + h, 0) : null;
+  };
+  const dev = subtasks.filter((s) => !isQa(s));
+  const parent = estimateHours(jira.estimate);
+  const fromSubtasks = sum(dev, "estimate");
+  return {
+    estimate: jira.estimate || null,
+    estimate_hours: parent != null ? parent : fromSubtasks,
+    estimate_source: parent != null ? "Dev Lead Estimation" : fromSubtasks != null ? "dev sub-tasks" : null,
+    subtask_estimate_hours: fromSubtasks,
+    dev_logged_hours: sum(dev, "logged"),
+    qa_logged_hours: sum(subtasks.filter(isQa), "logged"),
+    subtasks,
+  };
+}
+
 // ---------------------------------------------------------------- decisions
 
 function parseDecisions(file) {
@@ -484,8 +511,9 @@ function buildTicket(dir, now) {
     round: back.length + 1,
     next_action: state.next_action || null,
     blocked_on: state.blocked_on || null,
-    estimate: jira.estimate || null,
-    estimate_hours: estimateHours(jira.estimate),
+    customer_name: jira.customer_name || (state.customer_name ? [state.customer_name] : []),
+    labels: jira.labels || [],
+    ...devTime(jira),
     created_at: state.created_at || (events[0] && events[0].ts) || null,
     updated_at: state.updated_at || (events.length ? events[events.length - 1].ts : null),
     iteration: state.iteration ?? 0,

@@ -118,9 +118,9 @@
 
   /* table */
   .table-wrap { overflow: auto; max-height: 560px; overscroll-behavior: contain; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; }
-  table { border-collapse: collapse; width: 100%; min-width: 1080px; }
+  table { border-collapse: collapse; width: 100%; min-width: 960px; }
   th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
-  th { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: var(--sunken); white-space: nowrap; position: sticky; top: 0; z-index: 1; }
+  th { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: var(--sunken); position: sticky; top: 0; z-index: 1; }
   tbody tr { cursor: pointer; }
   tbody tr:hover td { background: var(--accent-soft); }
   tbody tr[aria-current="true"] td { background: var(--accent-soft); }
@@ -258,7 +258,7 @@
         <thead>
           <tr>
             <th>Ticket</th><th>Title</th><th>Sprint</th><th>Epic</th><th>Where it stands</th>
-            <th class="num">Iterations</th><th>Last verdict</th><th class="num">Dev estimate</th><th class="num">AI time</th><th class="num">Waiting on people</th><th class="num">Idle</th><th>Updated</th>
+            <th class="num" title="Dev Lead Estimation in Jira, or the developer sub-tasks' estimates when that is empty">Dev estimate</th><th class="num" title="Time developers logged on the ticket's sub-tasks in Jira">Dev logged</th><th class="num">AI time</th><th class="num">Waiting on people</th><th class="num">Idle</th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -618,7 +618,7 @@
     var body = clear(document.getElementById("rows"));
     document.getElementById("table-count").textContent = list.length + " of " + tickets.length + " tickets";
     if (!list.length) {
-      body.appendChild(el("tr", null, [el("td", { colspan: "12", class: "empty", text: "No tickets match these filters." })]));
+      body.appendChild(el("tr", null, [el("td", { colspan: "10", class: "empty", text: "No tickets match these filters." })]));
       return;
     }
     list.forEach(function (t) {
@@ -632,13 +632,14 @@
         el("td", { text: sprintName(t) || "—" }),
         el("td", { text: epicLabel(t) || "—" }),
         el("td", null, [el("div", { class: "meta-col" }, standPills(t, true))]),
-        el("td", { class: "num", text: t.evaluations.length + " / " + t.max_iterations }),
-        el("td", null, [verdictPill(lastVerdict(t))]),
-        el("td", { class: "num", text: t.estimate || "—" }),
+        el("td", { class: "num", title: t.estimate_source ? "From " + t.estimate_source : null }, [
+          t.estimate_hours != null ? duration(t.estimate_hours * 3600) : "—",
+          t.estimate_source === "dev sub-tasks" ? el("div", { class: "small muted", text: "sub-tasks" }) : null
+        ]),
+        el("td", { class: "num", text: t.dev_logged_hours != null ? duration(t.dev_logged_hours * 3600) : "—" }),
         el("td", { class: "num", text: duration(t.working_seconds) }),
         el("td", { class: "num", text: duration(peopleWait(t)) }),
-        el("td", { class: "num", text: duration((t.time || {}).idle) }),
-        el("td", { class: "small muted", text: ago(t.updated_at) })
+        el("td", { class: "num", text: duration((t.time || {}).idle) })
       ]);
       body.appendChild(row);
     });
@@ -704,7 +705,10 @@
       ["Epic", t.epic ? (t.epic.name ? t.epic.name + " (" + t.epic.key + ")" : t.epic.key) : "—"],
       ["Sprint", t.sprint ? t.sprint.name : "—"],
       ["Assignee", t.assignee || "—"],
-      ["Dev lead estimate", t.estimate ? t.estimate + " (Jira)" : "not recorded"],
+      ["Customer", t.customer_name && t.customer_name.length ? t.customer_name.join(", ") : "—"],
+      ["Jira labels", t.labels && t.labels.length ? t.labels.join(", ") : "—"],
+      ["Dev estimate", t.estimate_hours != null ? duration(t.estimate_hours * 3600) + " (" + t.estimate_source + ")" + (t.estimate_source === "Dev Lead Estimation" && t.subtask_estimate_hours != null ? "; sub-tasks " + duration(t.subtask_estimate_hours * 3600) : "") : "not recorded"],
+      ["Time logged in Jira", t.dev_logged_hours != null || t.qa_logged_hours != null ? [t.dev_logged_hours != null ? "dev " + duration(t.dev_logged_hours * 3600) : null, t.qa_logged_hours != null ? "QA " + duration(t.qa_logged_hours * 3600) : null].filter(Boolean).join(" · ") : "none"],
       ["Started", when(t.created_at)],
       ["Branch", t.branch ? t.branch + (t.source_branch ? " from " + t.source_branch : "") : "—"],
       ["Repos changed", t.repos.filter(function (r) { return r.role === "change"; }).map(function (r) { return r.name; }).join(", ") || "not yet decided"]
@@ -726,7 +730,7 @@
         return el("span", null, [el("i", { style: "background:" + kindColor(k) }), kindLabel(k) + " " + duration(t.time[k])]);
       })));
       life.appendChild(el("p", { class: "small muted", text: "The whole " + duration(t.elapsed_seconds) + " from start to " + (lane(t) === "closed" ? "close" : "now") + ", left to right." +
-        (t.estimate_hours != null ? " Dev lead estimate in Jira: " + t.estimate + "; AI working time: " + duration(t.working_seconds) + " (developer review and QA not included)." : "") }));
+        (t.estimate_hours != null ? " Dev estimate in Jira: " + duration(t.estimate_hours * 3600) + "; AI working time: " + duration(t.working_seconds) + " (developer review and QA not included)." : "") }));
     } else {
       life.appendChild(el("p", { class: "empty", text: "No stage time recorded yet." }));
     }
