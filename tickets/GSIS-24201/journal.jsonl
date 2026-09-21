@@ -19,3 +19,6 @@
 {"ts":"2026-09-19T09:05:00Z","event":"decision_locked","id":"D-7","summary":"Evaluator verdict: PASS (iteration 1) - regression test independently reproduced fail-before/pass-after, no blocking findings"}
 {"ts":"2026-09-19T09:15:00Z","event":"pr_prepared","repo":"sis-product-sis-frontend","stage":1,"target":"base-sandbox-qa","url":null}
 {"ts":"2026-09-21T00:00:00Z","event":"session_resumed","session_id":"a04c3fd9-0fb0-4498-8e79-79c779168b29","from_status":"PR_STAGE_1"}
+{"ts":"2026-09-21T11:10:16Z","event":"stage_corrected","stage":"plan","iteration":1,"original_start":"2026-09-18T14:50:00Z","start":"2026-09-18T13:01:25Z","end":"2026-09-18T13:16:55Z","excluded":[],"reason":"times taken from brain commits; the journal clock was wrong"}
+{"ts":"2026-09-21T11:10:16Z","event":"stage_corrected","stage":"implement","iteration":1,"original_start":"2026-09-18T15:23:00Z","start":"2026-09-18T17:48:39Z","end":"2026-09-18T18:20:31Z","excluded":[],"reason":"times taken from brain commits; the journal clock was wrong"}
+{"ts":"2026-09-21T11:10:16Z","event":"stage_corrected","stage":"evaluate","iteration":1,"original_start":"2026-09-18T15:55:00Z","start":"2026-09-18T18:20:45Z","end":"2026-09-18T18:37:52Z","excluded":[],"reason":"times taken from brain commits; stage_end had been written the next morning"}
