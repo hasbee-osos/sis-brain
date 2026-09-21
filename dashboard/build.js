@@ -66,7 +66,7 @@ function stageRuns(events) {
     else if (e.event === "stage_end" && open.has(e.stage)) {
       const start = open.get(e.stage);
       open.delete(e.stage);
-      runs.push({ stage: e.stage, iteration: e.iteration ?? start.iteration ?? null, start: start.ts, end: e.ts, seconds: seconds(start.ts, e.ts) });
+      runs.push({ stage: e.stage, iteration: e.iteration ?? start.iteration ?? null, start: start.ts, end: e.ts, seconds: seconds(start.ts, e.ts), startEvent: start, endEvent: e });
     }
   }
   for (const start of open.values()) {
@@ -82,8 +82,25 @@ function stageRuns(events) {
     run.excluded = (c.excluded || []).filter((x) => x && x.start && x.end);
     run.corrected = c.reason || true;
     run.seconds = seconds(run.start, run.end) - run.excluded.reduce((a, x) => a + seconds(x.start, x.end), 0);
+    if (run.startEvent) run.startEvent.ts = run.start;
+    if (run.endEvent) run.endEvent.ts = run.end;
   }
-  return runs;
+  return runs.map(({ startEvent, endEvent, ...r }) => r);
+}
+
+/**
+ * ts_corrected moves every event recorded at original_ts (or only the named events) to
+ * corrected_ts. Stage events are left to stage_corrected, which stageRuns has applied.
+ */
+function applyTsCorrections(events) {
+  for (const c of events.filter((e) => e.event === "ts_corrected")) {
+    if (!c.original_ts || !c.corrected_ts) continue;
+    for (const e of events) {
+      if (e.ts !== c.original_ts || /^(stage_start|stage_end|stage_corrected|ts_corrected)$/.test(e.event)) continue;
+      if (Array.isArray(c.events) && !c.events.includes(e.event)) continue;
+      e.ts = c.corrected_ts;
+    }
+  }
 }
 
 /**
@@ -296,8 +313,10 @@ function buildTicket(dir, now) {
   const metrics = readJson(path.join(dir, "metrics.json"), {});
   const jira = state.jira || {};
   const runs = stageRuns(events);
+  applyTsCorrections(events);
   // corrections are dated when they were written, not when anything happened on the ticket
-  events = events.filter((e) => e.event !== "stage_corrected");
+  events = events.filter((e) => e.event !== "stage_corrected" && e.event !== "ts_corrected");
+  events.sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0));
   const waitPeriods = waits(events, state, now);
   const openWait = waitPeriods.find((w) => !w.end) || null;
   const evaluations = events.filter((e) => e.event === "evaluation");
