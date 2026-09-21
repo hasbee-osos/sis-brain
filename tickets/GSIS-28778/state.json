@@ -12,7 +12,34 @@
       "end": "2026-09-29"
     },
     "assignee": "Ashoka Jayasekara",
-    "refreshed_at": "2026-09-17T05:11:55Z"
+    "refreshed_at": "2026-09-21T15:36:22Z",
+    "estimate": "6h",
+    "customer_name": [
+      "Product Core Feature"
+    ],
+    "labels": [
+      "SIS-OSOS-QA"
+    ],
+    "subtasks": [
+      {
+        "key": "GSIS-28900",
+        "type": "Dev Sub-task",
+        "estimate": "6h",
+        "logged": "5h"
+      },
+      {
+        "key": "GSIS-28902",
+        "type": "Sub-task",
+        "estimate": "4h",
+        "logged": "6h"
+      },
+      {
+        "key": "GSIS-28905",
+        "type": "QA Sub-task",
+        "estimate": null,
+        "logged": "1h"
+      }
+    ]
   },
   "status": "NEEDS_INPUT",
   "next_action": "Developer stopped this run: the harness pipeline took too long and was too complex, and they will simplify and relaunch the ticket fresh. Nothing is pushed to origin; the ticket branch base/bugfix/GSIS-28778-module-relationship-rule-propagation holds S1 (RC-2 row-id guard) and the D-18 empty-save guard as 2 backend + 1 frontend local commits. Iteration 1 evaluation is FAIL (evaluation-1.md, E-1 scope gap, E-2/E-3 no executed tests). A fresh run may reuse analysis-2.md, design.md and D-1..D-19, or start over; if it starts over, supersede the decisions it does not keep.",
