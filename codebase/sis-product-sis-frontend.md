@@ -14,6 +14,7 @@ The Angular admin, student and staff UI for all SIS domains. It uses Angular 13,
 | Components shared between screens | Look for other hosts before changing one. For example, the requisite components under `modules/admin/masters/course-master/requisite/` are embedded in the Course master, Course Offering, Study Plan, student study plan and graduation plan |
 | Translations | **Not in this repo.** The JSON lives in `sis-product-sis-admin-backend/src/main/resources/i18n/`. A new key there means changing the backend too |
 | Menu entries | Not in this repo either: they are Liquibase rows in the backend (`generated/sis-product-sis-admin-backend.menus.md`) |
+| Why a save fails with "Some entities are assigned to this &lt;X&gt;" | Not always a real conflict — `src/@gears-commons/services/gears-alert.service.ts` renders that text for **any** unclassified backend save exception (`DATA_SAVING_ERROR` / business status 5100), most often a plain DB constraint like a length cap |
 
 ## Naming
 
