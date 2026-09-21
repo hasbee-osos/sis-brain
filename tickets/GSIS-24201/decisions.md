@@ -60,3 +60,12 @@
 - **Convention cited:** `harness-core` — bug standard: "is the bug fixed, with evidence and no regression"
 - **Evidence:** `evaluation-1.md` — E-1 through E-8
 - **Status:** LOCKED
+
+### D-8 — Post-PR fix: guard `isValidCoRequisite()` against the async load race (Copilot review, PR #7338)
+- **Stage:** post-PR fix, not a new implement/evaluate iteration
+- **Decided by:** developer (Ashoka), applied directly in-session, not re-evaluated by the Evaluator
+- **Options considered:** (a) block the parent save while co-requisite data is loading (chosen); (b) load co-requisites synchronously before the page is interactive — rejected, larger change touching page init order across 5 host screens; (c) ignore as low-probability — rejected, Copilot correctly identified a silent-data-loss path on a fast EDIT-mode save
+- **Why:** on EDIT, `courseCoRequisiteFormGroupList` starts empty and is filled asynchronously by `loadData()`/its siblings; a save before that resolves reached `isValidCoRequisite()` with an empty list (vacuously valid), and `saveCourseCoRequisite()` then sent no existing rows, silently clearing them server-side. Added `isCoRequisiteDataLoading`, set before each of the 5 load paths and cleared in their `next`/`error` callbacks; the gate now blocks (reusing the existing `validation.message.notFilledRequiredField` alert per D-5, so no new i18n key/backend touch) while it is true.
+- **Convention cited:** D-5 (reuse existing i18n keys before adding new ones); `harness-core` — smallest safe change
+- **Evidence:** `course-co-requisite.component.ts` (isCoRequisiteDataLoading + 5 load callbacks + isValidCoRequisite guard); `course-co-requisite.component.spec.ts` U-C5/U-C6; targeted suite `Executed 12 of 12 SUCCESS` (temp `tsconfig.spec.local-verify.json` excluding the same ~14 pre-existing broken specs as iteration 1, deleted after the run); `ng build --build-optimizer=false` exit 0; `eslint` on both touched files: 1 pre-existing error (line 229, `coRequisiteFilterBasedSelectedProgramAndMms`, untouched by this change), 0 new
+- **Status:** LOCKED — **not yet evaluated by the Evaluator** (light track's single evaluation round was already used in iteration 1); commit `0e6de953a4` is ahead of `evaluated_head` (`2228522`) and not yet pushed to origin

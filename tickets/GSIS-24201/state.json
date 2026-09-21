@@ -12,10 +12,10 @@
     "refreshed_at": "2026-09-21T00:00:00Z"
   },
   "status": "PR_STAGE_1",
-  "next_action": "Human opens the compare link, creates the PR, QA runs the 5 manual verification steps, then merges and promotes to base-qa; once verified there, re-run /work to confirm stage 1 done and raise stage 2",
+  "next_action": "Local commit 0e6de953a4 (Copilot review fix, D-8) is ahead of evaluated_head and NOT pushed - developer to confirm before pushing to PR #7338; light track's single evaluation round is used, so this fix goes to the human/QA reviewer unevaluated, same as a final-fix-round commit",
   "blocked_on": null,
   "created_at": "2026-09-18T12:42:24Z",
-  "updated_at": "2026-09-21T11:24:08Z",
+  "updated_at": "2026-09-21T11:36:26Z",
   "iteration": 1,
   "max_iterations": 2,
   "track": "light",
@@ -52,7 +52,7 @@
     { "what": "repos_to_change", "at": "2026-09-18T17:45:50Z", "value": ["sis-product-sis-frontend"] },
     { "what": "track", "at": "2026-09-18T17:45:50Z", "value": "light" }
   ],
-  "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5", "D-6", "D-7"],
+  "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5", "D-6", "D-7", "D-8"],
   "artifacts": { "plan": "plan.md", "implementation": "implementation-report-1.md", "evaluation": "evaluation-1.md", "pr_sis_product_sis_frontend_base_sandbox_qa": "pr-sis-product-sis-frontend-base-sandbox-qa.md" },
   "plan": "READY",
   "implementation": "COMPLETE",

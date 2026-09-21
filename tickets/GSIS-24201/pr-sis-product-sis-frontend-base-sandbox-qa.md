@@ -25,8 +25,11 @@ On Administration → Master → Module → Module Co-Requisites, a co-requisite
   4. Module with no co-requisites at all, Save → succeeds (covered at unit level).
   5. Spot-check Module Offering and a Study Plan co-requisite drawer still behave as before.
 
+## Fixed after the last evaluation — reviewer to check
+- **Copilot (PR review):** on EDIT, `courseCoRequisiteFormGroupList` starts empty and is populated asynchronously by `loadData()` (and its siblings for the other host screens); a Save before that resolves reached `isValidCoRequisite()` with an empty list (vacuously valid), and `saveCourseCoRequisite()` then sent no existing rows — silently clearing them server-side. Fix: added `isCoRequisiteDataLoading`, set before each of the 5 load paths and cleared in their `next`/`error` callbacks; `isValidCoRequisite()` now blocks the save (reusing the existing `notFilledRequiredField` alert, no new i18n key) while it is true. Covered by `course-co-requisite.component.spec.ts` U-C5/U-C6. This commit was **not re-run through the automated Evaluator** — light track's one evaluation round was already used in iteration 1 — so please review it directly, the same as a final-fix-round commit.
+
 ## Evaluator
-**PASS** (iteration 1, 0 blocking findings). Full evaluation: `sis-brain/tickets/GSIS-24201/evaluation-1.md`.
+**PASS** (iteration 1, 0 blocking findings). Full evaluation: `sis-brain/tickets/GSIS-24201/evaluation-1.md`. See "Fixed after the last evaluation" above for a change made after this verdict.
 
 ## Iterations
 1 of 2 (light track).
