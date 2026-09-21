@@ -1,0 +1,65 @@
+{
+  "_about": "Display names, colours and timeline wording for the dashboard. The page lists no stages, audiences or events of its own: whatever the ticket records contain is shown, and a key missing here falls back to its name with underscores replaced by spaces and a colour from the palette. {field} in an event sentence is replaced by that field of the event (translated through the map named in field_maps, if any); a [bracketed part] is dropped when a field inside it is missing; null hides the event.",
+  "lanes": {
+    "claude": { "label": "With Claude", "hint": "A harness stage is running" },
+    "person": { "label": "Needs a person", "hint": "The run stopped until someone answers, confirms or decides" },
+    "outside": { "label": "Handed off", "hint": "Claude's part is done; the next move is outside the harness" },
+    "closed": { "label": "Closed", "hint": "A developer confirmed the ticket is finished" }
+  },
+  "stages": {
+    "plan": { "label": "Plan", "color": "#4a90b8" },
+    "implement": { "label": "Implement", "color": "#d08a2e" },
+    "evaluate": { "label": "Evaluate", "color": "#b95796" },
+    "pr": { "label": "Pull requests", "color": "#6f8f3a" },
+    "publish": { "label": "Publish", "color": "#8a8f99" }
+  },
+  "stage_aliases": { "analyze": "plan", "design": "plan" },
+  "audiences": {
+    "developer": { "label": "Developer", "color": "#6f8f3a" },
+    "qa": { "label": "QA", "color": "#b95796" },
+    "sme": { "label": "PO / BA", "color": "#d08a2e" },
+    "reviewers": { "label": "PR reviewers", "color": "#8a8f99" }
+  },
+  "kinds": {
+    "working": { "label": "AI working", "color": "#4a90b8" },
+    "outside": { "label": "Handed off, outside the harness", "color": "#9aa3b0" },
+    "idle": { "label": "Idle", "color": "#cdd2da" }
+  },
+  "reasons": {
+    "review": "review comments on the PR",
+    "qa_bug": "QA found an issue",
+    "other": "follow-up work"
+  },
+  "statuses": {
+    "PLANNING": "planning",
+    "AWAITING_REPO_CONFIRMATION": "repo confirmation",
+    "IMPLEMENTING": "implementing",
+    "EVALUATING": "evaluating",
+    "PR_STAGE_1": "PR raised",
+    "PR_STAGE_2": "PR raised",
+    "NEEDS_INPUT": "waiting for answers",
+    "ESCALATED": "escalated",
+    "DONE": "closed"
+  },
+  "field_maps": { "stage": "stages", "audience": "audiences", "to": "audiences", "reason": "reasons", "from_status": "statuses" },
+  "events": {
+    "ticket_started": "Harness started work on the ticket",
+    "session_resumed": "A new session resumed the ticket[ from {from_status}]",
+    "stage_start": null,
+    "stage_end": null,
+    "iteration_start": "Iteration {iteration} started[: {reason}]",
+    "human_confirmed": "Developer confirmed {what}[: {value}]",
+    "input_requested": "Stopped for answers from {audience}[ ({questions} questions)]",
+    "input_received": "Answers received from {audience}",
+    "decision_locked": "{id} locked: {summary}",
+    "decision_superseded": "{id} superseded by {superseded_by}",
+    "branch_created": "Branch ready in {repo}",
+    "evaluation": "Evaluation {iteration}: {verdict} — {blocking} blocking, {non_blocking} non-blocking",
+    "pr_prepared": "PR prepared for {repo} → {target}",
+    "handed_off": "Handed off to {to}",
+    "ticket_reopened": "Came back: {reason}",
+    "escalated": "Escalated[: {reason}]",
+    "ticket_closed": "Ticket closed[: {outcome}]"
+  },
+  "palette": ["#5b7be0", "#3fa3a0", "#c46a4a", "#7a64c4", "#4f9a55", "#b8883a", "#5f8fb0", "#a8577f"]
+}

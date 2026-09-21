@@ -94,7 +94,9 @@
   .pill.done, .pill.pass { background: var(--ok-soft); color: var(--ok); }
   .pill.escalated, .pill.fail { background: var(--bad-soft); color: var(--bad); }
   .pill.insufficient { background: var(--warn-soft); color: var(--warn); }
+  .pill.outside { background: var(--sunken); color: var(--ink); }
   .pill.plain::before { display: none; }
+  .pill.round { background: var(--warn-soft); color: var(--warn); }
 
   /* stage breakdown */
   .panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
@@ -108,7 +110,7 @@
 
   /* table */
   .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; }
-  table { border-collapse: collapse; width: 100%; min-width: 860px; }
+  table { border-collapse: collapse; width: 100%; min-width: 1080px; }
   th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
   th { font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: var(--sunken); white-space: nowrap; }
   tbody tr { cursor: pointer; }
@@ -116,7 +118,8 @@
   tbody tr[aria-current="true"] td { background: var(--accent-soft); }
   tbody tr:last-child td { border-bottom: 0; }
   td.num, th.num { text-align: right; }
-  td .t-title { max-width: 36ch; }
+  td .t-title { min-width: 24ch; max-width: 36ch; }
+  td .meta-col { display: flex; flex-wrap: wrap; gap: 4px; min-width: 16ch; max-width: 24ch; }
 
   /* detail */
   .detail { background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 20px; display: grid; gap: 22px; }
@@ -129,6 +132,7 @@
   .stands { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 12px 14px; border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
   .stands.waiting { border-color: var(--wait); background: var(--wait-soft); }
   .stands.done { border-color: var(--ok); background: var(--ok-soft); }
+  .stands.outside { border-color: var(--faint); background: var(--sunken); }
   .stands.escalated { border-color: var(--bad); background: var(--bad-soft); }
   .stands p { max-width: 90ch; }
   .cols { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; }
@@ -142,6 +146,7 @@
   .timeline { list-style: none; margin: 0; padding: 0; display: grid; }
   .timeline li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; padding: 7px 0; border-bottom: 1px dashed var(--rule); font-size: 13px; }
   .timeline li:last-child { border-bottom: 0; }
+  .timeline li.divider { border-top: 2px solid var(--warn); margin-top: 6px; font-weight: 600; }
   .timeline time { font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding-top: 1px; }
 
   details.decision { border: 1px solid var(--rule); border-radius: 8px; padding: 9px 12px; }
@@ -184,7 +189,7 @@
     <div>
       <div class="eyebrow">SIS engineering harness</div>
       <h1>Harness Record</h1>
-      <p class="lede">How Claude worked each Jira ticket: where it stands, who it is waiting on, the decisions it locked, and what the work took. Built from the team's brain repository.</p>
+      <p class="lede">How Claude worked each Jira ticket: who holds it now, the decisions it locked, and what the work took. Built from the team's brain repository.</p>
     </div>
     <div class="filters">
       <label for="f-sprint">Sprint<select id="f-sprint"></select></label>
@@ -198,7 +203,7 @@
   <section>
     <div class="section-head">
       <h2>Where things stand</h2>
-      <span class="small muted">Select a ticket to see how it was worked</span>
+      <span class="small muted">Who holds each ticket now. Select one to see how it was worked</span>
     </div>
     <div class="board" id="board"></div>
   </section>
@@ -216,7 +221,7 @@
       </div>
       <div class="panel">
         <h3>Elapsed time, by what it was waiting on</h3>
-        <p class="small muted">From ticket start to close (or now): the AI working, waiting on QA or an SME for answers, waiting on the developer, or idle</p>
+        <p class="small muted">From ticket start to close (or now): the AI working, waiting on someone for answers or a decision, handed off outside the harness, or idle</p>
         <div class="bars" id="bars-elapsed"></div>
       </div>
     </div>
@@ -231,7 +236,7 @@
       <table>
         <thead>
           <tr>
-            <th>Ticket</th><th>Title</th><th>Sprint</th><th>Epic</th><th>Status</th>
+            <th>Ticket</th><th>Title</th><th>Sprint</th><th>Epic</th><th>Where it stands</th>
             <th class="num">Iterations</th><th>Last verdict</th><th class="num">Dev estimate</th><th class="num">AI time</th><th class="num">Waiting on people</th><th class="num">Idle</th><th>Updated</th>
           </tr>
         </thead>
@@ -256,28 +261,68 @@
   catch (e) { data = { tickets: [], generated_at: null, unreadable: [] }; }
   var tickets = data.tickets || [];
   var now = data.generated_at ? Date.parse(data.generated_at) : Date.now();
+  var L = data.labels || {};
 
-  var STAGES = ["analyze", "design", "plan", "implement", "evaluate", "pr", "publish"];
-  var STAGE_LABEL = { analyze: "Analyze", design: "Design", plan: "Plan", implement: "Implement", evaluate: "Evaluate", pr: "Pull requests", publish: "Publish" };
-  var STAGE_COLOR = { analyze: "#5b7be0", design: "#3fa3a0", plan: "#4a90b8", implement: "#d08a2e", evaluate: "#b95796", pr: "#6f8f3a", publish: "#8a8f99" };
-  var STATUS_LABEL = {
-    PLANNING: "Planning", ANALYZING: "Analyzing", DESIGNING: "Designing", AWAITING_REPO_CONFIRMATION: "Awaiting repo confirmation",
-    IMPLEMENTING: "Implementing", EVALUATING: "Evaluating", PR_STAGE_1: "PRs · stage 1", PR_STAGE_2: "PRs · stage 2",
-    DONE: "Done", NEEDS_INPUT: "Needs input", ESCALATED: "Escalated"
-  };
-  var WAIT_LABEL = { qa: "QA", sme: "SME", developer: "Developer", reviewers: "PR reviewers" };
-  var KINDS = ["working", "qa", "sme", "developer", "idle"];
-  var KIND_LABEL = { working: "AI working", qa: "Waiting on QA", sme: "Waiting on SME", developer: "Waiting on developer", idle: "Idle" };
-  var KIND_COLOR = { working: "#4a90b8", qa: "#b95796", sme: "#d08a2e", developer: "#6f8f3a", idle: "#b3bac5" };
+  // The page lists no harness stages, audiences or events of its own: everything below is
+  // read from the ticket records, and named through labels.json with a readable fallback.
+  // The four lanes are about who holds the ticket, so they hold for any future stage.
+  var LANES = ["claude", "person", "outside", "closed"];
+  var LANE_CLASS = { claude: "working", person: "waiting", outside: "outside", closed: "done" };
   var RATE_MIN = 10; // show percentages only once there are enough tickets to mean something
-  var PHASES = [
-    { id: "working", label: "Claude working" },
-    { id: "waiting", label: "Waiting on people" },
-    { id: "done", label: "Delivered" },
-    { id: "escalated", label: "Escalated" }
-  ];
 
-  var state = { sprint: "", epic: "", type: "", selected: tickets.length ? tickets[0].id : null };
+  // ------------------------------------------------------------ labels
+  function humanize(key) {
+    var s = String(key == null ? "" : key).replace(/_/g, " ").trim();
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : "—";
+  }
+  function entry(map, key) { var m = L[map] || {}; return m[key]; }
+  function label(map, key) {
+    var v = entry(map, key);
+    return v == null ? humanize(key) : typeof v === "string" ? v : v.label || humanize(key);
+  }
+  var assigned = {}, nextColor = 0;
+  function color(map, key) {
+    var v = entry(map, key);
+    if (v && v.color) return v.color;
+    var id = map + ":" + key;
+    if (!assigned[id]) { var p = L.palette || ["#5b7be0"]; assigned[id] = p[nextColor++ % p.length]; }
+    return assigned[id];
+  }
+  function laneLabel(id) { return label("lanes", id); }
+  function stageLabel(s) { return label("stages", s); }
+  function whoLabel(w) { return label("audiences", w); }
+  // time kinds: working, outside and idle are fixed; any other kind is an audience being waited on
+  function kindLabel(k) { return entry("kinds", k) ? label("kinds", k) : "Waiting on " + whoLabel(k); }
+  function kindColor(k) { return entry("kinds", k) ? color("kinds", k) : color("audiences", k); }
+  function kindOrder(k) { return k === "working" ? 0 : k === "outside" ? 8 : k === "idle" ? 9 : 5; }
+
+  function fieldText(name, value) {
+    if (value == null || value === "") return null;
+    if (Array.isArray(value)) return value.join(", ");
+    if (typeof value === "object") return null;
+    var map = (L.field_maps || {})[name];
+    return map ? label(map, value) : name === "what" ? String(value).replace(/_/g, " ") : String(value);
+  }
+  var HIDDEN_FIELDS = { ts: 1, event: 1, ticket: 1, session_id: 1, derived: 1, round: 1 };
+  function sentence(e) {
+    var events = L.events || {};
+    if (e.event === "ticket_reopened" && e.round) {
+      return "↻ Round " + e.round + ": came back" + (e.reason ? " — " + fieldText("reason", e.reason) : e.derived ? " after the hand-off" : "");
+    }
+    if (Object.prototype.hasOwnProperty.call(events, e.event)) {
+      var tpl = events[e.event];
+      if (tpl == null) return null;
+      var fill = function (s) { return s.replace(/\{(\w+)\}/g, function (_, f) { var v = fieldText(f, e[f]); return v == null ? "—" : v; }); };
+      return fill(tpl.replace(/\[([^\]]*)\]/g, function (_, part) {
+        var fields = part.match(/\{(\w+)\}/g) || [];
+        return fields.every(function (f) { return fieldText(f.slice(1, -1), e[f.slice(1, -1)]) != null; }) ? part : "";
+      }));
+    }
+    // an event labels.json does not know yet: its name and its simple fields
+    var parts = Object.keys(e).filter(function (k) { return !HIDDEN_FIELDS[k] && fieldText(k, e[k]) != null; })
+      .map(function (k) { return k.replace(/_/g, " ") + " " + fieldText(k, e[k]); });
+    return humanize(e.event) + (parts.length ? ": " + parts.join(", ") : "");
+  }
 
   // ------------------------------------------------------------ helpers
   function el(tag, attrs, children) {
@@ -312,19 +357,41 @@
     if (h == null) return "—";
     return (h < 10 ? Math.round(h * 10) / 10 : Math.round(h)) + "h";
   }
-  function peopleWait(t) { return t.time.qa + t.time.sme + t.time.developer; }
+  function since(ts) { return ts ? duration((now - Date.parse(ts)) / 1000) : ""; }
+  // time spent waiting on any person: every kind except working, handed off and idle
+  function peopleWait(t) {
+    return Object.keys(t.time || {}).reduce(function (a, k) { return a + (kindOrder(k) === 5 ? t.time[k] : 0); }, 0);
+  }
   function when(ts) {
     if (!ts) return "—";
     var d = new Date(ts);
     return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" }) + " " +
       d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
   }
-  function ago(ts) {
-    if (!ts) return "";
-    return duration((now - Date.parse(ts)) / 1000) + " ago";
-  }
-  function statusPill(t) {
-    return el("span", { class: "pill " + t.phase, text: STATUS_LABEL[t.status] || t.status });
+  function ago(ts) { return ts ? since(ts) + " ago" : ""; }
+  function lane(t) { return (t.holder && t.holder.lane) || "person"; }
+
+  /** The pills that say where a ticket stands, the same on its card, row and detail. */
+  function standPills(t, withLane) {
+    var h = t.holder || {}, pills = [];
+    var cls = "pill " + LANE_CLASS[lane(t)];
+    if (withLane) pills.push(el("span", { class: cls, text: laneLabel(lane(t)) }));
+    if (h.lane === "claude") {
+      pills.push(el("span", { class: withLane ? "pill plain" : cls, text: stageLabel(h.stage) + (h.iteration ? " · iteration " + h.iteration : "") }));
+    } else if (h.lane === "person") {
+      if (h.escalated) pills.push(el("span", { class: "pill escalated", text: "Escalated" }));
+      if (h.stage) pills.push(el("span", { class: withLane ? "pill plain" : cls, text: "Stopped in " + stageLabel(h.stage) }));
+      pills.push(el("span", { class: "pill plain waiting", text: "on " + whoLabel(h.who) + (h.since ? " · " + since(h.since) : "") }));
+    } else if (h.lane === "outside") {
+      (h.refs && h.refs.length ? h.refs : [{ label: "With " + whoLabel(h.who) }]).forEach(function (r) {
+        pills.push(el("span", { class: withLane ? "pill plain" : cls, text: r.label }));
+      });
+      if (h.since) pills.push(el("span", { class: "pill plain", text: since(h.since) + " ago" }));
+    } else if (h.lane === "closed") {
+      pills.push(el("span", { class: withLane ? "pill plain" : cls, text: t.resolved_without_code ? "No code change" : "Closed" }));
+    }
+    if (t.round > 1) pills.push(el("span", { class: "pill plain round", text: "↻ Round " + t.round, title: "Came back " + (t.round - 1) + " time" + (t.round > 2 ? "s" : "") + " after being handed off or closed" }));
+    return pills;
   }
   function verdictPill(v) {
     if (!v) return el("span", { class: "muted", text: "—" });
@@ -348,6 +415,7 @@
     tickets.forEach(function (t) { var v = fn(t); if (v) seen[v] = true; });
     return Object.keys(seen).sort();
   }
+  var state = { sprint: "", epic: "", type: "", selected: tickets.length ? tickets[0].id : null };
   fillSelect("f-sprint", "sprints", unique(sprintName));
   fillSelect("f-epic", "epics", unique(epicLabel));
   fillSelect("f-type", "types", unique(workType));
@@ -383,26 +451,26 @@
     var box = clear(document.getElementById("kpis"));
     var evaluated = list.filter(function (t) { return t.evaluations.length; });
     var firstPass = evaluated.filter(function (t) { return t.evaluations[0].verdict === "PASS"; });
-    var waiting = list.filter(function (t) { return t.phase === "waiting"; });
-    var working = list.filter(function (t) { return t.phase === "working"; });
-    var done = list.filter(function (t) { return t.phase === "done"; });
     var work = list.reduce(function (a, t) { return a + t.working_seconds; }, 0);
     var prs = list.reduce(function (a, t) { return a + t.prs.length; }, 0);
     var noCode = list.filter(function (t) { return t.resolved_without_code; });
+    var cameBack = list.filter(function (t) { return t.round > 1; });
     var caught = list.reduce(function (a, t) { return a + t.evaluations.reduce(function (b, e) { return b + e.blocking; }, 0); }, 0);
     var decisions = list.reduce(function (a, t) { return a + t.decisions.length; }, 0);
     var estimated = list.filter(function (t) { return t.estimate_hours != null; });
-    var firstPassValue = !evaluated.length ? "—" : evaluated.length >= RATE_MIN ? Math.round(100 * firstPass.length / evaluated.length) + "%" : firstPass.length + " of " + evaluated.length;
+    var byLane = LANES.map(function (id) { return laneLabel(id) + ": " + list.filter(function (t) { return lane(t) === id; }).length; });
     var kpis = [
-      [String(list.length), "Tickets", done.length + " delivered · " + working.length + " in progress · " + waiting.length + " waiting on people"],
+      [String(list.length), "Tickets", byLane.join(" · ")],
       [String(prs), "PRs raised", prs ? "each reviewed and merged by a person" : "none yet"],
+      cameBack.length ? [String(cameBack.length), "Came back after hand-off", "resumed for review comments or a QA issue"] : null,
       [String(noCode.length), "Resolved without a code change", "investigated and shown not to need a fix"],
-      [String(caught), "Issues caught before any PR", "blocking findings from the independent Evaluator"],
-      [firstPassValue, "Passed first evaluation", evaluated.length ? (evaluated.length < RATE_MIN ? "shown as a % from " + RATE_MIN + " evaluated tickets" : evaluated.length + " evaluated") : "none evaluated yet"],
+      // stage-specific tiles appear only once that stage has data
+      evaluated.length ? [String(caught), "Issues caught before any PR", "blocking findings from the independent Evaluator"] : null,
+      evaluated.length ? [evaluated.length >= RATE_MIN ? Math.round(100 * firstPass.length / evaluated.length) + "%" : firstPass.length + " of " + evaluated.length, "Passed first evaluation", evaluated.length < RATE_MIN ? "shown as a % from " + RATE_MIN + " evaluated tickets" : evaluated.length + " evaluated"] : null,
       [String(decisions), "Decisions recorded", "each with its reason and evidence"],
       [duration(work), "AI working time", estimated.length ? "dev estimates on " + estimated.length + " of them: " + hours(estimated.reduce(function (a, t) { return a + t.estimate_hours; }, 0)) : "excludes developer review and QA"]
     ];
-    kpis.forEach(function (k) {
+    kpis.filter(Boolean).forEach(function (k) {
       box.appendChild(el("div", { class: "kpi" }, [
         el("div", { class: "value", text: k[0] }),
         el("div", { class: "label", text: k[1] }),
@@ -413,41 +481,50 @@
 
   function renderBoard(list) {
     var board = clear(document.getElementById("board"));
-    PHASES.forEach(function (phase) {
-      var items = list.filter(function (t) { return t.phase === phase.id; });
-      var lane = el("div", { class: "lane" }, [
-        el("div", { class: "lane-head" }, [el("h3", { text: phase.label }), el("span", { class: "count", text: String(items.length) })])
+    LANES.forEach(function (id) {
+      var items = list.filter(function (t) { return lane(t) === id; });
+      var hint = entry("lanes", id) && entry("lanes", id).hint;
+      var box = el("div", { class: "lane" }, [
+        el("div", { class: "lane-head", title: hint || null }, [el("h3", { text: laneLabel(id) }), el("span", { class: "count", text: String(items.length) })])
       ]);
-      if (!items.length) lane.appendChild(el("div", { class: "lane-empty", text: "None" }));
+      if (!items.length) box.appendChild(el("div", { class: "lane-empty", text: "None" }));
       items.forEach(function (t) {
-        var meta = el("div", { class: "meta" }, [statusPill(t)]);
-        if (t.waiting_on) meta.appendChild(el("span", { class: "pill plain waiting", text: "on " + (WAIT_LABEL[t.waiting_on] || t.waiting_on) + (t.waiting_since ? " · " + duration((now - Date.parse(t.waiting_since)) / 1000) : "") }));
-        lane.appendChild(el("button", {
+        box.appendChild(el("button", {
           class: "card", type: "button", "aria-current": t.id === state.selected ? "true" : null,
           onclick: function () { select(t.id, true); }
         }, [
           el("span", { class: "key", text: t.id }),
           el("span", { class: "title", text: t.title || "(title not recorded)" }),
-          meta,
+          el("div", { class: "meta" }, standPills(t, false)),
           sprintName(t) ? el("span", { class: "small muted", text: sprintName(t) }) : null
         ]));
       });
-      board.appendChild(lane);
+      board.appendChild(box);
     });
   }
 
   function renderBars(list) {
-    var time = {}, elapsed = {}, total = 0;
+    var time = {}, stageOrder = [], elapsed = {}, total = 0;
     list.forEach(function (t) {
-      t.stages.forEach(function (s) { time[s.stage] = (time[s.stage] || 0) + s.seconds; });
-      KINDS.forEach(function (k) { elapsed[k] = (elapsed[k] || 0) + (t.time[k] || 0); total += t.time[k] || 0; });
+      t.stages.forEach(function (s) {
+        if (!(s.stage in time)) { time[s.stage] = 0; stageOrder.push(s.stage); }
+        time[s.stage] += s.seconds;
+      });
+      Object.keys(t.time || {}).forEach(function (k) { elapsed[k] = (elapsed[k] || 0) + t.time[k]; total += t.time[k]; });
     });
-    var timeRows = STAGES.filter(function (s) { return time[s]; }).map(function (s) { return { label: STAGE_LABEL[s], value: time[s], text: duration(time[s]), color: STAGE_COLOR[s] }; });
-    var elapsedRows = KINDS.filter(function (k) { return elapsed[k] >= 60; }).map(function (k) {
-      return { label: KIND_LABEL[k], value: elapsed[k], text: duration(elapsed[k]) + " · " + Math.round(100 * elapsed[k] / total) + "%", color: KIND_COLOR[k] };
-    });
+    // stages in the order the harness first ran them
+    stageOrder.sort(function (a, b) { return firstRun(list, a) < firstRun(list, b) ? -1 : 1; });
+    var timeRows = stageOrder.filter(function (s) { return time[s]; }).map(function (s) { return { label: stageLabel(s), value: time[s], text: duration(time[s]), color: color("stages", s) }; });
+    var elapsedRows = Object.keys(elapsed).filter(function (k) { return elapsed[k] >= 60; })
+      .sort(function (a, b) { return kindOrder(a) - kindOrder(b) || elapsed[b] - elapsed[a]; })
+      .map(function (k) { return { label: kindLabel(k), value: elapsed[k], text: duration(elapsed[k]) + " · " + Math.round(100 * elapsed[k] / total) + "%", color: kindColor(k) }; });
     drawBars("bars-time", timeRows, "No stage time recorded yet");
     drawBars("bars-elapsed", elapsedRows, "No elapsed time recorded yet");
+  }
+  function firstRun(list, stage) {
+    var first = "~";
+    list.forEach(function (t) { t.stages.forEach(function (s) { if (s.stage === stage && s.start < first) first = s.start; }); });
+    return first;
   }
   function drawBars(id, rows, emptyText) {
     var box = clear(document.getElementById(id));
@@ -456,7 +533,7 @@
     rows.forEach(function (r) {
       box.appendChild(el("div", { class: "bar-row" }, [
         el("span", { text: r.label }),
-        el("div", { class: "bar-track" }, [el("div", { class: "bar-fill" + (r.wait ? " wait" : ""), style: "width:" + Math.max(1.5, 100 * r.value / max).toFixed(1) + "%" + (r.color ? ";background:" + r.color : "") })]),
+        el("div", { class: "bar-track" }, [el("div", { class: "bar-fill", style: "width:" + Math.max(1.5, 100 * r.value / max).toFixed(1) + "%" + (r.color ? ";background:" + r.color : "") })]),
         el("span", { class: "num", text: r.text })
       ]));
     });
@@ -479,13 +556,13 @@
         el("td", null, [el("div", { class: "t-title", text: t.title || "—" })]),
         el("td", { text: sprintName(t) || "—" }),
         el("td", { text: epicLabel(t) || "—" }),
-        el("td", null, [statusPill(t)]),
+        el("td", null, [el("div", { class: "meta-col" }, standPills(t, true))]),
         el("td", { class: "num", text: t.evaluations.length + " / " + t.max_iterations }),
         el("td", null, [verdictPill(lastVerdict(t))]),
         el("td", { class: "num", text: t.estimate || "—" }),
         el("td", { class: "num", text: duration(t.working_seconds) }),
         el("td", { class: "num", text: duration(peopleWait(t)) }),
-        el("td", { class: "num", text: duration(t.time.idle) }),
+        el("td", { class: "num", text: duration((t.time || {}).idle) }),
         el("td", { class: "small muted", text: ago(t.updated_at) })
       ]);
       body.appendChild(row);
@@ -493,39 +570,41 @@
   }
 
   // ------------------------------------------------------------ detail
-  function eventText(e) {
-    switch (e.event) {
-      case "ticket_started": return "Harness started work on the ticket";
-      case "session_resumed": return "A new session resumed the ticket" + (e.from_status ? " from " + (STATUS_LABEL[e.from_status] || e.from_status) : "");
-      case "stage_start": return null;
-      case "stage_end": return null;
-      case "stage_corrected": return null;
-      case "iteration_start": return "Iteration " + e.iteration + " started" + (e.reason ? ": " + e.reason : "");
-      case "human_confirmed": return "Developer confirmed " + String(e.what || "").replace(/_/g, " ") + (typeof e.value === "string" ? ": " + e.value : Array.isArray(e.value) ? ": " + e.value.join(", ") : "");
-      case "input_requested": return "Stopped for answers from " + (WAIT_LABEL[e.audience] || e.audience || "people") + (e.questions ? " (" + e.questions + " questions)" : "");
-      case "input_received": return "Answers received from " + (WAIT_LABEL[e.audience] || e.audience || "people");
-      case "decision_locked": return e.id + " locked: " + (e.summary || "");
-      case "decision_superseded": return e.id + " superseded by " + e.superseded_by;
-      case "branch_created": return (e.reused ? "Reused" : "Created") + " branch in " + e.repo;
-      case "evaluation": return "Evaluation " + (e.iteration || "") + ": " + e.verdict + " — " + (e.blocking || 0) + " blocking, " + (e.non_blocking || 0) + " non-blocking";
-      case "pr_prepared": return "PR prepared for " + e.repo + " → " + e.target;
-      case "escalated": return "Escalated" + (e.reason ? ": " + e.reason : "");
-      case "ticket_closed": return "Ticket closed" + (e.outcome ? ": " + e.outcome : "");
-      default: return e.event.replace(/_/g, " ");
-    }
-  }
-
   function timelineItems(t) {
     var items = [];
     t.events.forEach(function (e) {
-      var text = eventText(e);
-      if (text) items.push({ ts: e.ts, text: text });
+      var text = sentence(e);
+      if (text) items.push({ ts: e.ts, text: text, divider: e.event === "ticket_reopened" && e.round });
     });
     t.stages.forEach(function (s) {
-      var label = (STAGE_LABEL[s.stage] || s.stage) + (s.iteration ? " (iteration " + s.iteration + ")" : "");
-      items.push({ ts: s.start, text: s.end ? label + " — " + (s.seconds >= 1 ? duration(s.seconds) : "recorded as a revision") + (s.corrected ? " (corrected: " + s.corrected + ")" : "") : label + " — in progress" });
+      var name = stageLabel(s.stage) + (s.iteration ? " (iteration " + s.iteration + ")" : "");
+      items.push({ ts: s.start, text: s.end ? name + " — " + (s.seconds >= 1 ? duration(s.seconds) : "recorded as a revision") + (s.corrected ? " (corrected: " + s.corrected + ")" : "") : name + " — in progress" });
     });
     return items.sort(function (a, b) { return a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0; });
+  }
+
+  function standsBox(t) {
+    var h = t.holder || {}, lines = [];
+    if (h.lane === "claude") {
+      lines.push(el("p", null, [el("b", { text: "Claude is working: " + stageLabel(h.stage) }), h.since ? " for " + since(h.since) : ""]));
+    } else if (h.lane === "person") {
+      lines.push(el("p", null, [el("b", { text: (h.escalated ? "Escalated. " : "") + "Waiting on " + whoLabel(h.who) }), h.since ? " for " + since(h.since) : "", h.stage ? ", stopped in " + stageLabel(h.stage) : ""]));
+      if (t.blocked_on) lines.push(el("p", { text: "Blocked on " + t.blocked_on }));
+    } else if (h.lane === "outside") {
+      var refs = h.refs || [];
+      lines.push(el("p", null, [el("b", { text: "Handed off to " + whoLabel(h.who) }), h.since ? " " + since(h.since) + " ago" : ""].concat(
+        refs.length ? [": "].concat(refs.reduce(function (acc, r, i) {
+          if (i) acc.push(", ");
+          acc.push(r.href ? el("a", { href: r.href, target: "_blank", rel: "noopener", text: (r.repo ? r.repo + " " : "") + r.label + " ↗" }) : r.label);
+          return acc;
+        }, [])) : [])));
+      lines.push(el("p", { class: "small", text: "Claude's part is done. The ticket comes back here if a developer resumes it with /work, after review comments or a QA issue." }));
+    } else if (h.lane === "closed") {
+      lines.push(el("p", null, [el("b", { text: "Closed" }), h.since ? " " + when(h.since) : "", h.outcome ? ": " + h.outcome : ""]));
+    }
+    if (t.round > 1) lines.push(el("p", { class: "small", text: "Round " + t.round + ": came back " + (t.round - 1) + " time" + (t.round > 2 ? "s" : "") + " after being handed off or closed." }));
+    lines.push(el("p", { text: t.next_action ? "Next: " + t.next_action : "No next action recorded." }));
+    return el("div", { class: "stands " + LANE_CLASS[lane(t)] + (h.escalated ? " escalated" : "") }, [el("div", { class: "eyebrow", text: "Where it stands" })].concat(lines));
   }
 
   function renderDetail(list) {
@@ -539,12 +618,11 @@
     box.appendChild(el("div", { class: "detail-head" }, [
       el("div", { class: "eyebrow" }, [t.url ? el("a", { href: t.url, target: "_blank", rel: "noopener", text: t.id + " in Jira ↗" }) : t.id]),
       el("h2", { text: t.title || t.id }),
-      el("div", { class: "meta", style: "display:flex;flex-wrap:wrap;gap:6px" }, [
-        statusPill(t),
+      el("div", { class: "meta", style: "display:flex;flex-wrap:wrap;gap:6px" }, standPills(t, true).concat([
         workType(t) ? el("span", { class: "pill plain", text: workType(t) === "bug" ? "Bug" : "Feature" }) : null,
         t.track ? el("span", { class: "pill plain", text: t.track === "light" ? "Light track" : "Full track" }) : null,
         verdictPill(lastVerdict(t))
-      ])
+      ]))
     ]));
 
     var facts = [
@@ -560,24 +638,19 @@
       return el("div", { class: "fact" }, [el("dt", { text: f[0] }), el("dd", { text: f[1] })]);
     })));
 
-    var stands = el("div", { class: "stands " + t.phase }, [
-      el("div", { class: "eyebrow", text: "Where it stands" }),
-      t.waiting_on ? el("p", null, [el("b", { text: "Waiting on " + (WAIT_LABEL[t.waiting_on] || t.waiting_on) }), t.waiting_since ? " for " + duration((now - Date.parse(t.waiting_since)) / 1000) : ""]) : null,
-      t.blocked_on ? el("p", { text: "Blocked on " + t.blocked_on }) : null,
-      el("p", { text: t.next_action ? "Next: " + t.next_action : "No next action recorded." })
-    ]);
-    box.appendChild(stands);
+    box.appendChild(standsBox(t));
 
     // lifecycle strip
     var life = el("div", { class: "block" }, [el("h3", { text: "How the time went" })]);
     var segs = (t.time_segments || []).filter(function (s) { return s.seconds >= 1; });
     if (segs.length) {
-      life.appendChild(el("div", { class: "lifecycle", role: "img", "aria-label": segs.map(function (s) { return KIND_LABEL[s.kind] + " " + duration(s.seconds); }).join(", ") },
-        segs.map(function (s) { return el("span", { title: KIND_LABEL[s.kind] + " " + duration(s.seconds) + " from " + when(s.start), style: "flex:" + (s.seconds / t.elapsed_seconds).toFixed(4) + " 0 0;background:" + KIND_COLOR[s.kind] }); })));
-      life.appendChild(el("div", { class: "legend" }, KINDS.filter(function (k) { return t.time[k] >= 1; }).map(function (k) {
-        return el("span", null, [el("i", { style: "background:" + KIND_COLOR[k] }), KIND_LABEL[k] + " " + duration(t.time[k])]);
+      life.appendChild(el("div", { class: "lifecycle", role: "img", "aria-label": segs.map(function (s) { return kindLabel(s.kind) + " " + duration(s.seconds); }).join(", ") },
+        segs.map(function (s) { return el("span", { title: kindLabel(s.kind) + " " + duration(s.seconds) + " from " + when(s.start), style: "flex:" + (s.seconds / t.elapsed_seconds).toFixed(4) + " 0 0;background:" + kindColor(s.kind) }); })));
+      var kinds = Object.keys(t.time || {}).filter(function (k) { return t.time[k] >= 1; }).sort(function (a, b) { return kindOrder(a) - kindOrder(b); });
+      life.appendChild(el("div", { class: "legend" }, kinds.map(function (k) {
+        return el("span", null, [el("i", { style: "background:" + kindColor(k) }), kindLabel(k) + " " + duration(t.time[k])]);
       })));
-      life.appendChild(el("p", { class: "small muted", text: "The whole " + duration(t.elapsed_seconds) + " from start to " + (t.status === "DONE" ? "close" : "now") + ", left to right." +
+      life.appendChild(el("p", { class: "small muted", text: "The whole " + duration(t.elapsed_seconds) + " from start to " + (lane(t) === "closed" ? "close" : "now") + ", left to right." +
         (t.estimate_hours != null ? " Dev lead estimate in Jira: " + t.estimate + "; AI working time: " + duration(t.working_seconds) + " (developer review and QA not included)." : "") }));
     } else {
       life.appendChild(el("p", { class: "empty", text: "No stage time recorded yet." }));
@@ -591,7 +664,7 @@
     left.appendChild(el("h3", { text: "Timeline" }));
     var items = timelineItems(t);
     left.appendChild(items.length ? el("ol", { class: "timeline" }, items.map(function (i) {
-      return el("li", null, [el("time", { datetime: i.ts, text: when(i.ts) }), el("span", { text: i.text })]);
+      return el("li", { class: i.divider ? "divider" : null }, [el("time", { datetime: i.ts, text: when(i.ts) }), el("span", { text: i.text })]);
     })) : el("p", { class: "empty", text: "No journal events recorded." }));
 
     // decisions
@@ -617,15 +690,17 @@
     });
     right.appendChild(decWrap);
 
-    // evaluations
-    right.appendChild(el("h3", { text: "Evaluations" }));
-    right.appendChild(t.evaluations.length ? el("table", { class: "mini" }, [
-      el("thead", null, [el("tr", null, [el("th", { text: "Iteration" }), el("th", { text: "Verdict" }), el("th", { class: "num", text: "Must fix", title: "Blocking findings: problems the Evaluator requires fixed before a PR can be raised" }), el("th", { class: "num", text: "Advisory", title: "Non-blocking findings: recorded for the reviewer, do not stop the PR" })])]),
-      el("tbody", null, t.evaluations.map(function (e) {
-        return el("tr", null, [el("td", { text: String(e.iteration || "—") }), el("td", null, [verdictPill(e.verdict)]), el("td", { class: "num", text: String(e.blocking) }), el("td", { class: "num", text: String(e.non_blocking) })]);
-      }))
-    ]) : el("p", { class: "empty", text: "Not evaluated yet." }));
-    if (t.evaluations.length) right.appendChild(el("p", { class: "small muted", text: "Must fix: findings the independent Evaluator requires fixed before any PR; any one fails the evaluation. Advisory: findings noted for the PR reviewer that do not stop the PR." }));
+    // evaluations, shown only when the ticket went through that stage
+    if (t.evaluations.length) {
+      right.appendChild(el("h3", { text: "Evaluations" }));
+      right.appendChild(el("table", { class: "mini" }, [
+        el("thead", null, [el("tr", null, [el("th", { text: "Iteration" }), el("th", { text: "Verdict" }), el("th", { class: "num", text: "Must fix", title: "Blocking findings: problems the Evaluator requires fixed before a PR can be raised" }), el("th", { class: "num", text: "Advisory", title: "Non-blocking findings: recorded for the reviewer, do not stop the PR" })])]),
+        el("tbody", null, t.evaluations.map(function (e) {
+          return el("tr", null, [el("td", { text: String(e.iteration || "—") }), el("td", null, [verdictPill(e.verdict)]), el("td", { class: "num", text: String(e.blocking) }), el("td", { class: "num", text: String(e.non_blocking) })]);
+        }))
+      ]));
+      right.appendChild(el("p", { class: "small muted", text: "Must fix: findings the independent Evaluator requires fixed before any PR; any one fails the evaluation. Advisory: findings noted for the PR reviewer that do not stop the PR." }));
+    }
 
     // PRs
     right.appendChild(el("h3", { text: "Pull requests" }));
@@ -633,7 +708,7 @@
       el("thead", null, [el("tr", null, [el("th", { text: "Repo" }), el("th", { text: "Target" }), el("th", { text: "Link" })])]),
       el("tbody", null, t.prs.map(function (p) {
         var link = p.url || p.compare_link;
-        return el("tr", null, [el("td", { text: p.repo }), el("td", { text: p.target }), el("td", null, [link ? el("a", { href: link, target: "_blank", rel: "noopener", text: p.url ? "Open PR ↗" : "Compare ↗" }) : "—"])]);
+        return el("tr", null, [el("td", { text: p.repo }), el("td", { text: p.target }), el("td", null, [link ? el("a", { href: link, target: "_blank", rel: "noopener", text: p.url ? "Open PR ↗" : "Compare ↗ (not opened yet)" }) : "—"])]);
       }))
     ]) : el("p", { class: "empty", text: "No pull requests yet." }));
 
@@ -647,8 +722,9 @@
   function renderFooter() {
     var f = clear(document.getElementById("footer"));
     f.appendChild(el("p", { text: "Built " + (data.generated_at ? when(data.generated_at) : "at an unknown time") + " from the sis-brain repository. As current as the last publish; run /brain publish to refresh." }));
+    f.appendChild(el("p", { text: "The board shows who holds each ticket. " + LANES.map(function (id) { var e = entry("lanes", id); return laneLabel(id) + (e && e.hint ? ": " + e.hint : ""); }).join(". ") + ". Claude's part ends when the PR is raised; review, merge and QA happen outside the harness, and a ticket comes back when a developer resumes it with /work." }));
     f.appendChild(el("p", { text: "AI working time is measured from each stage's recorded start and end. It does not include the developer's review or QA, so compare it with a Jira estimate only as a guide." }));
-    f.appendChild(el("p", { text: "Waiting on QA or an SME means questions sent as a Jira comment were open; waiting on the developer means a confirmation, an answer or a paused run; idle means nobody was working and no answer was awaited." }));
+    f.appendChild(el("p", { text: "Waiting on " + whoLabel("qa") + " or the " + whoLabel("sme") + " means questions sent as a Jira comment were open; waiting on the developer means a confirmation, an answer or a paused run; handed off means the PR was with reviewers or QA; idle means nobody was working and no answer was awaited." }));
     f.appendChild(el("p", { text: "The AI runs within the team's Claude subscription." }));
     if (data.unreadable && data.unreadable.length) f.appendChild(el("p", { text: "Unreadable ticket records: " + data.unreadable.join(", ") }));
   }

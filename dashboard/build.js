@@ -4,7 +4,7 @@
  *
  *   node dashboard/build.js
  *
- * Reads only committed files (tickets/*, dashboard/prices.json), so every
+ * Reads only committed files (tickets/*, dashboard/labels.json, dashboard/prices.json), so every
  * clone builds the same page. Writes dashboard/dist/index.html: template.html with the
  * data embedded, and dashboard/dist/costs.json (API-equivalent cost, never shown on the
  * page). Node only, no dependencies.
@@ -21,7 +21,10 @@ const TICKETS = path.join(BRAIN, "tickets");
 const OUT_DIR = path.join(__dirname, "dist");
 
 const RECORD_FILES = new Set(["state.json", "journal.jsonl", "metrics.json"]);
-const WORKING_STATUSES = new Set(["PLANNING", "IMPLEMENTING", "EVALUATING", "ANALYZING", "DESIGNING"]); // ANALYZING and DESIGNING: tickets recorded before v0.4
+// Display names, colours and stage aliases. The build and the page list no stages of their own.
+const LABELS = readJson(path.join(__dirname, "labels.json"), {});
+const STAGE_ALIASES = LABELS.stage_aliases || {};
+const stageKey = (s) => STAGE_ALIASES[s] || s;
 
 function readJson(file, fallback) {
   try {
@@ -85,7 +88,7 @@ function stageRuns(events) {
     if (run.startEvent) run.startEvent.ts = run.start;
     if (run.endEvent) run.endEvent.ts = run.end;
   }
-  return runs.map(({ startEvent, endEvent, ...r }) => r);
+  return runs.map(({ startEvent, endEvent, ...r }) => ({ ...r, stage: stageKey(r.stage) }));
 }
 
 /**
@@ -140,23 +143,104 @@ function waits(events, state, now) {
   return periods.map((p) => ({ ...p, seconds: seconds(p.start, p.end || now) })).sort((a, b) => (a.start < b.start ? -1 : 1));
 }
 
+// ------------------------------------------------------------ who holds it
+//
+// The board groups tickets by who holds them, not by stage, so new harness stages
+// (automated QA, AI PR review, smoke tests, …) appear without any change here:
+//   claude  — a stage is running;
+//   person  — the run stopped until someone answers, confirms or decides;
+//   outside — the harness handed the ticket off (a PR raised) and the next move is elsewhere;
+//   closed  — a developer confirmed the ticket is finished.
+
+// pr_prepared: records written before handed_off existed
+const HANDOFF_EVENTS = new Set(["handed_off", "pr_prepared"]);
+const RETURN_EVENTS = new Set(["stage_start", "ticket_reopened", "ticket_closed", "input_requested", "escalated"]);
+
+/** Periods the ticket spent handed off: from a hand-off until the harness took it up again. */
+function handoffs(events) {
+  const spans = [];
+  let open = null;
+  for (const e of events) {
+    if (HANDOFF_EVENTS.has(e.event)) {
+      if (!open) open = { start: e.ts, end: null, to: null, refs: [] };
+      if (e.to) open.to = e.to;
+      for (const r of e.refs || []) open.refs.push(r);
+    } else if (open && RETURN_EVENTS.has(e.event)) {
+      open.end = e.ts;
+      spans.push(open);
+      open = null;
+    }
+  }
+  if (open) spans.push(open);
+  return spans.map((s) => ({ ...s, to: s.to || "reviewers" }));
+}
+
+/**
+ * Each time the ticket came back after a hand-off or a close. A ticket_reopened event
+ * records it; for records written before that event existed, a session resumed after a
+ * hand-off counts only once a stage actually ran again.
+ */
+function returns(events) {
+  const out = [];
+  let away = false;
+  let resumed = null;
+  for (const e of events) {
+    if (HANDOFF_EVENTS.has(e.event) || e.event === "ticket_closed") { away = true; resumed = null; }
+    else if (e.event === "ticket_reopened") { out.push({ ts: e.ts, reason: e.reason || null, ref: e.ref || null }); away = false; resumed = null; }
+    else if (e.event === "session_resumed" && away) resumed = resumed || e;
+    else if (e.event === "stage_start" && resumed) { out.push({ ts: resumed.ts, reason: null, ref: null, derived: true }); away = false; resumed = null; }
+  }
+  return out.map((r, i) => ({ ...r, round: i + 2 }));
+}
+
+function prRefs(state, span) {
+  const fromState = (state.prs || []).map((p) => {
+    const m = p.url && String(p.url).match(/\/pull\/(\d+)/);
+    return { repo: p.repo || null, href: p.url || p.compare_link || null, opened: Boolean(p.url), label: p.url ? (m ? "PR #" + m[1] : "PR") : "PR not opened yet" };
+  });
+  if (fromState.length) return fromState;
+  return (span ? span.refs : []).map((href) => {
+    const m = String(href).match(/\/pull\/(\d+)/);
+    return { repo: null, href, opened: Boolean(m), label: m ? "PR #" + m[1] : "Link" };
+  });
+}
+
+function holder(events, runs, waitPeriods, handoffSpans, state) {
+  const byStart = [...runs].sort((a, b) => (a.start < b.start ? -1 : 1));
+  const lastRun = byStart[byStart.length - 1] || null;
+  const stage = lastRun ? lastRun.stage : null;
+  const lastTs = events.length ? events[events.length - 1].ts : state.updated_at;
+  const closeOrReopen = [...events].reverse().find((e) => e.event === "ticket_closed" || e.event === "ticket_reopened");
+  const escalated = state.status === "ESCALATED";
+
+  if (closeOrReopen ? closeOrReopen.event === "ticket_closed" : state.status === "DONE") {
+    return { lane: "closed", who: null, stage, since: closeOrReopen ? closeOrReopen.ts : state.updated_at, outcome: (closeOrReopen && closeOrReopen.outcome) || null };
+  }
+  const openRun = byStart.filter((r) => !r.end).pop();
+  if (openRun) return { lane: "claude", who: null, stage: openRun.stage, iteration: openRun.iteration, since: openRun.start };
+  const openWait = waitPeriods.find((w) => !w.end);
+  if (openWait) return { lane: "person", who: openWait.audience || "developer", stage, since: openWait.start, escalated };
+  const handoff = handoffSpans[handoffSpans.length - 1];
+  if (handoff && !handoff.end) return { lane: "outside", who: handoff.to, stage, since: handoff.start, refs: prRefs(state, handoff) };
+  // stopped between stages (a confirmation, an escalation, a paused run): the developer resumes it
+  const lastEnd = [...events].reverse().find((e) => e.event === "stage_end" || e.event === "escalated");
+  return { lane: "person", who: "developer", stage, since: lastEnd ? lastEnd.ts : lastTs, escalated };
+}
+
 /**
  * Splits a ticket's whole elapsed time, from start to close (or now), into what was
- * happening: the AI working a stage, waiting on QA or an SME for packet answers, waiting
- * on the developer (their questions, confirmations, or a run they paused), or idle
- * (nobody working and no answer awaited). A gap that ends in a human confirmation counts
- * as waiting on the developer; after the last event, the ticket's status decides.
+ * happening: the AI working a stage, waiting on someone (keyed by the audience the journal
+ * names: developer, qa, sme, or any other), handed off outside the harness, or idle.
+ * A gap that ends in a human confirmation counts as waiting on the developer; after the
+ * last event, who holds the ticket decides.
  */
-const TIME_KINDS = ["working", "qa", "sme", "developer", "idle"];
-
-function timeBreakdown(events, runs, waitPeriods, state, now) {
-  const closed = events.find((e) => e.event === "ticket_closed");
+function timeBreakdown(events, runs, waitPeriods, handoffSpans, hold, state, now) {
   // a corrected stage can begin before the recorded start; the strip starts at whichever is first
   const startTs = [state.created_at, events[0] && events[0].ts, ...runs.map((r) => r.start)].filter(Boolean).sort()[0];
-  const endTs = state.status === "DONE" ? (closed ? closed.ts : state.updated_at) : now;
+  const endTs = hold.lane === "closed" ? hold.since : now;
   const start = Date.parse(startTs);
   const end = Date.parse(endTs);
-  const totals = Object.fromEntries(TIME_KINDS.map((k) => [k, 0]));
+  const totals = {};
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return { totals, segments: [], elapsed: 0 };
 
   const span = (a, b) => [Date.parse(a), b ? Date.parse(b) : end];
@@ -171,30 +255,29 @@ function timeBreakdown(events, runs, waitPeriods, state, now) {
     pieces.push(span(from, r.end));
     return pieces;
   });
-  const waitsBy = (aud) => waitPeriods.filter((w) => aud.includes(w.audience)).map((w) => span(w.start, w.end));
-  const qa = waitsBy(["qa"]), sme = waitsBy(["sme"]), dev = waitsBy(["developer", null, "unknown"]);
-  const inside = (list, t) => list.some(([a, b]) => t > a && t < b);
+  const waitSpans = waitPeriods.map((w) => [...span(w.start, w.end), w.audience && w.audience !== "unknown" ? w.audience : "developer"]);
+  const outside = handoffSpans.map((h) => span(h.start, h.end));
+  const inside = (list, t) => list.find(([a, b]) => t > a && t < b);
   const confirmAt = new Set(events.filter((e) => e.event === "human_confirmed").map((e) => Date.parse(e.ts)));
   const lastEvent = events.length ? Date.parse(events[events.length - 1].ts) : start;
-  const tailKind = ["AWAITING_REPO_CONFIRMATION", "NEEDS_INPUT", "ESCALATED"].includes(state.status) || /^PR_STAGE_/.test(state.status || "") ? "developer" : "idle";
+  const tailKind = hold.lane === "person" ? hold.who : hold.lane === "outside" ? "outside" : "idle";
 
   const cuts = new Set([start, end]);
   for (const e of events) { const t = Date.parse(e.ts); if (t > start && t < end) cuts.add(t); }
-  for (const [a, b] of [...work, ...qa, ...sme, ...dev]) for (const t of [a, b]) if (t > start && t < end) cuts.add(t);
+  for (const [a, b] of [...work, ...waitSpans, ...outside]) for (const t of [a, b]) if (t > start && t < end) cuts.add(t);
   const points = [...cuts].sort((a, b) => a - b);
 
   const segments = [];
   for (let i = 0; i < points.length - 1; i++) {
     const a = points[i], b = points[i + 1], mid = (a + b) / 2;
-    let kind;
+    let kind, w;
     if (inside(work, mid)) kind = "working";
-    else if (inside(qa, mid)) kind = "qa";
-    else if (inside(sme, mid)) kind = "sme";
-    else if (inside(dev, mid)) kind = "developer";
+    else if ((w = inside(waitSpans, mid))) kind = w[2];
+    else if (inside(outside, mid)) kind = "outside";
     else if (a >= lastEvent) kind = tailKind;
     else kind = confirmAt.has(b) ? "developer" : "idle";
     const secs = (b - a) / 1000;
-    totals[kind] += secs;
+    totals[kind] = (totals[kind] || 0) + secs;
     const last = segments[segments.length - 1];
     if (last && last.kind === kind) last.seconds += secs;
     else segments.push({ kind, start: new Date(a).toISOString(), seconds: secs });
@@ -283,26 +366,12 @@ function costs(metrics, prices) {
   const ratio = fallbackTotal > 0 ? total / fallbackTotal : 1;
   const byStage = {};
   for (const [stage, tokens] of Object.entries(metrics.tokens_by_stage || {})) {
-    byStage[stage] = priceTokens(tokens, fallback) * ratio;
+    byStage[stageKey(stage)] = (byStage[stageKey(stage)] || 0) + priceTokens(tokens, fallback) * ratio;
   }
   return { total, byStage, unpriced };
 }
 
 // ------------------------------------------------------------------- ticket
-
-function phaseOf(status) {
-  if (status === "DONE") return "done";
-  if (status === "ESCALATED") return "escalated";
-  if (WORKING_STATUSES.has(status)) return "working";
-  return "waiting";
-}
-
-function waitingOn(status, openWait) {
-  if (openWait) return openWait.audience;
-  if (status === "AWAITING_REPO_CONFIRMATION") return "developer";
-  if (/^PR_STAGE_/.test(status || "")) return "reviewers";
-  return null;
-}
 
 function buildTicket(dir, now) {
   const id = path.basename(dir);
@@ -318,11 +387,24 @@ function buildTicket(dir, now) {
   events = events.filter((e) => e.event !== "stage_corrected" && e.event !== "ts_corrected");
   events.sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0));
   const waitPeriods = waits(events, state, now);
-  const openWait = waitPeriods.find((w) => !w.end) || null;
+  const handoffSpans = handoffs(events);
+  const back = returns(events);
+  const hold = holder(events, runs, waitPeriods, handoffSpans, state);
   const evaluations = events.filter((e) => e.event === "evaluation");
-  const time = timeBreakdown(events, runs, waitPeriods, state, now);
+  const time = timeBreakdown(events, runs, waitPeriods, handoffSpans, hold, state, now);
   const changed = Object.values(state.repos || {}).filter((r) => r && r.role === "change").length;
-  const lastStageEnd = [...events].reverse().find((e) => e.event === "stage_end");
+  // number each return on the timeline; older records get one in place of their resume
+  for (const r of back) {
+    const e = events.find((x) => x.event === "ticket_reopened" && x.ts === r.ts && x.round == null);
+    if (e) e.round = r.round;
+    else events.push({ ts: r.ts, event: "ticket_reopened", round: r.round, reason: null, derived: true });
+  }
+  events.sort((a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0));
+  const tokensByStage = {};
+  for (const [stage, tokens] of Object.entries(metrics.tokens_by_stage || {})) {
+    const sum = (tokensByStage[stageKey(stage)] = tokensByStage[stageKey(stage)] || {});
+    for (const [k, v] of Object.entries(tokens || {})) if (typeof v === "number") sum[k] = (sum[k] || 0) + v;
+  }
 
   let files = [];
   try {
@@ -342,11 +424,10 @@ function buildTicket(dir, now) {
     work_type: state.work_type || null,
     track: state.track || null,
     status: state.status || "UNKNOWN",
-    phase: phaseOf(state.status),
+    holder: hold,
+    round: back.length + 1,
     next_action: state.next_action || null,
     blocked_on: state.blocked_on || null,
-    waiting_on: waitingOn(state.status, openWait),
-    waiting_since: openWait ? openWait.start : state.status === "AWAITING_REPO_CONFIRMATION" && lastStageEnd ? lastStageEnd.ts : null,
     estimate: jira.estimate || null,
     estimate_hours: estimateHours(jira.estimate),
     created_at: state.created_at || (events[0] && events[0].ts) || null,
@@ -370,7 +451,7 @@ function buildTicket(dir, now) {
     events,
     files,
     tokens: metrics.tokens || null,
-    tokens_by_stage: metrics.tokens_by_stage || {},
+    tokens_by_stage: tokensByStage,
     turns: metrics.turns || 0,
     sessions: Object.keys(metrics.sessions || {}).length || (state.sessions || []).length,
     time: time.totals,
@@ -422,6 +503,7 @@ function main() {
 
   const data = {
     generated_at: now,
+    labels: LABELS,
     tickets: good,
     unreadable: broken,
   };
