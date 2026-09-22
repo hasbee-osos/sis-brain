@@ -119,8 +119,13 @@
     "ticket_closed": "Ticket closed[: {outcome}]"
   },
   "blast": {
-    "changed": "Changed by the ticket",
-    "reached": "Calls an API the ticket changed"
+    "changed": "Edited by the ticket",
+    "reached": "Depends on it"
+  },
+  "blast_kinds": {
+    "screen": "screen",
+    "api": "API",
+    "table": "table"
   },
   "areas": {
     "advisory-and-counselling": "Advisory",

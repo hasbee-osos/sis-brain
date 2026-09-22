@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 /**
  * Works out how far a ticket's change reaches into the product and writes it to the
- * ticket folder as blast.json, which the dashboard draws as a wheel. A file of its own,
+ * ticket folder as blast.json, which the dashboard draws as rings. A file of its own,
  * not a state.json field, so agents reading the resume point don't carry it.
  *
  *   node sis-brain/codebase/blast.js <TICKET-ID>
  *
  * Reads what the ticket actually changed - the diff of its branch against its source
  * branch in every changed repo - and places each file with the generated indexes:
- *   changed  screens whose component (or an embedded component) changed; tables whose entity
- *            changed; APIs whose controller or frontend service changed, or whose controller
- *            uses a changed class or entity (a few classes away)
- *   reached  other screens that call one of those APIs
- * Every screen in the map is counted by product area (first route segment) and sub-area
- * (second), so the wheel is drawn to scale. Git only, never a checkout; no dependencies.
+ *   ring 1   what the ticket edited: screens (including screens that embed a changed
+ *            component), tables of changed entities, and APIs whose controller, frontend
+ *            service or service class changed
+ *   ring 2   other screens that call an API the change reaches, each with the ring 1
+ *            items it is reached through (`via`); a changed table reaches the APIs that use it
+ * Screens are named by menu label and grouped by product area (first route segment).
+ * Git only, never a checkout; no dependencies.
  * /work runs it just before recording "PRs prepared" (harness skills/brain/SKILL.md).
  */
 "use strict";
@@ -26,7 +27,7 @@ const HERE = __dirname;
 const BRAIN = path.resolve(HERE, "..");
 const WORKSPACE = path.resolve(HERE, "..", "..");
 const GEN = path.join(HERE, "generated");
-const MAX_NAMES = 20;
+const MAX_RING2 = 60; // screens kept by name; ring2_total still counts all
 const MAX_FRONTIER = 80; // classes followed per step, so a widely used class can't fan out without end
 // route segments that name an action, not a screen: "…/assessment-planning/view" is "Assessment Planning"
 const GENERIC = /^(view|list|add|edit|add-edit|add-view-edit|details?|create|new|index|manage|main)$/;
@@ -90,6 +91,7 @@ function main() {
     diff.split("\n").filter(Boolean).forEach((file) => changed.push({ repo, file, head, dir }));
   }
   const blast = {
+    schema: 2,
     at: new Date().toISOString(),
     map_built_at: null,
     files: changed.length,
@@ -131,12 +133,17 @@ function main() {
   }
 
   // ---- place each changed file
+  // ring 1: what the ticket edited. apiVia: API context path → the ring 1 names it is reached through
+  const ring1 = new Map(); // "<kind>:<name>" → { kind, name, area? }
   const changedScreens = new Set();
-  const changedApis = new Set();
-  const tables = new Set();
+  const apiVia = new Map();
   const unplaced = {};
   let migrations = 0;
   const miss = (what) => { unplaced[what] = (unplaced[what] || 0) + 1; };
+  const edit = (kind, name, area) => { if (!ring1.has(kind + ":" + name)) ring1.set(kind + ":" + name, area ? { kind, name, area } : { kind, name }); };
+  const reach = (ctx, via) => { if (!apiVia.has(ctx)) apiVia.set(ctx, new Set()); apiVia.get(ctx).add(via); };
+  const editApi = (ctx) => { edit("api", ctx); reach(ctx, ctx); };
+  const editScreen = (key) => { changedScreens.add(key); edit("screen", screens.get(key).name, screens.get(key).area); };
 
   // screens that render a component, following <tag> use up through parent components
   function screensRendering(c, selector, seen) {
@@ -186,25 +193,27 @@ function main() {
     if (screens.has(ts) || components.has(ts)) key = ts;
     const kind = kinds[c.repo];
 
-    if (screens.has(key)) { changedScreens.add(key); continue; }
+    if (screens.has(key)) { editScreen(key); continue; }
     if (components.has(key)) {
       const hosts = screensRendering(c, components.get(key), new Set());
-      if (hosts.length) hosts.forEach((h) => changedScreens.add(h)); else miss("shared components");
+      if (hosts.length) hosts.forEach(editScreen); else miss("shared components");
       continue;
     }
     if (entities.has(key)) {
-      tables.add(entities.get(key));
-      controllersUsing(c, path.basename(c.file, ".java"), 2).forEach((k) => apiFor(k).forEach((a) => changedApis.add(a)));
+      // the table is edited; the APIs that read it are only the way its screens are reached
+      const table = entities.get(key);
+      edit("table", table);
+      controllersUsing(c, path.basename(c.file, ".java"), 2).forEach((k) => apiFor(k).forEach((a) => reach(a, table)));
       continue;
     }
     if (/\/db\/changelog\//.test(c.file)) { migrations++; continue; }
     const direct = apiFor(key);
-    if (direct.length) { direct.forEach((a) => changedApis.add(a)); continue; }
+    if (direct.length) { direct.forEach(editApi); continue; }
 
     if (kind === "spring" && c.file.endsWith(".java")) {
-      // a service or helper: the APIs are the controllers that use it
+      // a service or helper: the APIs of the controllers that use it behave differently
       const via = controllersUsing(c, path.basename(c.file, ".java"), 2);
-      if (via.length) { via.forEach((k) => apiFor(k).forEach((a) => changedApis.add(a))); continue; }
+      if (via.length) { via.forEach((k) => apiFor(k).forEach(editApi)); continue; }
       miss("backend logic");
       continue;
     }
@@ -212,32 +221,24 @@ function main() {
     miss(kind === "angular" ? "shared frontend code" : "configuration and other files");
   }
 
-  // ---- screens the change reaches through a changed API
-  const reached = new Set();
+  // ---- ring 2: other screens that call an API the change reaches
+  const ring2 = new Map(); // "<area>:<name>" → { name, area, via }
   for (const [key, s] of screens) {
     if (changedScreens.has(key)) continue;
-    for (const p of s.paths) if (changedApis.has(p)) { reached.add(key); break; }
-  }
-
-  // ---- the whole product by area, with what the change touches
-  const areas = {};
-  for (const [key, s] of screens) {
-    const a = (areas[s.area] = areas[s.area] || { screens: 0, subs: {} });
-    const sub = (a.subs[s.sub] = a.subs[s.sub] || { screens: 0 });
-    a.screens++;
-    sub.screens++;
-    const ring = changedScreens.has(key) ? "changed" : reached.has(key) ? "reached" : null;
-    if (!ring) continue;
-    sub[ring] = sub[ring] || [];
-    if (sub[ring].length < MAX_NAMES && sub[ring].indexOf(s.name) < 0) sub[ring].push(s.name);
-    sub[ring + "_n"] = (sub[ring + "_n"] || 0) + 1;
+    const via = new Set();
+    for (const p of s.paths) if (apiVia.has(p)) apiVia.get(p).forEach((v) => via.add(v));
+    if (!via.size) continue;
+    const id = s.area + ":" + s.name;
+    const hit = ring2.get(id) || { name: s.name, area: s.area, via: [] };
+    via.forEach((v) => { if (hit.via.indexOf(v) < 0) hit.via.push(v); });
+    ring2.set(id, hit);
   }
 
   Object.assign(blast, {
     screens_total: screens.size,
-    areas,
-    apis: [...changedApis].sort(),
-    tables: [...tables].sort(),
+    ring1: [...ring1.values()],
+    ring2: [...ring2.values()].slice(0, MAX_RING2),
+    ring2_total: ring2.size,
     migrations,
     unplaced: Object.entries(unplaced).map(([what, files]) => ({ what, files })),
   });
@@ -246,10 +247,11 @@ function main() {
 
 function save(folder, blast) {
   fs.writeFileSync(path.join(folder, "blast.json"), JSON.stringify(blast) + "\n");
-  const s = Object.values(blast.areas || {}).flatMap((a) => Object.values(a.subs));
-  const n = (k) => s.reduce((t, x) => t + (x[k] || 0), 0);
-  console.log(`blast: ${blast.files} files in ${blast.repos} repos; ${n("changed_n")} screens changed, ${n("reached_n")} reached; ` +
-    `${(blast.apis || []).length} APIs, ${(blast.tables || []).length} tables` + (blast.map_built_at ? "" : " (no codebase map)"));
+  const kinds = {};
+  (blast.ring1 || []).forEach((x) => { kinds[x.kind] = (kinds[x.kind] || 0) + 1; });
+  console.log(`blast: ${blast.files} files in ${blast.repos} repos; edits ` +
+    (Object.entries(kinds).map(([k, n]) => n + " " + k + (n === 1 ? "" : "s")).join(", ") || "nothing placeable") +
+    `; ${blast.ring2_total || 0} screens depend on it` + (blast.map_built_at ? "" : " (no codebase map)"));
 }
 
 main();

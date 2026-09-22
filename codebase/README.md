@@ -113,9 +113,9 @@ Generated indexes:
 
 ## Blast radius
 
-When a ticket's PRs are prepared, `node codebase/blast.js <TICKET-ID>` works out how far the change reaches. It diffs the ticket branch against its source branch and places each file with the indexes above:
-- the screens it edits, including screens that embed a changed component;
-- the APIs and tables it changes;
-- the other screens that call a changed API.
+When a ticket's PRs are prepared, the harness runs `node codebase/blast.js <TICKET-ID>`, which works out how far the change reaches. It diffs the ticket branch against its source branch and places each file with the indexes above. It writes `tickets/<ID>/blast.json` in two rings:
 
-It writes `tickets/<ID>/blast.json`, which the dashboard draws as a wheel of the whole product. It uses git only, and costs no tokens.
+- **ring 1: what the ticket edited.** These are screens (including screens that embed a changed component), tables of changed entities, and APIs whose controller, frontend service or service class changed.
+- **ring 2: what depends on it.** These are the other screens that call an API the change reaches, grouped by product area. Each one records the ring 1 items it is reached through. A changed table reaches the APIs whose controllers use it within two classes.
+
+The dashboard draws the rings on the ticket's detail view. The script and its output format belong to the brain, so they can change without a harness change. It uses git only, and costs no tokens.

@@ -153,26 +153,33 @@
   .cols { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; }
   .block { display: grid; gap: 10px; align-content: start; }
 
-  /* blast radius wheel */
-  .wheel { display: grid; gap: 8px; align-content: start; }
-  .wheel svg { width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto; }
-  .wheel .seg { fill: var(--sunken); stroke: var(--surface); stroke-width: 0.8; }
-  .wheel .seg.lit { fill: var(--accent); cursor: pointer; animation: lit-in 0.5s ease-out both; }
-  .wheel .seg.lit:hover, .wheel .seg.picked { stroke: var(--ink); stroke-width: 1.4; }
-  .wheel .hub { fill: var(--accent); }
-  .wheel .hub-num { font: 600 15px var(--mono); fill: var(--surface); }
-  .wheel .hub-sub { font: 500 8.5px var(--sans); fill: var(--surface); letter-spacing: 0.04em; }
-  .wheel .area-label { font: 500 11px var(--sans); fill: var(--ink); }
-  .wheel .area-label.faint { fill: var(--faint); font-weight: 400; }
-  .wheel .ripple { fill: none; stroke: var(--accent); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: ripple 1.2s ease-out 1 both; }
-  @keyframes ripple { from { transform: scale(0.3); opacity: 0.8; } to { transform: scale(1.06); opacity: 0; } }
-  @keyframes lit-in { from { opacity: 0; } }
-  .wheel .headline { font-size: 15px; }
-  .wheel .headline b { font-weight: 600; font-variant-numeric: tabular-nums; }
-  .wheel .pick { font-size: 12.5px; min-height: 1.5em; }
-  .wheel .legend i.band { width: 14px; height: 7px; border-radius: 2px; }
-  .blast-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: center; }
-  @media (max-width: 900px) { .blast-panel { grid-template-columns: minmax(0, 1fr); } }
+  /* blast radius rings */
+  .rings { display: grid; gap: 8px; align-content: start; }
+  .rings svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .rings .edge { stroke: var(--rule); stroke-width: 1.2; fill: none; }
+  .rings .edge.far { stroke: var(--accent); stroke-opacity: 0.28; stroke-dasharray: 3 3; }
+  .rings .orbit { fill: none; stroke: var(--rule); stroke-dasharray: 2 4; }
+  .rings .hub { fill: var(--accent); }
+  .rings .hub-num { font: 600 16px var(--mono); fill: var(--surface); }
+  .rings .hub-sub { font: 500 8.5px var(--sans); fill: var(--surface); letter-spacing: 0.05em; }
+  .rings .edited { fill: var(--accent); stroke: var(--surface); stroke-width: 1.5; }
+  .rings .depends { fill: var(--surface); stroke: var(--accent); stroke-width: 1.8; }
+  .rings .name { font: 500 14px var(--sans); fill: var(--ink); }
+  .rings .kind { font: 400 12px var(--sans); fill: var(--muted); }
+  .rings .area { font: 600 14px var(--sans); fill: var(--ink); }
+  .rings .screen { font: 400 13px var(--sans); fill: var(--muted); }
+  .rings .more { font: 400 12.5px var(--sans); fill: var(--accent); }
+  .rings .ripple { fill: none; stroke: var(--accent); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: ripple 1.2s ease-out 1 both; }
+  .rings .r1 { animation: ring-in 0.45s ease-out 0.2s both; }
+  .rings .r2 { animation: ring-in 0.45s ease-out 0.55s both; }
+  @keyframes ripple { from { transform: scale(0.15); opacity: 0.7; } to { transform: scale(1); opacity: 0; } }
+  @keyframes ring-in { from { opacity: 0; } }
+  .rings .headline { font-size: 15px; }
+  .rings .headline b { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .legend .shape { display: inline-block; width: 9px; height: 9px; margin-right: 5px; vertical-align: -1px; background: var(--accent); }
+  .legend .shape.api, .legend .shape.hub { border-radius: 50%; }
+  .legend .shape.table { transform: rotate(45deg) scale(0.85); }
+  .legend .shape.depends { border-radius: 50%; background: var(--surface); border: 1.8px solid var(--accent); }
 
   .lifecycle { display: flex; height: 26px; border-radius: 6px; overflow: hidden; background: var(--sunken); }
   .lifecycle span { display: block; min-width: 3px; }
@@ -226,7 +233,7 @@
     .timeline li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
     .bar-row { grid-template-columns: 112px minmax(0, 1fr) 88px; }
   }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .wheel .seg.lit { animation: none; } .wheel .ripple { display: none; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .rings .r1, .rings .r2 { animation: none; } .rings .ripple { display: none; } }
 </style>
 
 <script id="brain-data" type="application/json">__BRAIN_DATA__</script>
@@ -275,14 +282,6 @@
         <div class="bars" id="bars-elapsed"></div>
       </div>
     </div>
-  </section>
-
-  <section id="blast-section" hidden>
-    <div class="section-head">
-      <h2>Where the changes land</h2>
-      <span class="small muted">The product by area, sized by its screens. Select a lit segment to list only the tickets that touch it</span>
-    </div>
-    <div class="panel blast-panel" id="blast-overview"></div>
   </section>
 
   <section>
@@ -489,7 +488,7 @@
     tickets.forEach(function (t) { var v = fn(t); if (v) seen[v] = true; });
     return Object.keys(seen).sort();
   }
-  var state = { sprint: "", epic: "", type: "", q: "", group: null, area: null, selected: tickets.length ? tickets[0].id : null };
+  var state = { sprint: "", epic: "", type: "", q: "", group: null, selected: tickets.length ? tickets[0].id : null };
   fillSelect("f-sprint", "sprints", (function () {
     var seen = {};
     tickets.forEach(function (t) { sprintNames(t).forEach(function (n) { seen[n] = true; }); });
@@ -523,7 +522,6 @@
   // ... narrowed further to one group chip, when one is chosen
   function narrowed(list) {
     if (state.group) list = list.filter(function (t) { return lane(t) === state.group.lane && groupOf(t).key === state.group.key; });
-    if (state.area) list = list.filter(function (t) { return touches(t, state.area.area, state.area.sub); });
     return list;
   }
 
@@ -592,11 +590,10 @@
   function renderBoard(all, list) {
     var board = clear(document.getElementById("board"));
     var note = clear(document.getElementById("group-note"));
-    note.hidden = !state.group && !state.area;
-    if (state.group || state.area) {
-      var what = [state.group ? laneLabel(state.group.lane) + ": " + state.group.label : null, state.area ? "touching " + state.area.label : null].filter(Boolean).join(", ");
-      note.appendChild(el("span", { text: "Showing " + what + " (" + list.length + ")" }));
-      note.appendChild(el("button", { type: "button", text: "Show all", onclick: function () { state.group = null; state.area = null; render(); } }));
+    note.hidden = !state.group;
+    if (state.group) {
+      note.appendChild(el("span", { text: "Showing " + laneLabel(state.group.lane) + ": " + state.group.label + " (" + list.length + ")" }));
+      note.appendChild(el("button", { type: "button", text: "Show all", onclick: function () { state.group = null; render(); } }));
     }
     LANES.forEach(function (id) {
       var inLane = all.filter(function (t) { return lane(t) === id; });
@@ -638,11 +635,11 @@
   }
 
   // ------------------------------------------------------------ blast radius
-  // A wheel of the whole product from the ticket's blast.json: one sector per area (first
-  // route segment), sized by its screens and split into sub-areas. The inner band lights where
-  // the change edits screens, the outer band where screens call an API it changed. Areas come
-  // from the data, so new modules appear without a page change.
+  // Rings out from the change, from the ticket's blast.json: ring 1 is what the ticket edited
+  // (screens, APIs, tables), ring 2 the screens that depend on those, grouped by product area.
+  // Kinds and areas are named through labels.json, so new ones need no page change.
   var SVGNS = "http://www.w3.org/2000/svg";
+  var RING1_MAX = 8, CLUSTERS_MAX = 7, NAMES_PER_CLUSTER = 3;
   function svg(tag, attrs, children) {
     var n = document.createElementNS(SVGNS, tag);
     for (var k in attrs) if (attrs[k] != null) n.setAttribute(k, attrs[k]);
@@ -655,201 +652,142 @@
     var w = String(k).replace(/[-_]+/g, " ");
     return w.charAt(0).toUpperCase() + w.slice(1);
   }
-  function placeLabel(a, sub) { return sub === "main" || entry("areas", sub) === null ? areaLabel(a) : areaLabel(a) + " › " + areaLabel(sub); }
-  function touches(t, a, sub) {
-    var x = t.blast && t.blast.areas && t.blast.areas[a] && t.blast.areas[a].subs[sub];
-    return !!(x && (x.changed_n || x.reached_n));
+  function kindName(k, n) { var one = label("blast_kinds", k); return n === 1 ? one : one + "s"; }
+  // anchor a label on the side of the circle it sits on
+  function anchor(cos) { return cos > 0.25 ? "start" : cos < -0.25 ? "end" : "middle"; }
+  function marker(kind, x, y, r) {
+    if (kind === "screen") return svg("rect", { x: (x - r).toFixed(1), y: (y - r).toFixed(1), width: 2 * r, height: 2 * r, rx: 2, class: "edited" });
+    if (kind === "table") return svg("rect", { x: (x - r).toFixed(1), y: (y - r).toFixed(1), width: 2 * r, height: 2 * r, class: "edited", transform: "rotate(45 " + x.toFixed(1) + " " + y.toFixed(1) + ")" });
+    return svg("circle", { cx: x.toFixed(1), cy: y.toFixed(1), r: r, class: "edited" });
   }
-  function annulus(r0, r1, a0, a1) {
-    function p(r, a) { return (r * Math.sin(a)).toFixed(2) + " " + (-r * Math.cos(a)).toFixed(2); }
-    var big = a1 - a0 > Math.PI ? 1 : 0;
-    return "M" + p(r1, a0) + "A" + r1 + " " + r1 + " 0 " + big + " 1 " + p(r1, a1) + "L" + p(r0, a1) + "A" + r0 + " " + r0 + " 0 " + big + " 0 " + p(r0, a0) + "Z";
-  }
-  /**
-   * areas: { area: { screens, subs: { sub: { screens, ... } } } }
-   * opts.level(sub, ring) → 0..1 lit strength; opts.tip(area, sub, x) → hover text;
-   * opts.pick(area, sub) on select; opts.picked {area, sub}; opts.hub [number, caption]
-   */
-  function drawWheel(areas, opts) {
-    var R = { hub: 30, in0: 40, in1: 70, out0: 74, out1: 104, label: 114 };
-    var keys = Object.keys(areas).sort(function (a, b) { return areas[b].screens - areas[a].screens || (a < b ? -1 : 1); });
-    var total = keys.reduce(function (t, k) { return t + areas[k].screens; }, 0) || 1;
-    var GAP = 0.018, span = 2 * Math.PI - GAP * keys.length;
-    var root = svg("svg", { viewBox: "-200 -128 400 256", role: "img", "aria-label": opts.aria || "Blast radius" });
-    var a = 0, lit = 0;
-    keys.forEach(function (k) {
-      var area = areas[k], a0 = a, width = span * area.screens / total, hot = false;
-      // untouched sub-areas too small to see are drawn as one segment at the end of their area
-      var subs = Object.keys(area.subs).sort(function (x, y) { return area.subs[y].screens - area.subs[x].screens || (x < y ? -1 : 1); });
-      var small = subs.filter(function (sk) { var x = area.subs[sk]; return x.screens / total < 0.012 && !opts.level(x, "changed") && !opts.level(x, "reached"); });
-      if (small.length > 1) {
-        subs = subs.filter(function (sk) { return small.indexOf(sk) < 0; }).concat([" rest"]);
-        area = { screens: area.screens, subs: Object.assign({}, area.subs, { " rest": { screens: small.reduce(function (t, sk) { return t + area.subs[sk].screens; }, 0), rest: small.length } }) };
-      }
-      var b = a0;
-      subs.forEach(function (sk) {
-        var sub = area.subs[sk], w = width * sub.screens / area.screens, b1 = b + w;
-        [["changed", R.in0, R.in1, 0.12], ["reached", R.out0, R.out1, 0.42]].forEach(function (ring) {
-          var v = opts.level(sub, ring[0]);
-          var isPicked = opts.picked && opts.picked.area === k && opts.picked.sub === sk && v > 0;
-          var path = svg("path", {
-            d: annulus(ring[1], ring[2], b, b1),
-            class: "seg" + (v > 0 ? " lit" : "") + (isPicked ? " picked" : ""),
-            "fill-opacity": v > 0 ? (0.35 + 0.65 * v).toFixed(2) : null,
-            style: v > 0 ? "animation-delay:" + (ring[3] + 0.05 * (lit++ % 6)).toFixed(2) + "s" : null
-          }, [svg("title", null, [sub.rest ? areaLabel(k) + ": " + sub.rest + " smaller sub-areas, " + sub.screens + " screens" : opts.tip(k, sk, sub)])]);
-          if (v > 0) {
-            hot = true;
-            path.setAttribute("tabindex", "0");
-            path.addEventListener("click", function () { opts.pick(k, sk); });
-            path.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); opts.pick(k, sk); } });
-          }
-          root.appendChild(path);
-        });
-        b = b1;
-      });
-      // name the areas the change reaches, and the big ones for orientation
-      if (hot || area.screens / total > 0.07) {
-        var mid = a0 + width / 2, x = R.label * Math.sin(mid), y = -R.label * Math.cos(mid);
-        root.appendChild(svg("text", {
-          x: x.toFixed(1), y: (y + 4).toFixed(1), class: "area-label" + (hot ? "" : " faint"),
-          "text-anchor": Math.abs(x) < 12 ? "middle" : x > 0 ? "start" : "end"
-        }, [areaLabel(k)]));
-      }
-      a += width + GAP;
+
+  function drawRings(b) {
+    var R1 = 92, R2 = 196;
+
+    // ring 1: what the ticket edited, at most RING1_MAX named, the rest folded into one node
+    var ring1 = b.ring1.slice(0, b.ring1.length > RING1_MAX ? RING1_MAX - 1 : RING1_MAX);
+    var folded = b.ring1.slice(ring1.length);
+    if (folded.length) ring1.push({ kind: "more", name: "+" + folded.length + " more", title: folded.map(function (x) { return x.name; }).join(", ") });
+    var n1 = ring1.length, at = {};
+    ring1.forEach(function (x, i) {
+      x.angle = n1 === 1 ? 0 : -Math.PI / 2 + (2 * Math.PI * i) / n1 + (n1 % 2 ? 0 : Math.PI / n1);
+      at[x.name] = x;
     });
-    if (lit) root.appendChild(svg("circle", { r: R.out1, class: "ripple" }));
-    root.appendChild(svg("circle", { r: R.hub, class: "hub" }));
-    root.appendChild(svg("text", { y: 2, "text-anchor": "middle", class: "hub-num" }, [String(opts.hub[0])]));
-    root.appendChild(svg("text", { y: 14, "text-anchor": "middle", class: "hub-sub" }, [opts.hub[1]]));
+    folded.forEach(function (x) { at[x.name] = ring1[ring1.length - 1]; });
+
+    // ring 2: dependent screens by area, each cluster placed in angle order of what it comes through
+    var clusters = {};
+    (b.ring2 || []).forEach(function (x) {
+      var c = clusters[x.area] = clusters[x.area] || { area: x.area, names: [], via: {} };
+      if (c.names.indexOf(x.name) < 0) c.names.push(x.name);
+      x.via.forEach(function (v) { if (at[v]) c.via[at[v].name] = at[v]; });
+    });
+    var list = Object.keys(clusters).map(function (k) { return clusters[k]; })
+      .sort(function (p, q) { return q.names.length - p.names.length; });
+    if (list.length > CLUSTERS_MAX) {
+      var rest = list.splice(CLUSTERS_MAX - 1), other = { area: null, names: [], via: {}, areas: rest.length };
+      rest.forEach(function (c) { other.names = other.names.concat(c.names); Object.assign(other.via, c.via); });
+      list.push(other);
+    }
+    list.forEach(function (c) {
+      var vs = Object.keys(c.via).map(function (k) { return c.via[k].angle; });
+      c.want = vs.length ? Math.atan2(vs.reduce(function (t, a) { return t + Math.sin(a); }, 0), vs.reduce(function (t, a) { return t + Math.cos(a); }, 0)) : 0;
+    });
+    list.sort(function (p, q) { return p.want - q.want; });
+    // evenly spaced, and half a step off the ring 1 nodes so the two rings' labels never share a line
+    var step = 2 * Math.PI / Math.max(list.length, 1);
+    var start = list.length ? list[0].want + (list.length === 1 ? 0.6 : step / 2) : 0;
+    list.forEach(function (c, i) { c.angle = start + step * i; });
+    var root = svg("svg", { viewBox: list.length ? "-340 -215 680 430" : "-250 -135 500 270", role: "img", "aria-label": "Blast radius" });
+
+    var edges = svg("g", null), g1 = svg("g", { class: "r1" }), g2 = svg("g", { class: "r2" });
+    root.appendChild(svg("circle", { r: R1, class: "orbit" }));
+    if (list.length) root.appendChild(svg("circle", { r: R2, class: "orbit" }));
+    root.appendChild(edges);
+
+    ring1.forEach(function (x) {
+      var cx = R1 * Math.cos(x.angle), cy = R1 * Math.sin(x.angle), cos = Math.cos(x.angle), sin = Math.sin(x.angle);
+      edges.appendChild(svg("line", { x1: (30 * cos).toFixed(1), y1: (30 * sin).toFixed(1), x2: cx.toFixed(1), y2: cy.toFixed(1), class: "edge" }));
+      var node = x.kind === "more" ? svg("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: 6, class: "depends" }) : marker(x.kind, cx, cy, 6.5);
+      var lx = cx + 13 * cos, ly = cy + 13 * sin + (Math.abs(cos) <= 0.25 ? (sin > 0 ? 12 : -16) : 0);
+      var text = svg("text", { x: lx.toFixed(1), y: (ly + 4).toFixed(1), "text-anchor": anchor(cos) }, [
+        svg("tspan", { class: "name" }, [x.name]),
+        x.kind !== "more" ? svg("tspan", { class: "kind", dx: 4 }, [label("blast_kinds", x.kind)]) : null
+      ]);
+      g1.appendChild(svg("g", null, [svg("title", null, [x.title || x.name]), node, text]));
+    });
+
+    list.forEach(function (c) {
+      var cos = Math.cos(c.angle), sin = Math.sin(c.angle), cx = R2 * cos, cy = R2 * sin;
+      Object.keys(c.via).forEach(function (k) {
+        var v = c.via[k];
+        edges.appendChild(svg("line", { x1: (R1 * Math.cos(v.angle)).toFixed(1), y1: (R1 * Math.sin(v.angle)).toFixed(1), x2: cx.toFixed(1), y2: cy.toFixed(1), class: "edge far" }));
+      });
+      var shown = c.names.slice(0, NAMES_PER_CLUSTER), more = c.names.length - shown.length;
+      var lines = [svg("tspan", { class: "area", x: 0, dy: 0 }, [c.area ? areaLabel(c.area) : c.areas + " other areas"])];
+      shown.forEach(function (nm) { lines.push(svg("tspan", { class: "screen", x: 0, dy: 16 }, [nm])); });
+      if (more) lines.push(svg("tspan", { class: "more", x: 0, dy: 16 }, ["+" + more + " more"]));
+      var h = 16 * (lines.length - 1);
+      var tx = cx + (Math.abs(cos) <= 0.25 ? 0 : cos > 0 ? 12 : -12);
+      var ty = Math.abs(cos) <= 0.25 ? (sin > 0 ? cy + 22 : cy - 14 - h) : cy + 5 - h / 2;
+      var text = svg("text", { transform: "translate(" + tx.toFixed(1) + " " + ty.toFixed(1) + ")", "text-anchor": anchor(cos) }, lines);
+      g2.appendChild(svg("g", null, [
+        svg("title", null, [(c.area ? areaLabel(c.area) : "Other areas") + ": " + c.names.join(", ")]),
+        svg("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: 6, class: "depends" }), text
+      ]));
+    });
+
+    root.appendChild(g2);
+    root.appendChild(g1);
+    root.appendChild(svg("circle", { r: list.length ? R2 : R1, class: "ripple" }));
+    root.appendChild(svg("circle", { r: 26, class: "hub" }));
+    root.appendChild(svg("text", { y: 3, "text-anchor": "middle", class: "hub-num" }, [String(b.files)]));
+    root.appendChild(svg("text", { y: 14, "text-anchor": "middle", class: "hub-sub" }, [b.files === 1 ? "FILE" : "FILES"]));
     return root;
   }
-  function wheelLegend() {
-    return el("div", { class: "legend", style: "justify-content:center" }, [
-      el("span", null, [el("i", { class: "band", style: "background:var(--accent)" }), "Inner ring: " + label("blast", "changed")]),
-      el("span", null, [el("i", { class: "band", style: "background:var(--accent);opacity:.55" }), "Outer ring: " + label("blast", "reached")])
-    ]);
-  }
-  function blastTotals(b) {
-    var out = { areas: 0, changed: 0, reached: 0, first: null, best: 0 };
-    Object.keys(b.areas || {}).forEach(function (a) {
-      var any = false;
-      Object.keys(b.areas[a].subs).forEach(function (sk) {
-        var x = b.areas[a].subs[sk], n = (x.changed_n || 0) + (x.reached_n || 0);
-        out.changed += x.changed_n || 0; out.reached += x.reached_n || 0;
-        if (n) any = true;
-        if (n > out.best) { out.best = n; out.first = { area: a, sub: sk }; }
-      });
-      if (any) out.areas++;
-    });
-    return out;
-  }
-  var picked = {}; // ticket id (or "*") → the segment last selected in its wheel
 
-  /** The ticket's blast radius, or null when there is nothing to draw. */
+  /** The ticket's blast radius, or null when there is nothing to show. */
   function blastBox(t) {
     var b = t.blast;
-    var box = el("div", { class: "block wheel" }, [el("h3", { text: "Blast radius" })]);
+    var box = el("div", { class: "block rings" }, [el("h3", { text: "Blast radius" })]);
     if (!b) {
       if ((t.prs || []).length) return null;
-      box.appendChild(el("p", { class: "empty", text: "Appears when the PR is raised: it is worked out from what the ticket changed." }));
+      box.appendChild(el("p", { class: "empty", text: "Appears once the PR is raised: it is worked out from what the ticket changed." }));
       return box;
     }
-    if (!b.map_built_at || !b.areas) {
+    if (b.schema !== 2) {
+      box.appendChild(el("p", { class: "empty", text: "Recorded in an older format; re-run node codebase/blast.js " + t.id + " in the brain." }));
+      return box;
+    }
+    if (!b.map_built_at || !b.ring1) {
       box.appendChild(el("p", { class: "empty", text: b.files ? b.files + " files changed in " + b.repos + (b.repos === 1 ? " repo" : " repos") + ". The codebase map was not built on the machine that raised the PR, so they could not be placed." : "The ticket's branch could not be read when the PR was raised." }));
       return box;
     }
-    var tot = blastTotals(b), areaCount = Object.keys(b.areas).length;
-    var pick = picked[t.id] || tot.first;
-    var line = el("p", { class: "pick" });
-    function showPick(p) {
-      clear(line);
-      if (!p) { line.appendChild(el("span", { class: "muted", text: "No screen could be tied to this change." })); return; }
-      var x = b.areas[p.area].subs[p.sub];
-      line.appendChild(el("b", { text: placeLabel(p.area, p.sub) + ": " }));
-      var parts = [];
-      if (x.changed_n) parts.push("changed " + x.changed.join(", ") + (x.changed_n > x.changed.length ? " and " + (x.changed_n - x.changed.length) + " more" : ""));
-      if (x.reached_n) parts.push("calls a changed API: " + x.reached.join(", ") + (x.reached_n > x.reached.length ? " and " + (x.reached_n - x.reached.length) + " more" : ""));
-      line.appendChild(document.createTextNode(parts.join("; ")));
-    }
-    var wheel = drawWheel(b.areas, {
-      aria: "Blast radius of " + t.id,
-      hub: [b.files, b.files === 1 ? "FILE" : "FILES"],
-      picked: pick,
-      level: function (x, ring) { return x[ring + "_n"] ? 1 : 0; },
-      tip: function (a, sk, x) { return placeLabel(a, sk) + ": " + x.screens + " screens" + (x.changed_n ? ", " + x.changed_n + " changed" : "") + (x.reached_n ? ", " + x.reached_n + " calling a changed API" : ""); },
-      pick: function (a, sk) { picked[t.id] = { area: a, sub: sk }; render(); }
-    });
-    var reach = tot.changed + tot.reached;
-    box.appendChild(el("p", { class: "headline" }, reach ? [
-      "Reaches ", el("b", { text: tot.areas + " of " + areaCount }), " areas and ", el("b", { text: reach + " of " + b.screens_total }), " screens"
-    ] : ["No screen could be tied to this change"]));
-    box.appendChild(wheel);
-    box.appendChild(wheelLegend());
-    showPick(reach ? pick : null);
-    box.appendChild(line);
+    var kinds = {}, order = [];
+    b.ring1.forEach(function (x) { if (!(x.kind in kinds)) { kinds[x.kind] = 0; order.push(x.kind); } kinds[x.kind]++; });
+    var areas = {};
+    (b.ring2 || []).forEach(function (x) { areas[x.area] = true; });
+    var nAreas = Object.keys(areas).length, deps = b.ring2_total || 0;
+    var head = [];
+    if (order.length) {
+      head.push("Edits ");
+      order.forEach(function (k, i) { if (i) head.push(i === order.length - 1 ? " and " : ", "); head.push(el("b", { text: String(kinds[k]) }), " " + kindName(k, kinds[k])); });
+      head.push(deps ? " · " : " · nothing else depends on " + (b.ring1.length === 1 ? "it" : "them"));
+      if (deps) head.push(el("b", { text: String(deps) }), " screen" + (deps === 1 ? "" : "s") + " in ", el("b", { text: String(nAreas) }), " area" + (nAreas === 1 ? "" : "s") + " depend on " + (b.ring1.length === 1 ? "it" : "them"));
+    } else head.push("No screen, API or table could be tied to this change");
+    box.appendChild(el("p", { class: "headline" }, head));
+    if (order.length) box.appendChild(drawRings(b));
+    box.appendChild(el("div", { class: "legend" }, [
+      el("span", null, [el("i", { class: "shape hub" }), "The change"]),
+      el("span", null, order.map(function (k) { return el("span", { style: "margin-right:10px" }, [el("i", { class: "shape " + k }), label("blast", "changed") + ": " + kindName(k, 2)]); })),
+      deps ? el("span", null, [el("i", { class: "shape depends" }), label("blast", "reached")]) : null
+    ]));
     var extra = [];
-    extra.push(tot.changed + " screen" + (tot.changed === 1 ? "" : "s") + " changed directly, " + tot.reached + " through a changed API");
-    if (b.apis && b.apis.length) extra.push("APIs affected: " + b.apis.join(", "));
-    if (b.tables && b.tables.length) extra.push("tables: " + b.tables.join(", "));
     if (b.migrations) extra.push(b.migrations + " database migration" + (b.migrations === 1 ? "" : "s"));
     (b.unplaced || []).forEach(function (u) { extra.push("also " + u.files + " " + u.what + " file" + (u.files === 1 ? "" : "s")); });
-    box.appendChild(el("p", { class: "small muted", text: extra.join(" · ") + ". From the ticket branch's diff, placed with the codebase map of " + when(b.map_built_at) + "." }));
+    extra.push("worked out from the ticket branch's diff with the codebase map of " + when(b.map_built_at));
+    box.appendChild(el("p", { class: "small muted", text: extra.join(" · ").replace(/^./, function (c) { return c.toUpperCase(); }) + "." }));
     return box;
-  }
-
-  /** Every shown ticket's blast radius on one wheel: segment strength = how many tickets touch it. */
-  function renderBlastOverview(all) {
-    var section = document.getElementById("blast-section");
-    var withBlast = all.filter(function (t) { return t.blast && t.blast.areas; });
-    section.hidden = !withBlast.length;
-    if (!withBlast.length) return;
-    var box = clear(document.getElementById("blast-overview"));
-    var areas = {}, max = 1;
-    withBlast.forEach(function (t) {
-      Object.keys(t.blast.areas).forEach(function (a) {
-        var src = t.blast.areas[a];
-        var dst = areas[a] = areas[a] || { screens: src.screens, subs: {} };
-        dst.screens = Math.max(dst.screens, src.screens);
-        Object.keys(src.subs).forEach(function (sk) {
-          var x = src.subs[sk], y = dst.subs[sk] = dst.subs[sk] || { screens: x.screens, changed_n: 0, reached_n: 0, ids: [] };
-          y.screens = Math.max(y.screens, x.screens);
-          if (x.changed_n) y.changed_n++;
-          if (x.reached_n) y.reached_n++;
-          if (x.changed_n || x.reached_n) y.ids.push(t.id);
-          max = Math.max(max, y.changed_n, y.reached_n);
-        });
-      });
-    });
-    var touched = 0, shared = 0;
-    Object.keys(areas).forEach(function (a) { Object.keys(areas[a].subs).forEach(function (sk) { var n = areas[a].subs[sk].ids.length; if (n) touched++; if (n > 1) shared++; }); });
-    var wheel = drawWheel(areas, {
-      aria: "Where the shown tickets' changes land",
-      hub: [withBlast.length, withBlast.length === 1 ? "TICKET" : "TICKETS"],
-      picked: state.area,
-      level: function (x, ring) { return x[ring + "_n"] ? (max > 1 ? (x[ring + "_n"] - 1) / (max - 1) : 1) * 0.6 + 0.4 : 0; },
-      tip: function (a, sk, x) { return placeLabel(a, sk) + ": " + x.ids.length + " ticket" + (x.ids.length === 1 ? "" : "s") + (x.ids.length ? " (" + x.ids.join(", ") + ")" : ""); },
-      pick: function (a, sk) {
-        var same = state.area && state.area.area === a && state.area.sub === sk;
-        state.area = same ? null : { area: a, sub: sk, label: placeLabel(a, sk) };
-        render();
-      }
-    });
-    box.appendChild(el("div", { class: "wheel" }, [wheel, wheelLegend()]));
-    var busiest = [];
-    Object.keys(areas).forEach(function (a) { Object.keys(areas[a].subs).forEach(function (sk) { var x = areas[a].subs[sk]; if (x.ids.length > 1) busiest.push({ label: placeLabel(a, sk), ids: x.ids }); }); });
-    busiest.sort(function (x, y) { return y.ids.length - x.ids.length; });
-    box.appendChild(el("div", { class: "block" }, [
-      el("p", { class: "headline", style: "font-size:15px" }, [
-        el("b", { text: String(withBlast.length) }), " of " + all.length + " tickets have a recorded blast radius; together they touch ",
-        el("b", { text: String(touched) }), " product sub-areas."
-      ]),
-      el("p", { class: "small muted", text: shared ? shared + " sub-area" + (shared === 1 ? " is" : "s are") + " touched by more than one ticket, a regression and merge risk worth a look:" : "No two tickets touch the same sub-area." }),
-      busiest.length ? el("p", { class: "small" }, busiest.slice(0, 4).map(function (x, i) {
-        return el("span", null, [(i ? " · " : ""), el("b", { text: x.label }), " " + x.ids.join(", ")]);
-      })) : null,
-      el("p", { class: "small muted", text: "Stronger colour means more tickets. Tickets raised before the blast radius was recorded, or still before their PR, are not on the wheel." })
-    ]));
   }
 
   function renderBars(list) {
@@ -1116,7 +1054,6 @@
     renderKpis(list);
     renderBoard(all, list);
     renderBars(list);
-    renderBlastOverview(all);
     renderTable(list);
     renderDetail(list);
   }
