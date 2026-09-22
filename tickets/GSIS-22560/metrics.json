@@ -1,56 +1,58 @@
 {
   "ticket": "GSIS-22560",
-  "updated_at": "2026-09-21T18:09:02.311Z",
+  "updated_at": "2026-09-21T18:55:12.921Z",
   "sessions": {
     "6917b26b-57d4-4146-a9ac-9acf730f9afb": {
-      "turns": 61,
+      "turns": 102,
       "tokens_by_stage": {
         "plan": {
-          "input": 132,
-          "output": 43980,
-          "cache_read": 4687070,
-          "cache_creation": 278353,
-          "thinking": 14103
+          "input": 224,
+          "output": 98165,
+          "cache_read": 9908757,
+          "cache_creation": 397906,
+          "thinking": 28670
         }
       },
       "tokens_by_model": {
         "claude-sonnet-5": {
-          "input": 132,
-          "output": 43980,
-          "cache_read": 4687070,
-          "cache_creation": 278353,
-          "thinking": 14103
+          "input": 224,
+          "output": 98165,
+          "cache_read": 9908757,
+          "cache_creation": 397906,
+          "thinking": 28670
         }
       }
     }
   },
   "tokens": {
-    "input": 132,
-    "output": 43980,
-    "cache_read": 4687070,
-    "cache_creation": 278353,
-    "thinking": 14103
+    "input": 224,
+    "output": 98165,
+    "cache_read": 9908757,
+    "cache_creation": 397906,
+    "thinking": 28670
   },
   "tokens_by_stage": {
     "plan": {
-      "input": 132,
-      "output": 43980,
-      "cache_read": 4687070,
-      "cache_creation": 278353,
-      "thinking": 14103
+      "input": 224,
+      "output": 98165,
+      "cache_read": 9908757,
+      "cache_creation": 397906,
+      "thinking": 28670
     }
   },
   "tokens_by_model": {
     "claude-sonnet-5": {
-      "input": 132,
-      "output": 43980,
-      "cache_read": 4687070,
-      "cache_creation": 278353,
-      "thinking": 14103
+      "input": 224,
+      "output": 98165,
+      "cache_read": 9908757,
+      "cache_creation": 397906,
+      "thinking": 28670
     }
   },
-  "turns": 61,
-  "stage_seconds": {},
+  "turns": 102,
+  "stage_seconds": {
+    "plan": 918
+  },
   "iterations": 0,
   "verdicts": {},
   "findings": {

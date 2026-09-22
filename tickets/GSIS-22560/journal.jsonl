@@ -7,3 +7,4 @@
 {"ts":"2026-09-21T18:11:17Z","event":"decision_locked","id":"D-3","summary":"Fix approach: next code = highest existing code in the assignment + 1; add the re-entry guard to Save All"}
 {"ts":"2026-09-21T18:11:17Z","event":"decision_locked","id":"D-4","summary":"Test strategy: backend regression test on count > max, frontend spec for the Save All guard"}
 {"ts":"2026-09-21T18:11:17Z","event":"decision_locked","id":"D-5","summary":"Accepted limitation: two truly simultaneous creates can still mint the same code"}
+{"ts":"2026-09-22T01:53:53Z","event":"input_requested","audience":"qa","packet":"qa-packet.md","questions":4}

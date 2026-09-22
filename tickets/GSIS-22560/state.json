@@ -18,11 +18,11 @@
     "estimate": null,
     "refreshed_at": "2026-09-21T17:45:00Z"
   },
-  "status": "AWAITING_REPO_CONFIRMATION",
-  "next_action": "Human confirms the repos to change (sis-product-sis-admin-backend, sis-product-sis-frontend) and the proposed light track, weighing the delete-scenario note in plan.md; then create ticket branches and run the Implementor",
-  "blocked_on": null,
+  "status": "NEEDS_INPUT",
+  "next_action": "Developer posts qa-packet.md as a Jira comment on GSIS-22560; when answered, run /work GSIS-22560",
+  "blocked_on": "answers to qa-packet.md Q1–Q4",
   "created_at": "2026-09-21T17:45:00Z",
-  "updated_at": "2026-09-21T18:11:17Z",
+  "updated_at": "2026-09-22T01:53:53Z",
   "iteration": 1,
   "max_iterations": null,
   "track": null,
@@ -58,7 +58,8 @@
     "D-5"
   ],
   "artifacts": {
-    "plan": "plan.md"
+    "plan": "plan.md",
+    "qa_packet": "qa-packet.md"
   },
   "plan": "READY",
   "implementation": null,
