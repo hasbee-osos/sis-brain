@@ -178,10 +178,17 @@
   @keyframes ring-in { from { opacity: 0; } }
   .rings .headline { font-size: 15px; }
   .rings .headline b { font-weight: 600; font-variant-numeric: tabular-nums; }
-  .legend .shape { display: inline-block; width: 9px; height: 9px; margin-right: 5px; vertical-align: -1px; background: var(--accent); }
-  .legend .shape.api, .legend .shape.hub { border-radius: 50%; }
-  .legend .shape.table { transform: rotate(45deg) scale(0.85); }
-  .legend .shape.depends { border-radius: 50%; background: var(--surface); border: 1.8px solid var(--accent); }
+  .legend .shape { display: inline-block; width: 9px; height: 9px; margin-right: 5px; vertical-align: -1px; background: var(--accent); border-radius: 50%; }
+  .legend .shape.hub { width: 11px; height: 11px; vertical-align: -2px; }
+  .legend .shape.depends { background: var(--surface); border: 1.8px solid var(--accent); }
+  .rings .node { cursor: pointer; outline: none; }
+  .rings .node .hit { fill: transparent; stroke: none; }
+  .rings .node:hover .name, .rings .node:hover .area, .rings .node:focus-visible .name, .rings .node:focus-visible .area { text-decoration: underline; }
+  .rings .node.picked circle.edited, .rings .node.picked circle.depends, .rings .node.picked circle.hub { stroke: var(--ink); stroke-width: 2.5; }
+  .node-info { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; background: var(--sunken); font-size: 13px; display: grid; gap: 4px; }
+  .node-info .ni-title { font-weight: 600; }
+  .node-info .ni-kind { font-size: 11px; font-weight: 500; color: var(--muted); margin-left: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .node-info p { max-width: 70ch; }
 
   .lifecycle { display: flex; height: 26px; border-radius: 6px; overflow: hidden; background: var(--sunken); }
   .lifecycle span { display: block; min-width: 3px; }
@@ -658,13 +665,17 @@
   function kindName(k, n) { var one = label("blast_kinds", k); return n === 1 ? one : one + "s"; }
   // anchor a label on the side of the circle it sits on
   function anchor(cos) { return cos > 0.25 ? "start" : cos < -0.25 ? "end" : "middle"; }
-  function marker(kind, x, y, r) {
-    if (kind === "screen") return svg("rect", { x: (x - r).toFixed(1), y: (y - r).toFixed(1), width: 2 * r, height: 2 * r, rx: 2, class: "edited" });
-    if (kind === "table") return svg("rect", { x: (x - r).toFixed(1), y: (y - r).toFixed(1), width: 2 * r, height: 2 * r, class: "edited", transform: "rotate(45 " + x.toFixed(1) + " " + y.toFixed(1) + ")" });
-    return svg("circle", { cx: x.toFixed(1), cy: y.toFixed(1), r: r, class: "edited" });
+  // a node the reader can select (click, Enter or Space) to read about it below the drawing
+  function pickable(g, info, onPick) {
+    g.setAttribute("class", "node");
+    g.setAttribute("tabindex", "0");
+    g.setAttribute("role", "button");
+    g.addEventListener("click", function () { onPick(g, info); });
+    g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPick(g, info); } });
+    return g;
   }
 
-  function drawRings(b) {
+  function drawRings(b, onPick) {
     var R1 = 92, R2 = 196;
 
     // ring 1: what the ticket edited, at most RING1_MAX named, the rest folded into one node
@@ -716,13 +727,14 @@
     ring1.forEach(function (x) {
       var cx = R1 * Math.cos(x.angle), cy = R1 * Math.sin(x.angle), cos = Math.cos(x.angle), sin = Math.sin(x.angle);
       edges.appendChild(svg("line", { x1: (30 * cos).toFixed(1), y1: (30 * sin).toFixed(1), x2: cx.toFixed(1), y2: cy.toFixed(1), class: "edge" }));
-      var node = x.kind === "more" ? svg("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: 6, class: "depends" }) : marker(x.kind, cx, cy, 6.5);
+      var node = svg("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: x.kind === "more" ? 6 : 7, class: x.kind === "more" ? "depends" : "edited" });
       var lx = cx + 13 * cos, ly = cy + 13 * sin + (Math.abs(cos) <= 0.25 ? (sin > 0 ? 12 : -16) : 0);
       var text = svg("text", { x: lx.toFixed(1), y: (ly + 4).toFixed(1), "text-anchor": anchor(cos) }, [
         svg("tspan", { class: "name" }, [short(x.name)]),
         mixed && x.kind !== "more" ? svg("tspan", { class: "kind", dx: 4 }, [label("blast_kinds", x.kind)]) : null
       ]);
-      g1.appendChild(svg("g", null, [svg("title", null, [x.title || x.name]), node, text]));
+      g1.appendChild(pickable(svg("g", null, [svg("title", null, [x.title || x.name]), svg("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: 14, class: "hit" }), node, text]),
+        x.kind === "more" ? { kind: "more", items: folded } : { kind: "edited", item: x }, onPick));
     });
 
     list.forEach(function (c) {
@@ -739,19 +751,65 @@
       var tx = cx + (Math.abs(cos) <= 0.25 ? 0 : cos > 0 ? 12 : -12);
       var ty = Math.abs(cos) <= 0.25 ? (sin > 0 ? cy + 22 : cy - 14 - h) : cy + 5 - h / 2;
       var text = svg("text", { transform: "translate(" + tx.toFixed(1) + " " + ty.toFixed(1) + ")", "text-anchor": anchor(cos) }, lines);
-      g2.appendChild(svg("g", null, [
+      g2.appendChild(pickable(svg("g", null, [
         svg("title", null, [(c.area ? areaLabel(c.area) : "Other areas") + ": " + c.names.join(", ")]),
+        svg("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: 14, class: "hit" }),
         svg("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: 6, class: "depends" }), text
-      ]));
+      ]), { kind: "cluster", cluster: c }, onPick));
     });
 
     root.appendChild(g2);
     root.appendChild(g1);
     root.appendChild(svg("circle", { r: R2, class: "ripple" }));
-    root.appendChild(svg("circle", { r: 26, class: "hub" }));
-    root.appendChild(svg("text", { y: 3, "text-anchor": "middle", class: "hub-num" }, [String(b.files)]));
-    root.appendChild(svg("text", { y: 14, "text-anchor": "middle", class: "hub-sub" }, [b.files === 1 ? "FILE" : "FILES"]));
+    root.appendChild(pickable(svg("g", null, [
+      svg("title", null, ["The change"]),
+      svg("circle", { r: 26, class: "hub" }),
+      svg("text", { y: 3, "text-anchor": "middle", class: "hub-num" }, [String(b.files)]),
+      svg("text", { y: 14, "text-anchor": "middle", class: "hub-sub" }, [b.files === 1 ? "FILE" : "FILES"])
+    ]), { kind: "hub" }, onPick));
     return root;
+  }
+
+  /** What the panel under the rings says about a selected node. */
+  function nodeInfo(b, info) {
+    var out = [];
+    function byArea(list) {
+      var groups = {}, order = [];
+      list.forEach(function (x) { if (!groups[x.area]) { groups[x.area] = []; order.push(x.area); } if (groups[x.area].indexOf(x.name) < 0) groups[x.area].push(x.name); });
+      return order.map(function (a) { return areaLabel(a) + ": " + groups[a].join(", "); });
+    }
+    if (info.kind === "hub") {
+      out.push(el("div", null, [el("span", { class: "ni-title", text: "The change" })]));
+      out.push(el("p", { text: b.files + " file" + (b.files === 1 ? "" : "s") + " changed in " + b.repos + (b.repos === 1 ? " repo" : " repos") + ", compared with the branch the ticket started from." }));
+      var parts = [];
+      if (b.migrations) parts.push(b.migrations + " database migration" + (b.migrations === 1 ? "" : "s"));
+      (b.unplaced || []).forEach(function (u) { parts.push(u.files + " " + u.what + " file" + (u.files === 1 ? "" : "s") + " that could not be tied to a screen, API or table"); });
+      if (parts.length) out.push(el("p", { class: "muted", text: "Also: " + parts.join("; ") + "." }));
+    } else if (info.kind === "edited") {
+      var x = info.item;
+      out.push(el("div", null, [el("span", { class: "ni-title", text: x.name }), el("span", { class: "ni-kind", text: label("blast_kinds", x.kind) })]));
+      var where = x.kind === "screen" ? "A screen in " + areaLabel(x.area) + ", changed by the ticket (directly, or through a component it shows)."
+        : x.kind === "table" ? "A database table whose definition the ticket changed."
+        : "An API whose code the ticket changed.";
+      out.push(el("p", { text: where }));
+      var deps = (b.ring2 || []).filter(function (d) { return d.via.indexOf(x.name) >= 0; });
+      if (deps.length) {
+        out.push(el("p", { text: deps.length + " other screen" + (deps.length === 1 ? "" : "s") + (x.kind === "table" ? " read it through their APIs:" : " call it:") }));
+        byArea(deps).forEach(function (line) { out.push(el("p", { class: "muted", text: line })); });
+      } else out.push(el("p", { class: "muted", text: "No other screen depends on it." }));
+    } else if (info.kind === "more") {
+      out.push(el("div", null, [el("span", { class: "ni-title", text: info.items.length + " more edited" })]));
+      info.items.forEach(function (x) { out.push(el("p", { class: "muted", text: x.name + " (" + label("blast_kinds", x.kind) + (x.area ? ", " + areaLabel(x.area) : "") + ")" })); });
+    } else {
+      var c = info.cluster;
+      out.push(el("div", null, [el("span", { class: "ni-title", text: c.area ? areaLabel(c.area) : c.areas + " other areas" }), el("span", { class: "ni-kind", text: label("blast", "reached") })]));
+      var one = c.names.length === 1;
+      out.push(el("p", { text: c.names.length + (one ? " screen here uses" : " screens here use") + " what the ticket changed, so " + (one ? "it is" : "they are") + " worth a check when testing:" }));
+      out.push(el("p", { class: "muted", text: c.names.join(", ") }));
+      var via = Object.keys(c.via);
+      if (via.length) out.push(el("p", { class: "muted", text: "Through: " + via.join(", ") }));
+    }
+    return out;
   }
 
   /** The ticket's blast radius, or null when there is nothing to show. */
@@ -784,8 +842,17 @@
       if (deps) head.push(el("b", { text: String(deps) }), " screen" + (deps === 1 ? "" : "s") + " in ", el("b", { text: String(nAreas) }), " area" + (nAreas === 1 ? "" : "s") + " depend on " + (b.ring1.length === 1 ? "it" : "them"));
     } else head.push("No screen, API or table could be tied to this change");
     box.appendChild(el("p", { class: "headline" }, head));
+    var panel = el("div", { class: "node-info", "aria-live": "polite" }, [el("span", { class: "muted", text: "Select the centre or any node to see what it is and what depends on it." })]);
+    var current = null;
+    function onPick(g, info) {
+      if (current) current.classList.remove("picked");
+      current = g;
+      g.classList.add("picked");
+      clear(panel);
+      nodeInfo(b, info).forEach(function (n) { panel.appendChild(n); });
+    }
     if (order.length) {
-      var rings = drawRings(b);
+      var rings = drawRings(b, onPick);
       box.appendChild(rings);
       // fit the drawing to its labels once it is laid out, so long names never cross the panel
       requestAnimationFrame(function () {
@@ -797,9 +864,10 @@
     }
     box.appendChild(el("div", { class: "legend" }, [
       el("span", null, [el("i", { class: "shape hub" }), "The change"]),
-      el("span", null, order.map(function (k) { return el("span", { style: "margin-right:10px" }, [el("i", { class: "shape " + k }), label("blast", "changed") + ": " + kindName(k, 2)]); })),
+      el("span", null, [el("i", { class: "shape" }), label("blast", "changed")]),
       deps ? el("span", null, [el("i", { class: "shape depends" }), label("blast", "reached")]) : null
     ]));
+    if (order.length) box.appendChild(panel);
     var extra = [];
     if (b.migrations) extra.push(b.migrations + " database migration" + (b.migrations === 1 ? "" : "s"));
     (b.unplaced || []).forEach(function (u) { extra.push("also " + u.files + " " + u.what + " file" + (u.files === 1 ? "" : "s")); });
