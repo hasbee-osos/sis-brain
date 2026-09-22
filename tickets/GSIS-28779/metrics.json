@@ -1,0 +1,94 @@
+{
+  "ticket": "GSIS-28779",
+  "updated_at": "2026-09-22T08:55:29.195Z",
+  "sessions": {
+    "ab709f7f-af65-4f21-a970-c5c920cc3e3c": {
+      "turns": 239,
+      "tokens_by_stage": {
+        "plan": {
+          "input": 184,
+          "output": 35946,
+          "cache_read": 9041763,
+          "cache_creation": 239101,
+          "thinking": 10746
+        },
+        "implement": {
+          "input": 244,
+          "output": 72931,
+          "cache_read": 21256568,
+          "cache_creation": 522769,
+          "thinking": 11041
+        },
+        "evaluate": {
+          "input": 50,
+          "output": 15219,
+          "cache_read": 4200192,
+          "cache_creation": 32501,
+          "thinking": 2301
+        }
+      },
+      "tokens_by_model": {
+        "claude-sonnet-5": {
+          "input": 478,
+          "output": 124096,
+          "cache_read": 34498523,
+          "cache_creation": 794371,
+          "thinking": 24088
+        }
+      }
+    }
+  },
+  "tokens": {
+    "input": 478,
+    "output": 124096,
+    "cache_read": 34498523,
+    "cache_creation": 794371,
+    "thinking": 24088
+  },
+  "tokens_by_stage": {
+    "plan": {
+      "input": 184,
+      "output": 35946,
+      "cache_read": 9041763,
+      "cache_creation": 239101,
+      "thinking": 10746
+    },
+    "implement": {
+      "input": 244,
+      "output": 72931,
+      "cache_read": 21256568,
+      "cache_creation": 522769,
+      "thinking": 11041
+    },
+    "evaluate": {
+      "input": 50,
+      "output": 15219,
+      "cache_read": 4200192,
+      "cache_creation": 32501,
+      "thinking": 2301
+    }
+  },
+  "tokens_by_model": {
+    "claude-sonnet-5": {
+      "input": 478,
+      "output": 124096,
+      "cache_read": 34498523,
+      "cache_creation": 794371,
+      "thinking": 24088
+    }
+  },
+  "turns": 239,
+  "stage_seconds": {
+    "plan": 2720,
+    "implement": 3503,
+    "evaluate": 1420
+  },
+  "iterations": 1,
+  "verdicts": {
+    "INSUFFICIENT_EVIDENCE": 1
+  },
+  "findings": {
+    "blocking": 1,
+    "non_blocking": 6
+  }
+}

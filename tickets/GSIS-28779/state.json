@@ -7,15 +7,20 @@
     "issue_type": "Bug",
     "epic": { "key": "GSIS-2727", "name": "Finance Review" },
     "sprint": { "name": "Sustainment Team Backlog", "start": null, "end": null },
-    "assignee": null,
+    "sprints": [{ "name": "Sustainment Team Backlog", "state": "future", "start": null, "end": null }],
+    "links": [],
+    "assignee": "Ashoka Jayasekara",
     "estimate": null,
-    "refreshed_at": "2026-09-22T02:09:41Z"
+    "customer_name": ["Product Core Feature"],
+    "labels": [],
+    "subtasks": [],
+    "refreshed_at": "2026-09-22T10:32:00Z"
   },
-  "status": "IMPLEMENTING",
-  "next_action": "Both blocking findings closed with real evidence - raise the PR",
+  "status": "PR_STAGE_1",
+  "next_action": "Human reviews the PR on sis-product-sis-admin-backend (base-sandbox-qa), checking the final-fix-round item (E-1) noted in the description; harness resumes if review comments or a QA issue come back",
   "blocked_on": null,
   "created_at": "2026-09-22T02:09:41Z",
-  "updated_at": "2026-09-22T05:31:39Z",
+  "updated_at": "2026-09-22T10:40:00Z",
   "iteration": 1,
   "max_iterations": 1,
   "track": "light",
@@ -30,9 +35,20 @@
   },
   "context_repos": ["sis-product-sis-frontend"],
   "pr_target": "base-sandbox-qa",
-  "prs": [],
+  "prs": [
+    {
+      "repo": "sis-product-sis-admin-backend",
+      "stage": 1,
+      "target": "base-sandbox-qa",
+      "head": "base/bugfix/GSIS-28779-invoice-status-filter",
+      "resolve_branch": null,
+      "compare_link": "https://github.com/pbsgears/sis-product-sis-admin-backend/compare/base-sandbox-qa...base/bugfix/GSIS-28779-invoice-status-filter?expand=1&title=GSIS-28779%3A%20Manage%20Invoices%20Status%20filter%20matches%20sponsor-cancelled%20invoices",
+      "url": null
+    }
+  ],
   "sessions": [
-    { "session_id": "ab709f7f-af65-4f21-a970-c5c920cc3e3c", "started_at": "2026-09-22T02:09:41Z", "ended_at": null }
+    { "session_id": "ab709f7f-af65-4f21-a970-c5c920cc3e3c", "started_at": "2026-09-22T02:09:41Z", "ended_at": null },
+    { "session_id": "9ec70d3f-8a76-4bf6-b269-ef09eed6f312", "started_at": "2026-09-22T10:32:00Z", "ended_at": null }
   ],
   "human_confirmations": [
     { "what": "line_and_branch", "at": "2026-09-22T02:15:00Z", "value": "Customer Name 'Product Core Feature' → line base, base/bugfix/GSIS-28779-invoice-status-filter, source base-development, PR to base-sandbox-qa" },
