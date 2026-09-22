@@ -44,6 +44,10 @@ This ticket is on the **light track** (1 evaluation round). The blocking finding
 
 Non-blocking findings from evaluation-1.md (N-1…N-6, recommended changes) were left for the human reviewer / a separate ticket, as instructed — none require code changes to this fix.
 
+### Commit after the branch was pushed — also unreviewed
+
+`ae4454b42f` (on top of the final-fix-round HEAD above) restyles the comments this ticket added — `//` line comments to `/* */` block comments — at the developer's request. **No logic, test assertions, or behavior changed**; verified no comment text contains a stray `*/` that could truncate a block early. The light track's single evaluation round was already used, so this was not re-evaluated either; please check it alongside E-1 above.
+
 ## Iterations
 
 1 implementation round, 1 evaluation round (INSUFFICIENT_EVIDENCE), 1 final fix round (not re-evaluated, per the light track's evaluation cap).

@@ -17,10 +17,10 @@
     "refreshed_at": "2026-09-22T10:32:00Z"
   },
   "status": "PR_STAGE_1",
-  "next_action": "Human reviews the PR on sis-product-sis-admin-backend (base-sandbox-qa), checking the final-fix-round item (E-1) noted in the description; harness resumes if review comments or a QA issue come back",
+  "next_action": "Human reviews the PR on sis-product-sis-admin-backend (base-sandbox-qa), checking the final-fix-round item (E-1) and the post-evaluation comment-style commit (ae4454b42f), both noted in the description; harness resumes if review comments or a QA issue come back",
   "blocked_on": null,
   "created_at": "2026-09-22T02:09:41Z",
-  "updated_at": "2026-09-22T10:40:00Z",
+  "updated_at": "2026-09-22T10:47:00Z",
   "iteration": 1,
   "max_iterations": 1,
   "track": "light",
@@ -31,7 +31,7 @@
   "source_branch": "base-development",
   "branch": "base/bugfix/GSIS-28779-invoice-status-filter",
   "repos": {
-    "sis-product-sis-admin-backend": { "role": "change", "branch_created": true, "evaluated_head": "9182f244ca873029dcf53e96ba2066538c6d885d", "final_head": "06cd8cca7ad1f6249fad0e45dfc2fb0db02f5481" }
+    "sis-product-sis-admin-backend": { "role": "change", "branch_created": true, "evaluated_head": "9182f244ca873029dcf53e96ba2066538c6d885d", "final_head": "ae4454b42f" }
   },
   "context_repos": ["sis-product-sis-frontend"],
   "pr_target": "base-sandbox-qa",
@@ -53,7 +53,8 @@
   "human_confirmations": [
     { "what": "line_and_branch", "at": "2026-09-22T02:15:00Z", "value": "Customer Name 'Product Core Feature' → line base, base/bugfix/GSIS-28779-invoice-status-filter, source base-development, PR to base-sandbox-qa" },
     { "what": "repos_to_change", "at": "2026-09-22T04:07:32Z", "value": ["sis-product-sis-admin-backend"] },
-    { "what": "track", "at": "2026-09-22T04:07:32Z", "value": "light" }
+    { "what": "track", "at": "2026-09-22T04:07:32Z", "value": "light" },
+    { "what": "unreviewed_post_evaluation_commit", "at": "2026-09-22T10:45:00Z", "value": "ae4454b42f (comment-style only, // -> /* */, no logic change) raised in the PR as unreviewed rather than triggering another evaluation round; no rounds remained on the light track" }
   ],
   "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5", "D-6"],
   "artifacts": { "plan": "plan.md", "implementation": "implementation-report-2.md", "evaluation": "evaluation-1.md" },
