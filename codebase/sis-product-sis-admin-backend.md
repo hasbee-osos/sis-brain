@@ -20,7 +20,7 @@ The main SIS backend: one Spring Boot service serving the whole `/api/v1` REST A
 
 ## Build and test
 
-- **JDK 11 and Gradle.** The checkout has **no Gradle wrapper jar**, so use a local Gradle 8.x (`gradle -p sis-product-sis-admin-backend …`). CI builds with tests skipped (`gradle build -x test`), so there is no test baseline to rely on.
+- **JDK 11 and Gradle.** The checkout has **no Gradle wrapper jar**, so use a local Gradle 8.x (`gradle -p sis-product-sis-admin-backend …`). CI builds with tests skipped (`gradle build -x test`). **The test source set does not currently compile at all** — `gradle test` (even `--tests`-filtered) fails at `:compileTestJava` before any test runs, regardless of which test is targeted (confirmed 2026-09, GSIS-28779: 50 errors across 21 pre-existing files unrelated to finance, as of `base-development` `9b6f9e6d0267c`). Expect no executable test evidence from this repo until that drift is fixed.
 - **Known problem (2026-09, GSIS-28778):** in this workspace, `compileJava` stalled in annotation processing (Lombok, MapStruct, Hibernate metamodel) with no compiler error. One attempt ran for hours. **Time-box a build to about 15 minutes.** If nothing finishes, stop and record it as an environment gap; don't leave it running.
 - **Tests:** JUnit 5 (`useJUnitPlatform`), H2 as the test database, JaCoCo after tests. There are ArchUnit rules in `src/test/java/com/ubs/sis/archunit/` (auth, master). Run the ones that touch your change: `gradle -p <repo> test --tests "<Class>" --tests "com.ubs.sis.archunit.*"`.
 - PostgreSQL-specific Liquibase checks need Docker (PostgreSQL 14). Check `docker ps` first, and say so if Docker is not available.
