@@ -1,3 +1,8 @@
 {"ts":"2026-09-22T02:09:41Z","event":"ticket_started","ticket":"GSIS-28779","session_id":"ab709f7f-af65-4f21-a970-c5c920cc3e3c"}
 {"ts":"2026-09-22T02:15:00Z","event":"human_confirmed","what":"line_and_branch","value":"Customer Name 'Product Core Feature' -> line base, base/bugfix/GSIS-28779-invoice-status-filter, source base-development, PR to base-sandbox-qa"}
 {"ts":"2026-09-22T02:15:00Z","event":"decision_locked","id":"D-1","summary":"Routing: bug on the base line, branch base/bugfix/GSIS-28779-invoice-status-filter"}
+{"ts":"2026-09-22T02:16:00Z","event":"stage_start","stage":"plan","iteration":1}
+{"ts":"2026-09-22T03:01:20Z","event":"stage_end","stage":"plan","iteration":1}
+{"ts":"2026-09-22T03:01:20Z","event":"decision_locked","id":"D-2","summary":"Root cause: Status filter ignores the sponsor-cancelled override the grid displays"}
+{"ts":"2026-09-22T03:01:20Z","event":"decision_locked","id":"D-3","summary":"Fix approach: match the effective status in InvoiceSpecification, gated by isManageInvoice"}
+{"ts":"2026-09-22T03:01:20Z","event":"decision_locked","id":"D-4","summary":"Test strategy: repository-level IT against H2, plus a pinning case for unrelated consumers"}
