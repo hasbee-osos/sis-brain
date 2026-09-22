@@ -8,9 +8,10 @@
  *
  * Reads what the ticket actually changed - the diff of its branch against its source
  * branch in every changed repo - and places each file with the generated indexes:
- *   changed  screens whose component (or an embedded component) changed, APIs whose
- *            controller, frontend service or backing class changed, tables whose entity changed
- *   reached  other screens that call a changed API
+ *   changed  screens whose component (or an embedded component) changed; tables whose entity
+ *            changed; APIs whose controller or frontend service changed, or whose controller
+ *            uses a changed class or entity (a few classes away)
+ *   reached  other screens that call one of those APIs
  * Every screen in the map is counted by product area (first route segment) and sub-area
  * (second), so the wheel is drawn to scale. Git only, never a checkout; no dependencies.
  * /work runs it just before recording "PRs prepared" (harness skills/brain/SKILL.md).
@@ -26,6 +27,7 @@ const BRAIN = path.resolve(HERE, "..");
 const WORKSPACE = path.resolve(HERE, "..", "..");
 const GEN = path.join(HERE, "generated");
 const MAX_NAMES = 20;
+const MAX_FRONTIER = 80; // classes followed per step, so a widely used class can't fan out without end
 // route segments that name an action, not a screen: "…/assessment-planning/view" is "Assessment Planning"
 const GENERIC = /^(view|list|add|edit|add-edit|add-view-edit|details?|create|new|index|manage|main)$/;
 
@@ -59,7 +61,7 @@ function readTable(name) {
 const contextPaths = (cell) => [...(cell || "").matchAll(/\(\/?([^)]+)\)/g)].map((m) => m[1]);
 
 const humanise = (seg) => seg.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-const isTest = (f) => /\.spec\.ts$|\/src\/test\//.test(f);
+const isTest = (f) => /\.spec\.ts$|(^|\/)src\/test\//.test(f);
 
 /** The commit that holds the ticket's work in a repo: its branch, else the commit the gate accepted. */
 function headOf(dir, state, info) {
@@ -155,6 +157,28 @@ function main() {
     return byApi.length ? byApi : controllers.has(key) ? [controllers.get(key).replace(/^\/api\/v\d+\//, "")] : [];
   };
 
+  // controllers that use a class, following uses up to `depth` classes away (entity → repository
+  // → service → controller); a class is also known by its interface name without "Impl"
+  function controllersUsing(c, cls, depth) {
+    const found = new Set();
+    const seen = new Set();
+    let frontier = [cls];
+    for (let d = 0; d < depth && frontier.length; d++) {
+      const names = [...new Set(frontier.flatMap((n) => [n, n.replace(/Impl$/, "")]))].filter((n) => !seen.has(n));
+      names.forEach((n) => seen.add(n));
+      if (!names.length) break;
+      const hits = git(c.dir, ["grep", "-l", "-w", ...names.flatMap((n) => ["-e", n]), c.head, "--", "src/main/java"]) || "";
+      frontier = [];
+      for (const line of hits.split("\n").filter(Boolean)) {
+        const k = c.repo + "/" + line.slice(line.indexOf(":") + 1);
+        if (controllers.has(k)) found.add(k);
+        else frontier.push(path.basename(k, ".java"));
+      }
+      frontier = frontier.slice(0, MAX_FRONTIER);
+    }
+    return [...found];
+  }
+
   for (const c of changed) {
     if (isTest(c.file)) continue;
     let key = c.repo + "/" + c.file;
@@ -168,17 +192,18 @@ function main() {
       if (hosts.length) hosts.forEach((h) => changedScreens.add(h)); else miss("shared components");
       continue;
     }
-    if (entities.has(key)) { tables.add(entities.get(key)); continue; }
+    if (entities.has(key)) {
+      tables.add(entities.get(key));
+      controllersUsing(c, path.basename(c.file, ".java"), 2).forEach((k) => apiFor(k).forEach((a) => changedApis.add(a)));
+      continue;
+    }
     if (/\/db\/changelog\//.test(c.file)) { migrations++; continue; }
     const direct = apiFor(key);
     if (direct.length) { direct.forEach((a) => changedApis.add(a)); continue; }
 
     if (kind === "spring" && c.file.endsWith(".java")) {
       // a service or helper: the APIs are the controllers that use it
-      const cls = path.basename(c.file, ".java");
-      const names = [...new Set([cls, cls.replace(/Impl$/, "")])];
-      const hits = git(c.dir, ["grep", "-l", "-w", ...names.flatMap((n) => ["-e", n]), c.head, "--", "src/main/java"]) || "";
-      const via = hits.split("\n").filter(Boolean).map((l) => c.repo + "/" + l.slice(l.indexOf(":") + 1)).filter((k) => controllers.has(k));
+      const via = controllersUsing(c, path.basename(c.file, ".java"), 2);
       if (via.length) { via.forEach((k) => apiFor(k).forEach((a) => changedApis.add(a))); continue; }
       miss("backend logic");
       continue;

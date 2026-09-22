@@ -790,7 +790,7 @@
     box.appendChild(line);
     var extra = [];
     extra.push(tot.changed + " screen" + (tot.changed === 1 ? "" : "s") + " changed directly, " + tot.reached + " through a changed API");
-    if (b.apis && b.apis.length) extra.push("APIs changed: " + b.apis.join(", "));
+    if (b.apis && b.apis.length) extra.push("APIs affected: " + b.apis.join(", "));
     if (b.tables && b.tables.length) extra.push("tables: " + b.tables.join(", "));
     if (b.migrations) extra.push(b.migrations + " database migration" + (b.migrations === 1 ? "" : "s"));
     (b.unplaced || []).forEach(function (u) { extra.push("also " + u.files + " " + u.what + " file" + (u.files === 1 ? "" : "s")); });
