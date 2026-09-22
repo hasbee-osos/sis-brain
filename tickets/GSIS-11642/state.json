@@ -1,0 +1,50 @@
+{
+  "schema_version": 3,
+  "ticket": "GSIS-11642",
+  "jira": {
+    "url": "https://gearsjira.atlassian.net/browse/GSIS-11642",
+    "title": "\"Application attachment expire\" notification is not triggering to application",
+    "issue_type": "Bug",
+    "epic": { "key": "GSIS-2619", "name": "Admission Review" },
+    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "sprints": [
+      { "name": "Sustainment Sprint 21", "state": "active", "start": "2026-09-16", "end": "2026-09-29" }
+    ],
+    "links": [{ "key": "GSIS-10461", "type": "Relates", "direction": "outward" }],
+    "assignee": "Chittaranjan nayak",
+    "estimate": null,
+    "customer_name": ["Product Core Feature"],
+    "labels": ["SIS-GCET-QA", "SIS-GUTECH-QA"],
+    "subtasks": [{ "key": "GSIS-28594", "type": "Dev Sub-task", "estimate": "4h", "logged": null }],
+    "refreshed_at": "2026-09-22T11:22:38Z"
+  },
+  "status": "PLANNING",
+  "next_action": "Run the Planner: root cause of the missing attachment-expiry notification, with the codebase map at origin/base-development",
+  "blocked_on": null,
+  "created_at": "2026-09-22T11:22:38Z",
+  "updated_at": "2026-09-22T11:22:38Z",
+  "iteration": 0,
+  "max_iterations": null,
+  "track": null,
+  "workspace": "D:/projects/sis_new_repo/brain",
+  "work_type": "bug",
+  "line": "base",
+  "customer_name": "Product Core Feature",
+  "source_branch": "base-development",
+  "branch": "base/bugfix/GSIS-11642-attachment-expiry-notification",
+  "repos": {},
+  "context_repos": [],
+  "pr_target": "base-sandbox-qa",
+  "prs": [],
+  "sessions": [
+    { "session_id": "9f08a0e9-0bfd-4ef2-aded-87fdb8c56d96", "started_at": "2026-09-22T11:22:38Z", "ended_at": null }
+  ],
+  "human_confirmations": [
+    { "what": "line_and_branch", "at": "2026-09-22T11:22:38Z", "value": "Customer Name 'Product Core Feature' -> line base, base/bugfix/GSIS-11642-attachment-expiry-notification, source base-development, PR to base-sandbox-qa" }
+  ],
+  "decisions": ["D-1"],
+  "artifacts": {},
+  "plan": null,
+  "implementation": null,
+  "evaluation": null
+}

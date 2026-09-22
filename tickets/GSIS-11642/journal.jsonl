@@ -1,0 +1,3 @@
+{"ts":"2026-09-22T11:22:38Z","event":"ticket_started","ticket":"GSIS-11642","session_id":"9f08a0e9-0bfd-4ef2-aded-87fdb8c56d96"}
+{"ts":"2026-09-22T11:22:38Z","event":"human_confirmed","what":"line_and_branch","value":"Customer Name 'Product Core Feature' -> line base, base/bugfix/GSIS-11642-attachment-expiry-notification, source base-development, PR to base-sandbox-qa"}
+{"ts":"2026-09-22T11:22:38Z","event":"decision_locked","id":"D-1","summary":"Routing: bug on the base line, branch base/bugfix/GSIS-11642-attachment-expiry-notification"}
