@@ -18,11 +18,11 @@
     "subtasks": [{ "key": "GSIS-28594", "type": "Dev Sub-task", "estimate": "4h", "logged": null }],
     "refreshed_at": "2026-09-22T11:22:38Z"
   },
-  "status": "PLANNING",
-  "next_action": "Run the Planner: root cause of the missing attachment-expiry notification, with the codebase map at origin/base-development",
-  "blocked_on": null,
+  "status": "NEEDS_INPUT",
+  "next_action": "Developer posts qa-packet.md as a Jira comment on GSIS-11642; when answered, run /work GSIS-11642",
+  "blocked_on": "answers to qa-packet.md Q1-Q2",
   "created_at": "2026-09-22T11:22:38Z",
-  "updated_at": "2026-09-22T11:22:38Z",
+  "updated_at": "2026-09-22T13:38:00Z",
   "iteration": 0,
   "max_iterations": null,
   "track": null,
@@ -42,9 +42,9 @@
   "human_confirmations": [
     { "what": "line_and_branch", "at": "2026-09-22T11:22:38Z", "value": "Customer Name 'Product Core Feature' -> line base, base/bugfix/GSIS-11642-attachment-expiry-notification, source base-development, PR to base-sandbox-qa" }
   ],
-  "decisions": ["D-1"],
-  "artifacts": {},
-  "plan": null,
+  "decisions": ["D-1", "D-2", "D-3", "D-4", "D-5", "D-6"],
+  "artifacts": { "plan": "plan.md", "qa_packet": "qa-packet.md" },
+  "plan": "NEEDS_INPUT",
   "implementation": null,
   "evaluation": null
 }

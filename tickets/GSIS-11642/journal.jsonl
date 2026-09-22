@@ -1,3 +1,11 @@
 {"ts":"2026-09-22T11:22:38Z","event":"ticket_started","ticket":"GSIS-11642","session_id":"9f08a0e9-0bfd-4ef2-aded-87fdb8c56d96"}
 {"ts":"2026-09-22T11:22:38Z","event":"human_confirmed","what":"line_and_branch","value":"Customer Name 'Product Core Feature' -> line base, base/bugfix/GSIS-11642-attachment-expiry-notification, source base-development, PR to base-sandbox-qa"}
 {"ts":"2026-09-22T11:22:38Z","event":"decision_locked","id":"D-1","summary":"Routing: bug on the base line, branch base/bugfix/GSIS-11642-attachment-expiry-notification"}
+{"ts":"2026-09-22T13:26:54Z","event":"stage_start","stage":"plan","iteration":1}
+{"ts":"2026-09-22T14:01:07Z","event":"stage_end","stage":"plan","iteration":1}
+{"ts":"2026-09-22T14:01:07Z","event":"decision_locked","id":"D-2","summary":"Root cause: business-entity filter never matches a stored value, so expiry notification never fires"}
+{"ts":"2026-09-22T14:01:07Z","event":"decision_locked","id":"D-3","summary":"Window and legacy dispatch path are also defective and must be fixed for the ticket to be verifiable"}
+{"ts":"2026-09-22T14:01:07Z","event":"decision_locked","id":"D-4","summary":"Fix approach: correct entity/window, dispatch via NotificationService.sendNotifications"}
+{"ts":"2026-09-22T14:01:07Z","event":"decision_locked","id":"D-5","summary":"Track proposed: full (backlog blast radius over existing rows)"}
+{"ts":"2026-09-22T14:01:07Z","event":"decision_locked","id":"D-6","summary":"Plan stopped NEEDS_INPUT: notification cadence and backlog handling undetermined"}
+{"ts":"2026-09-22T14:01:07Z","event":"input_requested","audience":"qa","packet":"qa-packet.md","questions":2}
