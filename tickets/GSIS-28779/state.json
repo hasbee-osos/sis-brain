@@ -26,7 +26,7 @@
   "source_branch": "base-development",
   "branch": "base/bugfix/GSIS-28779-invoice-status-filter",
   "repos": {
-    "sis-product-sis-admin-backend": { "role": "change", "branch_created": false, "evaluated_head": null, "final_head": null }
+    "sis-product-sis-admin-backend": { "role": "change", "branch_created": true, "evaluated_head": null, "final_head": null }
   },
   "context_repos": ["sis-product-sis-frontend"],
   "pr_target": "base-sandbox-qa",
