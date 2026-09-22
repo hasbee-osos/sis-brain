@@ -17,3 +17,5 @@
 {"ts":"2026-09-22T05:02:00Z","event":"evaluation","verdict":"INSUFFICIENT_EVIDENCE","blocking":1,"non_blocking":6,"iteration":1}
 {"ts":"2026-09-22T05:02:00Z","event":"decision_locked","id":"D-6","summary":"Evaluation 1 verdict: INSUFFICIENT_EVIDENCE - proving test never executed (repo-wide Spring context break)"}
 {"ts":"2026-09-22T05:02:00Z","event":"iteration_start","iteration":1,"reason":"final fix round - last evaluation round used (light track), close blocking finding E-1 (R-1/R-2), no evaluation follows"}
+{"ts":"2026-09-22T05:02:00Z","event":"stage_start","stage":"implement","iteration":1}
+{"ts":"2026-09-22T05:31:39Z","event":"stage_end","stage":"implement","iteration":1}
