@@ -155,7 +155,9 @@
 
   /* blast radius rings */
   .rings { display: grid; gap: 8px; align-content: start; }
-  .rings svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .rings svg { width: 100%; height: auto; display: block; }
+  .rings .orbit.empty { stroke-opacity: 0.5; }
+  .rings .ring-caption { font: 600 10.5px var(--sans); letter-spacing: 0.08em; fill: var(--faint); }
   .rings .edge { stroke: var(--rule); stroke-width: 1.2; fill: none; }
   .rings .edge.far { stroke: var(--accent); stroke-opacity: 0.28; stroke-dasharray: 3 3; }
   .rings .orbit { fill: none; stroke: var(--rule); stroke-dasharray: 2 4; }
@@ -652,6 +654,7 @@
     var w = String(k).replace(/[-_]+/g, " ");
     return w.charAt(0).toUpperCase() + w.slice(1);
   }
+  function short(name) { return name.length > 26 ? name.slice(0, 25) + "…" : name; } // full name stays in the hover text
   function kindName(k, n) { var one = label("blast_kinds", k); return n === 1 ? one : one + "s"; }
   // anchor a label on the side of the circle it sits on
   function anchor(cos) { return cos > 0.25 ? "start" : cos < -0.25 ? "end" : "middle"; }
@@ -698,11 +701,16 @@
     var step = 2 * Math.PI / Math.max(list.length, 1);
     var start = list.length ? list[0].want + (list.length === 1 ? 0.6 : step / 2) : 0;
     list.forEach(function (c, i) { c.angle = start + step * i; });
-    var root = svg("svg", { viewBox: list.length ? "-340 -215 680 430" : "-250 -135 500 270", role: "img", "aria-label": "Blast radius" });
+    var root = svg("svg", { viewBox: "-340 -215 680 430", role: "img", "aria-label": "Blast radius" });
+    var mixed = b.ring1.some(function (x) { return x.kind !== b.ring1[0].kind; });
 
     var edges = svg("g", null), g1 = svg("g", { class: "r1" }), g2 = svg("g", { class: "r2" });
+    // both rings always drawn; the outer one is named on the drawing, at the bottom unless an
+    // area cluster sits there, so an empty outer ring says plainly that nothing depends on the change
     root.appendChild(svg("circle", { r: R1, class: "orbit" }));
-    if (list.length) root.appendChild(svg("circle", { r: R2, class: "orbit" }));
+    root.appendChild(svg("circle", { r: R2, class: "orbit" + (list.length ? "" : " empty") }));
+    var bottomTaken = list.some(function (c) { var d = Math.atan2(Math.sin(c.angle - Math.PI / 2), Math.cos(c.angle - Math.PI / 2)); return Math.abs(d) < 0.5; });
+    root.appendChild(svg("text", { y: bottomTaken ? -R2 + 18 : R2 - 8, "text-anchor": "middle", class: "ring-caption" }, [(list.length ? label("blast", "reached") : label("blast", "reached_none")).toUpperCase()]));
     root.appendChild(edges);
 
     ring1.forEach(function (x) {
@@ -711,8 +719,8 @@
       var node = x.kind === "more" ? svg("circle", { cx: cx.toFixed(1), cy: cy.toFixed(1), r: 6, class: "depends" }) : marker(x.kind, cx, cy, 6.5);
       var lx = cx + 13 * cos, ly = cy + 13 * sin + (Math.abs(cos) <= 0.25 ? (sin > 0 ? 12 : -16) : 0);
       var text = svg("text", { x: lx.toFixed(1), y: (ly + 4).toFixed(1), "text-anchor": anchor(cos) }, [
-        svg("tspan", { class: "name" }, [x.name]),
-        x.kind !== "more" ? svg("tspan", { class: "kind", dx: 4 }, [label("blast_kinds", x.kind)]) : null
+        svg("tspan", { class: "name" }, [short(x.name)]),
+        mixed && x.kind !== "more" ? svg("tspan", { class: "kind", dx: 4 }, [label("blast_kinds", x.kind)]) : null
       ]);
       g1.appendChild(svg("g", null, [svg("title", null, [x.title || x.name]), node, text]));
     });
@@ -725,7 +733,7 @@
       });
       var shown = c.names.slice(0, NAMES_PER_CLUSTER), more = c.names.length - shown.length;
       var lines = [svg("tspan", { class: "area", x: 0, dy: 0 }, [c.area ? areaLabel(c.area) : c.areas + " other areas"])];
-      shown.forEach(function (nm) { lines.push(svg("tspan", { class: "screen", x: 0, dy: 16 }, [nm])); });
+      shown.forEach(function (nm) { lines.push(svg("tspan", { class: "screen", x: 0, dy: 16 }, [short(nm)])); });
       if (more) lines.push(svg("tspan", { class: "more", x: 0, dy: 16 }, ["+" + more + " more"]));
       var h = 16 * (lines.length - 1);
       var tx = cx + (Math.abs(cos) <= 0.25 ? 0 : cos > 0 ? 12 : -12);
@@ -739,7 +747,7 @@
 
     root.appendChild(g2);
     root.appendChild(g1);
-    root.appendChild(svg("circle", { r: list.length ? R2 : R1, class: "ripple" }));
+    root.appendChild(svg("circle", { r: R2, class: "ripple" }));
     root.appendChild(svg("circle", { r: 26, class: "hub" }));
     root.appendChild(svg("text", { y: 3, "text-anchor": "middle", class: "hub-num" }, [String(b.files)]));
     root.appendChild(svg("text", { y: 14, "text-anchor": "middle", class: "hub-sub" }, [b.files === 1 ? "FILE" : "FILES"]));
@@ -776,7 +784,17 @@
       if (deps) head.push(el("b", { text: String(deps) }), " screen" + (deps === 1 ? "" : "s") + " in ", el("b", { text: String(nAreas) }), " area" + (nAreas === 1 ? "" : "s") + " depend on " + (b.ring1.length === 1 ? "it" : "them"));
     } else head.push("No screen, API or table could be tied to this change");
     box.appendChild(el("p", { class: "headline" }, head));
-    if (order.length) box.appendChild(drawRings(b));
+    if (order.length) {
+      var rings = drawRings(b);
+      box.appendChild(rings);
+      // fit the drawing to its labels once it is laid out, so long names never cross the panel
+      requestAnimationFrame(function () {
+        try {
+          var bb = rings.getBBox();
+          if (bb.width) rings.setAttribute("viewBox", [bb.x - 8, bb.y - 8, bb.width + 16, bb.height + 16].map(function (v) { return v.toFixed(1); }).join(" "));
+        } catch (e) { /* keeps the fixed viewBox */ }
+      });
+    }
     box.appendChild(el("div", { class: "legend" }, [
       el("span", null, [el("i", { class: "shape hub" }), "The change"]),
       el("span", null, order.map(function (k) { return el("span", { style: "margin-right:10px" }, [el("i", { class: "shape " + k }), label("blast", "changed") + ": " + kindName(k, 2)]); })),

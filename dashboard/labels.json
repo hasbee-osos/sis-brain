@@ -120,7 +120,8 @@
   },
   "blast": {
     "changed": "Edited by the ticket",
-    "reached": "Depends on it"
+    "reached": "Depends on it",
+    "reached_none": "Nothing else depends on it"
   },
   "blast_kinds": {
     "screen": "screen",
