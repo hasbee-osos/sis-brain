@@ -1,0 +1,41 @@
+{
+  "schema_version": 3,
+  "ticket": "GSIS-28779",
+  "jira": {
+    "url": "https://gearsjira.atlassian.net/browse/GSIS-28779",
+    "title": "incorrect records appear when filter data from the status filter in manage invoice",
+    "issue_type": "Bug",
+    "epic": { "key": "GSIS-2727", "name": "Finance Review" },
+    "sprint": { "name": "Sustainment Team Backlog", "start": null, "end": null },
+    "assignee": null,
+    "estimate": null,
+    "refreshed_at": "2026-09-22T02:09:41Z"
+  },
+  "status": "PLANNING",
+  "next_action": "Confirm work type, line and branch, then run the Planner",
+  "blocked_on": null,
+  "created_at": "2026-09-22T02:09:41Z",
+  "updated_at": "2026-09-22T02:09:41Z",
+  "iteration": 1,
+  "max_iterations": null,
+  "track": null,
+  "workspace": "E:/Projects",
+  "work_type": null,
+  "line": null,
+  "customer_name": null,
+  "source_branch": null,
+  "branch": null,
+  "repos": {},
+  "context_repos": [],
+  "pr_target": null,
+  "prs": [],
+  "sessions": [
+    { "session_id": "ab709f7f-af65-4f21-a970-c5c920cc3e3c", "started_at": "2026-09-22T02:09:41Z", "ended_at": null }
+  ],
+  "human_confirmations": [],
+  "decisions": [],
+  "artifacts": {},
+  "plan": null,
+  "implementation": null,
+  "evaluation": null
+}
