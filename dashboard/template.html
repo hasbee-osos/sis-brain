@@ -683,8 +683,8 @@
       var subs = Object.keys(area.subs).sort(function (x, y) { return area.subs[y].screens - area.subs[x].screens || (x < y ? -1 : 1); });
       var small = subs.filter(function (sk) { var x = area.subs[sk]; return x.screens / total < 0.012 && !opts.level(x, "changed") && !opts.level(x, "reached"); });
       if (small.length > 1) {
-        subs = subs.filter(function (sk) { return small.indexOf(sk) < 0; }).concat([" rest"]);
-        area = { screens: area.screens, subs: Object.assign({}, area.subs, { " rest": { screens: small.reduce(function (t, sk) { return t + area.subs[sk].screens; }, 0), rest: small.length } }) };
+        subs = subs.filter(function (sk) { return small.indexOf(sk) < 0; }).concat([" rest"]);
+        area = { screens: area.screens, subs: Object.assign({}, area.subs, { " rest": { screens: small.reduce(function (t, sk) { return t + area.subs[sk].screens; }, 0), rest: small.length } }) };
       }
       var b = a0;
       subs.forEach(function (sk) {
