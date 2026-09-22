@@ -110,3 +110,12 @@ Generated indexes:
 - **Notes stay short**, about one page per repo. Write down only what saves the next session real time, and only what has been checked against the code.
 - **Nothing copied from config.** No URLs, keys, tenant settings or credentials. `build.js` extracts names and paths only.
 - No ticket history here; that belongs in `tickets/`.
+
+## Blast radius
+
+When a ticket's PRs are prepared, `node codebase/blast.js <TICKET-ID>` works out how far the change reaches. It diffs the ticket branch against its source branch and places each file with the indexes above:
+- the screens it edits, including screens that embed a changed component;
+- the APIs and tables it changes;
+- the other screens that call a changed API.
+
+It writes `tickets/<ID>/blast.json`, which the dashboard draws as a wheel of the whole product. It uses git only, and costs no tokens.

@@ -20,7 +20,7 @@ const BRAIN = path.resolve(__dirname, "..");
 const TICKETS = path.join(BRAIN, "tickets");
 const OUT_DIR = path.join(__dirname, "dist");
 
-const RECORD_FILES = new Set(["state.json", "journal.jsonl", "metrics.json"]);
+const RECORD_FILES = new Set(["state.json", "journal.jsonl", "metrics.json", "blast.json"]);
 // Display names, colours and stage aliases. The build and the page list no stages of their own.
 const LABELS = readJson(path.join(__dirname, "labels.json"), {});
 const STAGE_ALIASES = LABELS.stage_aliases || {};
@@ -545,6 +545,7 @@ function buildTicket(dir, now) {
     stages: runs,
     sprints,
     links: Array.isArray(jira.links) ? jira.links.filter((l) => l && l.key) : [],
+    blast: readJson(path.join(dir, "blast.json"), null), // written by codebase/blast.js when the PR is raised
     waits: waitPeriods,
     working_seconds: runs.reduce((a, r) => a + r.seconds, 0),
     waiting_seconds: waitPeriods.reduce((a, w) => a + w.seconds, 0),
