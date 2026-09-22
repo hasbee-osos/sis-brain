@@ -35,3 +35,12 @@ Work type: `bug` · Line: `base` · Branch: `base/bugfix/GSIS-28779-invoice-stat
 - **Convention cited:** `engineering-standards` → Testing: repository/SQL behaviour needs a DB-backed test, not mocks alone
 - **Evidence:** new `InvoiceSpecificationIT.java` (pattern: `StructureMasterServiceIT.java`); fallback pattern `BatchMasterSpecificationTest.java`
 - **Status:** LOCKED
+
+### D-5 — Repos to change: sis-product-sis-admin-backend only; track: light
+- **Stage:** plan, iteration 1
+- **Decided by:** planner · confirmed by human 2026-09-22T04:07:32Z
+- **Options considered:** full track — rejected, every light criterion in `harness-core` → Tracks is met (root cause established with evidence, 1 repo changes, no contract/entity/table/workflow/notification change, nothing touching auth or existing rows)
+- **Why:** the fix is one JPA predicate in `InvoiceSpecification`, gated by an existing flag; `sis-product-sis-frontend` needs no change (context only)
+- **Convention cited:** `harness-core` → Tracks
+- **Evidence:** `plan.md` → Repositories, Track
+- **Status:** LOCKED

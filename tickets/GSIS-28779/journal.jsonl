@@ -6,3 +6,6 @@
 {"ts":"2026-09-22T03:01:20Z","event":"decision_locked","id":"D-2","summary":"Root cause: Status filter ignores the sponsor-cancelled override the grid displays"}
 {"ts":"2026-09-22T03:01:20Z","event":"decision_locked","id":"D-3","summary":"Fix approach: match the effective status in InvoiceSpecification, gated by isManageInvoice"}
 {"ts":"2026-09-22T03:01:20Z","event":"decision_locked","id":"D-4","summary":"Test strategy: repository-level IT against H2, plus a pinning case for unrelated consumers"}
+{"ts":"2026-09-22T04:07:32Z","event":"human_confirmed","what":"repos_to_change","value":["sis-product-sis-admin-backend"]}
+{"ts":"2026-09-22T04:07:32Z","event":"human_confirmed","what":"track","value":"light"}
+{"ts":"2026-09-22T04:07:32Z","event":"decision_locked","id":"D-5","summary":"Repos to change: sis-product-sis-admin-backend only; track: light"}
