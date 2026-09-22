@@ -44,3 +44,12 @@ Work type: `bug` · Line: `base` · Branch: `base/bugfix/GSIS-28779-invoice-stat
 - **Convention cited:** `harness-core` → Tracks
 - **Evidence:** `plan.md` → Repositories, Track
 - **Status:** LOCKED
+
+### D-6 — Evaluation 1 verdict: INSUFFICIENT_EVIDENCE
+- **Stage:** evaluate, iteration 1
+- **Decided by:** evaluator
+- **Options considered:** PASS — rejected, a bug fix must be proven by an executed regression test and none has run; FAIL — rejected, no incorrect logic, regression, convention breach or contradicted decision was found; the fix is otherwise fully evidenced by independent code trace
+- **Why:** the proving test (`InvoiceSpecificationIT`, per D-4) has never executed. Root cause: this repo's entire `@SpringBootTest` context is broken on `base-development` (duplicate `restTemplate` bean between `SisAdminServiceApplication` and `ConfigClientAppConfig`), confirmed against untouched `StructureMasterServiceIT` and the plan's own fallback `BatchMasterSpecificationTest` — both fail identically. Deeper and repo-wider than the implementor's reported `:compileTestJava` gap (which is also real and pre-existing, 21 unrelated files). A non-Spring Mockito specification test (`LetterTemplateSpecificationTest`) does run in this repo, giving a demonstrated route to executed evidence (R-1).
+- **Convention cited:** `harness-core` → Evidence-based verification ("never claim tests passed unless they were executed")
+- **Evidence:** `evaluation-1.md` → Blocking Findings E-1, Evidence section
+- **Status:** LOCKED
