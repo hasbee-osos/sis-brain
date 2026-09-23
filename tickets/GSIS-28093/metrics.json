@@ -1,0 +1,122 @@
+{
+  "ticket": "GSIS-28093",
+  "updated_at": "2026-09-23T14:40:47.781Z",
+  "sessions": {
+    "a27cefdb-44f5-4edb-8f2d-70ca5f5939f2": {
+      "turns": 164,
+      "tokens_by_stage": {
+        "plan": {
+          "input": 126,
+          "output": 38439,
+          "cache_read": 5161183,
+          "cache_creation": 171682,
+          "thinking": 5421
+        },
+        "implement": {
+          "input": 168,
+          "output": 79621,
+          "cache_read": 10222876,
+          "cache_creation": 511304,
+          "thinking": 5770
+        },
+        "evaluate": {
+          "input": 58,
+          "output": 18275,
+          "cache_read": 3230461,
+          "cache_creation": 49503,
+          "thinking": 1580
+        }
+      },
+      "tokens_by_model": {
+        "claude-opus-5-5": {
+          "input": 352,
+          "output": 136335,
+          "cache_read": 18614520,
+          "cache_creation": 732489,
+          "thinking": 12771
+        }
+      }
+    },
+    "0c20d8c7-87a1-4937-934d-7351c3f85b56": {
+      "turns": 8,
+      "tokens_by_stage": {
+        "implement": {
+          "input": 16,
+          "output": 7600,
+          "cache_read": 533998,
+          "cache_creation": 53139,
+          "thinking": 834
+        }
+      },
+      "tokens_by_model": {
+        "claude-sonnet-5": {
+          "input": 16,
+          "output": 7600,
+          "cache_read": 533998,
+          "cache_creation": 53139,
+          "thinking": 834
+        }
+      }
+    }
+  },
+  "tokens": {
+    "input": 368,
+    "output": 143935,
+    "cache_read": 19148518,
+    "cache_creation": 785628,
+    "thinking": 13605
+  },
+  "tokens_by_stage": {
+    "plan": {
+      "input": 126,
+      "output": 38439,
+      "cache_read": 5161183,
+      "cache_creation": 171682,
+      "thinking": 5421
+    },
+    "implement": {
+      "input": 184,
+      "output": 87221,
+      "cache_read": 10756874,
+      "cache_creation": 564443,
+      "thinking": 6604
+    },
+    "evaluate": {
+      "input": 58,
+      "output": 18275,
+      "cache_read": 3230461,
+      "cache_creation": 49503,
+      "thinking": 1580
+    }
+  },
+  "tokens_by_model": {
+    "claude-opus-5-5": {
+      "input": 352,
+      "output": 136335,
+      "cache_read": 18614520,
+      "cache_creation": 732489,
+      "thinking": 12771
+    },
+    "claude-sonnet-5": {
+      "input": 16,
+      "output": 7600,
+      "cache_read": 533998,
+      "cache_creation": 53139,
+      "thinking": 834
+    }
+  },
+  "turns": 172,
+  "stage_seconds": {
+    "plan": 288,
+    "implement": 1342,
+    "evaluate": 593
+  },
+  "iterations": 1,
+  "verdicts": {
+    "FAIL": 1
+  },
+  "findings": {
+    "blocking": 1,
+    "non_blocking": 3
+  }
+}

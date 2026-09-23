@@ -24,3 +24,8 @@
 {"ts":"2026-09-23T11:37:01Z","event":"iteration_start","iteration":2,"reason":"Final fix round for evaluation-1 blocking finding E-1 (frontend sponsor interim invoice grid duplicate join); not re-evaluated"}
 {"ts":"2026-09-23T11:37:01Z","event":"stage_start","stage":"implement","iteration":2}
 {"ts":"2026-09-23T14:41:40Z","event":"stage_end","stage":"implement","iteration":2}
+{"ts":"2026-09-23T14:43:57Z","event":"stage_start","stage":"pr","iteration":2}
+{"ts":"2026-09-23T14:43:57Z","event":"pr_prepared","repo":"sis-product-sis-admin-backend","stage":1,"target":"base-sandbox-qa","url":null}
+{"ts":"2026-09-23T14:43:57Z","event":"pr_prepared","repo":"sis-product-sis-frontend","stage":1,"target":"base-sandbox-qa","url":null}
+{"ts":"2026-09-23T14:43:57Z","event":"stage_end","stage":"pr","iteration":2}
+{"ts":"2026-09-23T14:43:57Z","event":"handed_off","to":"reviewers","refs":["https://github.com/pbsgears/sis-product-sis-admin-backend/compare/base-sandbox-qa...base/bugfix/GSIS-28093-final-invoice-duplicate-fee-category?expand=1&title=GSIS-28093%3A%20de-duplicate%20fee%20category%20in%20final%20sponsor%20invoice","https://github.com/pbsgears/sis-product-sis-frontend/compare/base-sandbox-qa...base/bugfix/GSIS-28093-final-invoice-duplicate-fee-category?expand=1&title=GSIS-28093%3A%20de-duplicate%20fee%20category%20in%20sponsor%20interim%20invoice%20grid"]}
