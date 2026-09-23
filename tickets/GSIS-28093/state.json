@@ -24,7 +24,7 @@
     ],
     "links": [],
     "assignee": "Naveendra Kularathne",
-    "estimate": null,
+    "estimate": "0d",
     "customer_name": [
       "Product Core Feature"
     ],
@@ -45,13 +45,13 @@
         "logged": null
       }
     ],
-    "refreshed_at": "2026-09-23T16:51:26Z"
+    "refreshed_at": "2026-09-23T17:08:56Z"
   },
   "status": "PR_STAGE_1",
-  "next_action": "Developer replies on frontend PR #7506 that the optional-chain comment is not valid (no throw on a missing invoiceChargeList, verified with tsc es2017); developer creates the backend PR from its compare link and pastes the URL; QA runs the manual checks after promotion",
+  "next_action": "Developer replies on frontend PR #7506 (sponsor-interim-invoice-list.component.ts:51-54) that the review comment is not valid: ?. short-circuits the whole chain including .filter()/.join(), so a missing invoiceChargeList yields undefined as before (re-verified with the repo TypeScript 4.4.4, target es2017). Record the backend PR URL with /work when available; QA runs the manual checks after promotion.",
   "blocked_on": null,
   "created_at": "2026-09-23T10:39:15Z",
-  "updated_at": "2026-09-23T16:51:26Z",
+  "updated_at": "2026-09-23T17:31:59Z",
   "iteration": 2,
   "max_iterations": 1,
   "track": "light",
@@ -113,6 +113,11 @@
     {
       "session_id": "4ea926a3-098b-45e8-8570-8e8c802bead9",
       "started_at": "2026-09-23T16:51:26Z",
+      "ended_at": null
+    },
+    {
+      "session_id": "9cab73fc-564d-42ad-b995-8e11dd032b32",
+      "started_at": "2026-09-23T17:08:56Z",
       "ended_at": null
     }
   ],
