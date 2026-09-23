@@ -23,9 +23,9 @@ The UI and the code use different words. "Module" on GCET screens is `course` in
 
 ## Build and test
 
-- **Node 16** (`.nvmrc`). Run `npm ci` once per checkout.
+- **Node 16** (`.nvmrc`); Node 22.12 also works here (only EBADENGINE warnings). `npm ci` fails because `package-lock.json` is out of sync with `package.json` on `base-development` (2026-09); use `npm install` and revert `package-lock.json` before committing.
 - **Type-check and compile:** `npx ng build --build-optimizer=false`. It takes about 4–5 minutes, and CommonJS warnings are normal. This proves the code compiles, not that it behaves correctly.
 - **Unit tests:** `npx ng test --watch=false --browsers=ChromeHeadless --include="<path>/**/*.spec.ts"`. `karma.conf.js` defaults to a visible Chrome in watch mode, so always pass both flags.
-  - **Known problem (2026-09, GSIS-28778):** the Karma TypeScript compile failed on about 22 existing broken spec files elsewhere in the app, so the run reported "Executed 0 of 0". If that happens, record it as an environment gap straight away. Don't claim the tests ran, and don't try to fix unrelated specs.
+  - **Known problem (2026-09, GSIS-28778):** the Karma TypeScript compile failed on about 22 existing broken spec files elsewhere in the app, so the run reported "Executed 0 of 0". The Karma compile covers all of `src`, so this happens for **any** `--include`, however narrow (confirmed on GSIS-9911). If that happens, record it as an environment gap straight away. Don't claim the tests ran, and don't try to fix unrelated specs.
 - **Spec style used in this repo:** create the component without TestBed (`Object.create(Component.prototype)`), with dependencies from `jasmine.createSpyObj`. See `review-program-sponsor.component.spec.ts`. That style can't see templates: for a template/DOM defect, use a TestBed spec that imports the feature module's real dependencies (precedent: `resit-retake-rules-list.component.spec.ts`).
 - CI (`.github/workflows/all-deploy-workflow.yml`) calls the shared `pbsgears/sis-product-devops-workflows` workflows. There is no test gate in CI.
