@@ -45,13 +45,13 @@
         "logged": null
       }
     ],
-    "refreshed_at": "2026-09-23T10:39:15Z"
+    "refreshed_at": "2026-09-23T16:51:26Z"
   },
   "status": "PR_STAGE_1",
   "next_action": "Developer replies on frontend PR #7506 that the optional-chain comment is not valid (no throw on a missing invoiceChargeList, verified with tsc es2017); developer creates the backend PR from its compare link and pastes the URL; QA runs the manual checks after promotion",
   "blocked_on": null,
   "created_at": "2026-09-23T10:39:15Z",
-  "updated_at": "2026-09-23T16:43:48Z",
+  "updated_at": "2026-09-23T16:51:26Z",
   "iteration": 2,
   "max_iterations": 1,
   "track": "light",
@@ -108,6 +108,11 @@
     {
       "session_id": "a27cefdb-44f5-4edb-8f2d-70ca5f5939f2",
       "started_at": "2026-09-23T10:39:15Z",
+      "ended_at": null
+    },
+    {
+      "session_id": "4ea926a3-098b-45e8-8570-8e8c802bead9",
+      "started_at": "2026-09-23T16:51:26Z",
       "ended_at": null
     }
   ],

@@ -29,3 +29,4 @@
 {"ts":"2026-09-23T14:43:57Z","event":"pr_prepared","repo":"sis-product-sis-frontend","stage":1,"target":"base-sandbox-qa","url":null}
 {"ts":"2026-09-23T14:43:57Z","event":"stage_end","stage":"pr","iteration":2}
 {"ts":"2026-09-23T14:43:57Z","event":"handed_off","to":"reviewers","refs":["https://github.com/pbsgears/sis-product-sis-admin-backend/compare/base-sandbox-qa...base/bugfix/GSIS-28093-final-invoice-duplicate-fee-category?expand=1&title=GSIS-28093%3A%20de-duplicate%20fee%20category%20in%20final%20sponsor%20invoice","https://github.com/pbsgears/sis-product-sis-frontend/compare/base-sandbox-qa...base/bugfix/GSIS-28093-final-invoice-duplicate-fee-category?expand=1&title=GSIS-28093%3A%20de-duplicate%20fee%20category%20in%20sponsor%20interim%20invoice%20grid"]}
+{"ts":"2026-09-23T16:51:26Z","event":"session_resumed","session_id":"4ea926a3-098b-45e8-8570-8e8c802bead9","from_status":"PR_STAGE_1"}
