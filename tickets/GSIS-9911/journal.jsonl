@@ -24,3 +24,8 @@
 {"ts":"2026-09-23T08:16:03Z","event":"stage_end","stage":"evaluate","iteration":1}
 {"ts":"2026-09-23T08:16:03Z","event":"evaluation","verdict":"PASS","blocking":0,"non_blocking":5,"iteration":1}
 {"ts":"2026-09-23T08:16:03Z","event":"decision_locked","id":"D-9","summary":"Evaluator verdict round 1: PASS, 0 blocking"}
+{"ts":"2026-09-23T08:45:21Z","event":"human_confirmed","what":"pr_scope","value":"PR raised from the ticket branch as is; it also carries base-development merges #7395 (GSIS-19495), #7378 (GSIS-27817), #7375 (GSIS-26301) not yet in base-sandbox-qa"}
+{"ts":"2026-09-23T08:45:21Z","event":"stage_start","stage":"pr","iteration":1}
+{"ts":"2026-09-23T08:45:52Z","event":"pr_prepared","repo":"sis-product-sis-frontend","stage":1,"target":"base-sandbox-qa","url":null}
+{"ts":"2026-09-23T08:45:52Z","event":"stage_end","stage":"pr","iteration":1}
+{"ts":"2026-09-23T08:45:52Z","event":"handed_off","to":"reviewers","refs":["https://github.com/pbsgears/sis-product-sis-frontend/compare/base-sandbox-qa...base/bugfix/GSIS-9911-approval-matrix-missing-workflows?expand=1&title=GSIS-9911%3A%20show%20a%20paginator%20on%20the%20Approval%20Matrix%20so%20every%20approval%20workflow%20can%20be%20reached"]}

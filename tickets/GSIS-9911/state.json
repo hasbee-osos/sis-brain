@@ -48,10 +48,10 @@
     "refreshed_at": "2026-09-23T04:57:47Z"
   },
   "status": "PR_STAGE_1",
-  "next_action": "Raise the PR from base/bugfix/GSIS-9911-approval-matrix-missing-workflows to base-sandbox-qa",
+  "next_action": "Developer opens the compare link, creates the PR to base-sandbox-qa using pr-sis-product-sis-frontend-base-sandbox-qa.md, and pastes the PR URL back; QA runs the manual paging check after promotion",
   "blocked_on": null,
   "created_at": "2026-09-23T04:57:47Z",
-  "updated_at": "2026-09-23T08:16:03Z",
+  "updated_at": "2026-09-23T08:45:52Z",
   "iteration": 1,
   "max_iterations": 2,
   "track": "full",
@@ -73,7 +73,17 @@
     "sis-product-sis-admin-backend"
   ],
   "pr_target": "base-sandbox-qa",
-  "prs": [],
+  "prs": [
+    {
+      "repo": "sis-product-sis-frontend",
+      "stage": 1,
+      "target": "base-sandbox-qa",
+      "head": "base/bugfix/GSIS-9911-approval-matrix-missing-workflows",
+      "resolve_branch": null,
+      "compare_link": "https://github.com/pbsgears/sis-product-sis-frontend/compare/base-sandbox-qa...base/bugfix/GSIS-9911-approval-matrix-missing-workflows?expand=1&title=GSIS-9911%3A%20show%20a%20paginator%20on%20the%20Approval%20Matrix%20so%20every%20approval%20workflow%20can%20be%20reached",
+      "url": null
+    }
+  ],
   "sessions": [
     {
       "session_id": "1233f2ee-c75a-4a3a-a93e-473013ce8d1c",
@@ -108,6 +118,11 @@
       "what": "track",
       "at": "2026-09-23T07:09:37Z",
       "value": "full (human moved the light proposal to full)"
+    },
+    {
+      "what": "pr_scope",
+      "at": "2026-09-23T08:45:21Z",
+      "value": "PR raised from the ticket branch as is; it also carries base-development merges #7395 (GSIS-19495), #7378 (GSIS-27817), #7375 (GSIS-26301) not yet in base-sandbox-qa"
     }
   ],
   "decisions": [
@@ -124,7 +139,8 @@
   "artifacts": {
     "plan": "plan-2.md",
     "implementation": "implementation-report-1.md",
-    "evaluation": "evaluation-1.md"
+    "evaluation": "evaluation-1.md",
+    "pr_frontend": "pr-sis-product-sis-frontend-base-sandbox-qa.md"
   },
   "plan": "READY",
   "implementation": "COMPLETE",
