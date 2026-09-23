@@ -35,3 +35,39 @@ Work type: `bug` · Line: `base` · Branch: `base/bugfix/GSIS-9911-approval-matr
 - **Convention cited:** `engineering-standards` → risk-based testing, characterization tests
 - **Evidence:** plan.md → Tests
 - **Status:** LOCKED
+
+### D-5 — Common-export verification: code-search checks, full AOT build, before/after run of GearsCommonsModule-importing specs
+- **Stage:** plan, iteration 2 (full-track revision)
+- **Decided by:** planner · condition set by human (export accepted only if nothing else breaks)
+- **Options considered:** rely on `ng build` alone; manual smoke test only
+- **Why:** `GearsCommonsModule` is imported by 263 NgModules; the export is additive, and three independent checks with recorded results prove no other host, selector, re-export or declaration changes: (a) single `gears-paginator` selector, one declaring module, hosts listed; (b) `npx ng build --build-optimizer=false`; (c) the 2 specs importing `GearsCommonsModule` plus the paginator spec run before and after with identical results; and `GearsPaginatorComponent` files have no diff
+- **Convention cited:** `engineering-standards` → common components changed only with the lead's agreement
+- **Evidence:** plan-2.md → Blast radius of the common export
+- **Status:** LOCKED
+
+### D-6 — Spec style: TestBed for the template regression test, prototype style for characterization
+- **Stage:** plan, iteration 2
+- **Decided by:** planner
+- **Options considered:** repo-usual `Object.create(Component.prototype)` for everything
+- **Why:** the defect is a missing template element, which only a rendered template can show; the TestBed imports `GearsCommonsModule` (no schema, no direct declaration) so it also proves the export. Characterization of `mapDataItem` / `calc*RowSpan` keeps the repo's prototype style
+- **Convention cited:** deviation from the repo's usual spec style (not from `engineering-standards`)
+- **Evidence:** `resit-retake-rules-list.component.spec.ts` (TestBed precedent); `review-program-sponsor.component.spec.ts` (prototype style)
+- **Status:** LOCKED
+
+### D-7 — Repos: change sis-product-sis-frontend; sis-product-sis-admin-backend is context
+- **Stage:** plan, iteration 2
+- **Decided by:** planner · confirmed by human 2026-09-23T07:09:37Z
+- **Options considered:** also change the backend
+- **Why:** the backend already pages and returns the total; the defect and fix are in the frontend template and common module only. All other repos are not in the flow
+- **Convention cited:** `harness-core` → Touch only confirmed repos
+- **Evidence:** `sis-product-sis-admin-backend/…/ApprovalMatrixServiceImpl.java:65-77`
+- **Status:** LOCKED
+
+### D-8 — Track: full
+- **Stage:** plan, iteration 2
+- **Decided by:** human (planner proposed light) · 2026-09-23T07:09:37Z
+- **Options considered:** light
+- **Why:** the ticket meets every light criterion on the evidence, but it changes `GearsCommonsModule`, imported by 263 modules; the human chose full for the extra care (2 evaluation rounds)
+- **Convention cited:** `harness-core` → Tracks
+- **Evidence:** plan-2.md header
+- **Status:** LOCKED
