@@ -45,7 +45,7 @@ Work type: `bug` · Line: `base` · Branch: `base/bugfix/GSIS-28093-final-invoic
 - **Why:** every fee-category string is composed in admin-backend. The frontend only displays the value it receives, so it is context. The other six repos have no sponsor-invoice references and are not in the flow.
 - **Convention cited:** —
 - **Evidence:** plan.md → Repositories
-- **Status:** LOCKED
+- **Status:** SUPERSEDED by D-8
 
 ### D-6 — Track: light
 - **Stage:** plan, iteration 1
@@ -63,4 +63,13 @@ Work type: `bug` · Line: `base` · Branch: `base/bugfix/GSIS-28093-final-invoic
 - **Why:** the backend fix is correct and its regression test is proven. But E-1 found the same duplicate join in the frontend at `sponsor-interim-invoice-list.component.ts:49-51` (Sponsor master → Invoices child grid), which the backend change cannot fix. D-5's claim that the UI does no joining is contradicted.
 - **Convention cited:** —
 - **Evidence:** evaluation-1.md → E-1
+- **Status:** LOCKED
+
+### D-8 — Repos: change sis-product-sis-admin-backend and sis-product-sis-frontend (supersedes D-5)
+- **Stage:** evaluate, iteration 1 → final fix round
+- **Decided by:** orchestrator on evaluator finding E-1 · confirmed by human 2026-09-23
+- **Options considered:** add the frontend and do the final fix round on light (chosen); move to full for a second evaluation; leave the frontend out and escalate
+- **Why:** the Sponsor master → Invoices child grid composes the fee category client-side with an un-deduplicated `.join(', ')`, so the backend fix alone leaves the ticket's defect visible there. Two repos with no contract change still meet the light criteria, so D-6 stands. The frontend fix is made in the final fix round, is not re-evaluated, and is listed for the PR reviewer.
+- **Convention cited:** `harness-core` → Tracks
+- **Evidence:** `sis-product-sis-frontend/src/app/modules/finance/master/sponsor/steps/sponsor-interim-invoice-list/sponsor-interim-invoice-list.component.ts:49-51`; evaluation-1.md → E-1
 - **Status:** LOCKED
