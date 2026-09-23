@@ -1,0 +1,60 @@
+{
+  "ticket": "GSIS-9911",
+  "updated_at": "2026-09-23T06:35:57.449Z",
+  "sessions": {
+    "1233f2ee-c75a-4a3a-a93e-473013ce8d1c": {
+      "turns": 39,
+      "tokens_by_stage": {
+        "plan": {
+          "input": 78,
+          "output": 17919,
+          "cache_read": 2752706,
+          "cache_creation": 260417,
+          "thinking": 2050
+        }
+      },
+      "tokens_by_model": {
+        "claude-opus-5-5": {
+          "input": 78,
+          "output": 17919,
+          "cache_read": 2752706,
+          "cache_creation": 260417,
+          "thinking": 2050
+        }
+      }
+    }
+  },
+  "tokens": {
+    "input": 78,
+    "output": 17919,
+    "cache_read": 2752706,
+    "cache_creation": 260417,
+    "thinking": 2050
+  },
+  "tokens_by_stage": {
+    "plan": {
+      "input": 78,
+      "output": 17919,
+      "cache_read": 2752706,
+      "cache_creation": 260417,
+      "thinking": 2050
+    }
+  },
+  "tokens_by_model": {
+    "claude-opus-5-5": {
+      "input": 78,
+      "output": 17919,
+      "cache_read": 2752706,
+      "cache_creation": 260417,
+      "thinking": 2050
+    }
+  },
+  "turns": 39,
+  "stage_seconds": {},
+  "iterations": 0,
+  "verdicts": {},
+  "findings": {
+    "blocking": 0,
+    "non_blocking": 0
+  }
+}
