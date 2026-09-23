@@ -6,3 +6,7 @@
 {"ts":"2026-09-23T10:47:39Z","event":"decision_locked","id":"D-2","summary":"Root cause: final-invoice fee category joins every interim charge's category without de-duplication (display only, no data fix)"}
 {"ts":"2026-09-23T10:47:39Z","event":"decision_locked","id":"D-3","summary":"Fix: one distinct-join helper used at the four composition sites in admin-backend"}
 {"ts":"2026-09-23T10:47:39Z","event":"decision_locked","id":"D-4","summary":"Tests: helper unit regression test, backend build, manual QA check"}
+{"ts":"2026-09-23T10:57:24Z","event":"human_confirmed","what":"repos_to_change","value":["sis-product-sis-admin-backend"]}
+{"ts":"2026-09-23T10:57:24Z","event":"human_confirmed","what":"track","value":"light"}
+{"ts":"2026-09-23T10:57:24Z","event":"decision_locked","id":"D-5","summary":"Repos: change sis-product-sis-admin-backend only; frontend and others are context"}
+{"ts":"2026-09-23T10:57:24Z","event":"decision_locked","id":"D-6","summary":"Track: light (meets all light criteria)"}

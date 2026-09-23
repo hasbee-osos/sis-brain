@@ -37,3 +37,21 @@ Work type: `bug` · Line: `base` · Branch: `base/bugfix/GSIS-28093-final-invoic
 - **Convention cited:** `engineering-standards` → risk-based testing
 - **Evidence:** plan.md → Tests
 - **Status:** LOCKED
+
+### D-5 — Repos: change sis-product-sis-admin-backend only
+- **Stage:** plan, iteration 1
+- **Decided by:** planner · confirmed by human 2026-09-23
+- **Options considered:** also change sis-product-sis-frontend (de-duplicate in the UI) — rejected per D-3
+- **Why:** every fee-category string is composed in admin-backend. The frontend only displays the value it receives, so it is context. The other six repos have no sponsor-invoice references and are not in the flow.
+- **Convention cited:** —
+- **Evidence:** plan.md → Repositories
+- **Status:** LOCKED
+
+### D-6 — Track: light
+- **Stage:** plan, iteration 1
+- **Decided by:** planner · confirmed by human 2026-09-23
+- **Options considered:** full
+- **Why:** meets every light criterion: the root cause is established with evidence (D-2); one repo changes and there is no contract change; no new entity, workflow or notification; no auth, deletion-check or data-fix involvement. One evaluation round.
+- **Convention cited:** `harness-core` → Tracks
+- **Evidence:** plan.md → Track
+- **Status:** LOCKED
