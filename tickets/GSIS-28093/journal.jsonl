@@ -1,3 +1,8 @@
 {"ts":"2026-09-23T10:39:15Z","event":"ticket_started","ticket":"GSIS-28093","session_id":"a27cefdb-44f5-4edb-8f2d-70ca5f5939f2"}
 {"ts":"2026-09-23T10:41:20Z","event":"human_confirmed","what":"line_and_branch","value":"Customer Name 'Product Core Feature' -> bug, line base, base/bugfix/GSIS-28093-final-invoice-duplicate-fee-category, source base-development (developer override of base-sandbox-qa), PR to base-sandbox-qa"}
 {"ts":"2026-09-23T10:41:20Z","event":"decision_locked","id":"D-1","summary":"Routing: bug on the base line, base/bugfix/GSIS-28093-final-invoice-duplicate-fee-category from base-development, PR to base-sandbox-qa"}
+{"ts":"2026-09-23T10:42:51Z","event":"stage_start","stage":"plan","iteration":1}
+{"ts":"2026-09-23T10:47:39Z","event":"stage_end","stage":"plan","iteration":1}
+{"ts":"2026-09-23T10:47:39Z","event":"decision_locked","id":"D-2","summary":"Root cause: final-invoice fee category joins every interim charge's category without de-duplication (display only, no data fix)"}
+{"ts":"2026-09-23T10:47:39Z","event":"decision_locked","id":"D-3","summary":"Fix: one distinct-join helper used at the four composition sites in admin-backend"}
+{"ts":"2026-09-23T10:47:39Z","event":"decision_locked","id":"D-4","summary":"Tests: helper unit regression test, backend build, manual QA check"}
