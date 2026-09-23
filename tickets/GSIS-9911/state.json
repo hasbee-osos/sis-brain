@@ -5,45 +5,83 @@
     "url": "https://gearsjira.atlassian.net/browse/GSIS-9911",
     "title": "Some of the Approval Workflows are not displayed in the Approval Matrix Master page",
     "issue_type": "Bug",
-    "epic": { "key": "GSIS-2639", "name": "Admin Review" },
-    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "epic": {
+      "key": "GSIS-2639",
+      "name": "Admin Review"
+    },
+    "sprint": {
+      "name": "Sustainment Sprint 21",
+      "start": "2026-09-16",
+      "end": "2026-09-29"
+    },
     "sprints": [
-      { "name": "Sustainment Sprint 21", "state": "active", "start": "2026-09-16", "end": "2026-09-29" }
+      {
+        "name": "Sustainment Sprint 21",
+        "state": "active",
+        "start": "2026-09-16",
+        "end": "2026-09-29"
+      }
     ],
     "links": [],
     "assignee": "Naveendra Kularathne",
     "estimate": "5h",
-    "customer_name": ["Product Core Feature"],
-    "labels": ["Defect"],
+    "customer_name": [
+      "Product Core Feature"
+    ],
+    "labels": [
+      "Defect"
+    ],
     "subtasks": [
-      { "key": "GSIS-10082", "type": "QA Sub-task", "estimate": null, "logged": "10m" },
-      { "key": "GSIS-28730", "type": "Dev Sub-task", "estimate": "6h", "logged": null }
+      {
+        "key": "GSIS-10082",
+        "type": "QA Sub-task",
+        "estimate": null,
+        "logged": "10m"
+      },
+      {
+        "key": "GSIS-28730",
+        "type": "Dev Sub-task",
+        "estimate": "6h",
+        "logged": null
+      }
     ],
     "refreshed_at": "2026-09-23T04:57:47Z"
   },
   "status": "PLANNING",
-  "next_action": "Confirm work type, line and branch, then run the Planner",
+  "next_action": "Run the Planner",
   "blocked_on": null,
   "created_at": "2026-09-23T04:57:47Z",
-  "updated_at": "2026-09-23T04:57:47Z",
+  "updated_at": "2026-09-23T06:28:06Z",
   "iteration": 0,
   "max_iterations": null,
   "track": null,
   "workspace": "D:/projects/sis_new_repo/brain",
-  "work_type": null,
-  "line": null,
+  "work_type": "bug",
+  "line": "base",
   "customer_name": "Product Core Feature",
-  "source_branch": null,
-  "branch": null,
+  "source_branch": "base-development",
+  "branch": "base/bugfix/GSIS-9911-approval-matrix-missing-workflows",
   "repos": {},
   "context_repos": [],
-  "pr_target": null,
+  "pr_target": "base-sandbox-qa",
   "prs": [],
   "sessions": [
-    { "session_id": "1233f2ee-c75a-4a3a-a93e-473013ce8d1c", "started_at": "2026-09-23T04:57:47Z", "ended_at": null }
+    {
+      "session_id": "1233f2ee-c75a-4a3a-a93e-473013ce8d1c",
+      "started_at": "2026-09-23T04:57:47Z",
+      "ended_at": null
+    }
   ],
-  "human_confirmations": [],
-  "decisions": [],
+  "human_confirmations": [
+    {
+      "what": "line_and_branch",
+      "at": "2026-09-23T06:28:06Z",
+      "value": "Customer Name 'Product Core Feature' -> bug, line base, base/bugfix/GSIS-9911-approval-matrix-missing-workflows, source base-development (developer override of base-sandbox-qa), PR to base-sandbox-qa"
+    }
+  ],
+  "decisions": [
+    "D-1"
+  ],
   "artifacts": {},
   "plan": null,
   "implementation": null,
