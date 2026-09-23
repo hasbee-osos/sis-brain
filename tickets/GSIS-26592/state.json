@@ -1,0 +1,75 @@
+{
+  "schema_version": 3,
+  "ticket": "GSIS-26592",
+  "jira": {
+    "url": "https://gearsjira.atlassian.net/browse/GSIS-26592",
+    "title": "BUG : Credit Point in Configure Fee Displays Previous Value Instead of Updated Model Master Value",
+    "issue_type": "Bug",
+    "epic": {
+      "key": "GSIS-2727",
+      "name": "Finance Review"
+    },
+    "sprint": {
+      "name": "Sustainment Sprint 21",
+      "start": "2026-09-16",
+      "end": "2026-09-29"
+    },
+    "sprints": [
+      {
+        "name": "Sustainment Sprint 21",
+        "state": "active",
+        "start": "2026-09-16",
+        "end": "2026-09-29"
+      }
+    ],
+    "links": [],
+    "assignee": "Dulanjith De Silva",
+    "estimate": "4h",
+    "customer_name": [
+      "Product Core Feature"
+    ],
+    "labels": [
+      "GCET_Demo_02"
+    ],
+    "subtasks": [
+      {
+        "key": "GSIS-28543",
+        "type": "Dev Sub-task",
+        "estimate": "4h",
+        "logged": "1h"
+      }
+    ],
+    "refreshed_at": "2026-09-23T10:17:07Z"
+  },
+  "status": "PLANNING",
+  "next_action": "Developer confirms work type, line and branch",
+  "blocked_on": null,
+  "created_at": "2026-09-23T10:17:07Z",
+  "updated_at": "2026-09-23T10:17:07Z",
+  "iteration": 0,
+  "max_iterations": null,
+  "track": null,
+  "workspace": "D:/projects/sis_new_repo/brain",
+  "work_type": null,
+  "line": null,
+  "customer_name": "Product Core Feature",
+  "source_branch": null,
+  "branch": null,
+  "repos": {},
+  "context_repos": [],
+  "pr_target": null,
+  "prs": [],
+  "sessions": [
+    {
+      "session_id": "5b919b9b-850e-4a1e-8fe1-30ea4d40f8f2",
+      "started_at": "2026-09-23T10:17:07Z",
+      "ended_at": null
+    }
+  ],
+  "human_confirmations": [],
+  "decisions": [],
+  "artifacts": {},
+  "plan": null,
+  "implementation": null,
+  "evaluation": null
+}
