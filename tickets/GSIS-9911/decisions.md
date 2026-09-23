@@ -71,3 +71,12 @@ Work type: `bug` · Line: `base` · Branch: `base/bugfix/GSIS-9911-approval-matr
 - **Convention cited:** `harness-core` → Tracks
 - **Evidence:** plan-2.md header
 - **Status:** LOCKED
+
+### D-9 — Evaluator verdict, round 1: PASS
+- **Stage:** evaluate, iteration 1
+- **Decided by:** evaluator
+- **Options considered:** PASS; INSUFFICIENT_EVIDENCE (implementor had no executed test)
+- **Why:** evaluator ran the tests itself using a narrowed Karma tsconfig. The regression spec fails before (a, b, d) and passes after (7/7). Whole-suite before/after (958 specs each) differs only by the 3 GSIS-9911 cases, so the common export breaks nothing that runs. AOT build passes. Scope matches plan-2, and D-1 to D-8 are followed. 0 blocking, 5 non-blocking (E-1 to E-5); the manual QA-base check is pending (E-2)
+- **Convention cited:** `harness-core` → evidence-based verification
+- **Evidence:** evaluation-1.md; frontend HEAD `1867708ac7`
+- **Status:** LOCKED

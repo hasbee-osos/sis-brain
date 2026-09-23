@@ -47,11 +47,11 @@
     ],
     "refreshed_at": "2026-09-23T04:57:47Z"
   },
-  "status": "EVALUATING",
-  "next_action": "Evaluator iteration 1",
+  "status": "PR_STAGE_1",
+  "next_action": "Raise the PR from base/bugfix/GSIS-9911-approval-matrix-missing-workflows to base-sandbox-qa",
   "blocked_on": null,
   "created_at": "2026-09-23T04:57:47Z",
-  "updated_at": "2026-09-23T07:42:55Z",
+  "updated_at": "2026-09-23T08:16:03Z",
   "iteration": 1,
   "max_iterations": 2,
   "track": "full",
@@ -65,7 +65,7 @@
     "sis-product-sis-frontend": {
       "role": "change",
       "branch_created": true,
-      "evaluated_head": null,
+      "evaluated_head": "1867708ac7",
       "final_head": null
     }
   },
@@ -118,13 +118,15 @@
     "D-5",
     "D-6",
     "D-7",
-    "D-8"
+    "D-8",
+    "D-9"
   ],
   "artifacts": {
     "plan": "plan-2.md",
-    "implementation": "implementation-report-1.md"
+    "implementation": "implementation-report-1.md",
+    "evaluation": "evaluation-1.md"
   },
   "plan": "READY",
   "implementation": "COMPLETE",
-  "evaluation": null
+  "evaluation": "PASS"
 }
