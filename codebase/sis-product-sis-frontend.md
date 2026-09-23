@@ -19,7 +19,7 @@ The Angular admin, student and staff UI for all SIS domains. It uses Angular 13,
 
 ## Naming
 
-The UI and the code use different words. "Module" on GCET screens is `course` in code, and "Module Offering" is `course-offering`. Search `screens.md` for the ticket's own word.
+The UI and the code use different words. "Module" on GCET screens is `course` in code, and "Module Offering" is `course-offering`. Search `screens.md` for the ticket's own word. Tickets may say "Model Master" for Module (`/admin/masters/course`). The "Module" dropdown in Configure Fee lists Module Offering courses (`/masters/CRSOFCRS`), whose credit fields are a separate copy that Module edits do not update.
 
 ## Build and test
 
