@@ -42,22 +42,22 @@
     "refreshed_at": "2026-09-23T10:17:07Z"
   },
   "status": "PLANNING",
-  "next_action": "Developer confirms work type, line and branch",
+  "next_action": "Planner writes the plan",
   "blocked_on": null,
   "created_at": "2026-09-23T10:17:07Z",
-  "updated_at": "2026-09-23T10:17:07Z",
+  "updated_at": "2026-09-23T10:19:27Z",
   "iteration": 0,
   "max_iterations": null,
   "track": null,
   "workspace": "D:/projects/sis_new_repo/brain",
-  "work_type": null,
-  "line": null,
+  "work_type": "bug",
+  "line": "base",
   "customer_name": "Product Core Feature",
-  "source_branch": null,
-  "branch": null,
+  "source_branch": "base-development",
+  "branch": "base/bugfix/GSIS-26592-configure-fee-stale-credit-point",
   "repos": {},
   "context_repos": [],
-  "pr_target": null,
+  "pr_target": "base-sandbox-qa",
   "prs": [],
   "sessions": [
     {
@@ -66,8 +66,16 @@
       "ended_at": null
     }
   ],
-  "human_confirmations": [],
-  "decisions": [],
+  "human_confirmations": [
+    {
+      "what": "line_and_branch",
+      "at": "2026-09-23T10:19:27Z",
+      "value": "Customer Name 'Product Core Feature' → line base, base/bugfix/GSIS-26592-configure-fee-stale-credit-point, source base-development (developer override), PR to base-sandbox-qa"
+    }
+  ],
+  "decisions": [
+    "D-1"
+  ],
   "artifacts": {},
   "plan": null,
   "implementation": null,
