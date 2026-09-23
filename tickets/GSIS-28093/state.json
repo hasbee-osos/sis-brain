@@ -1,0 +1,51 @@
+{
+  "schema_version": 3,
+  "ticket": "GSIS-28093",
+  "jira": {
+    "url": "https://gearsjira.atlassian.net/browse/GSIS-28093",
+    "title": "Fee Category Is Duplicated in Final Sponsor Invoice for Multiple Tuition Fee Courses",
+    "issue_type": "Bug",
+    "epic": { "key": "GSIS-2727", "name": "Finance Review" },
+    "sprint": { "name": "Sustainment Sprint 21", "start": "2026-09-16", "end": "2026-09-29" },
+    "sprints": [
+      { "name": "Sustainment Sprint 21", "state": "active", "start": "2026-09-16", "end": "2026-09-29" }
+    ],
+    "links": [],
+    "assignee": "Naveendra Kularathne",
+    "estimate": null,
+    "customer_name": ["Product Core Feature"],
+    "labels": ["SIS-OSOS-QA"],
+    "subtasks": [
+      { "key": "GSIS-28094", "type": "QA Sub-task", "estimate": null, "logged": "20m" },
+      { "key": "GSIS-28712", "type": "Dev Sub-task", "estimate": "4h", "logged": null }
+    ],
+    "refreshed_at": "2026-09-23T10:39:15Z"
+  },
+  "status": "PLANNING",
+  "next_action": "Developer confirms work type, line and branch for GSIS-28093",
+  "blocked_on": null,
+  "created_at": "2026-09-23T10:39:15Z",
+  "updated_at": "2026-09-23T10:39:15Z",
+  "iteration": 0,
+  "max_iterations": null,
+  "track": null,
+  "workspace": "D:/projects/sis_new_repo/brain",
+  "work_type": null,
+  "line": null,
+  "customer_name": "Product Core Feature",
+  "source_branch": null,
+  "branch": null,
+  "repos": {},
+  "context_repos": [],
+  "pr_target": null,
+  "prs": [],
+  "sessions": [
+    { "session_id": "a27cefdb-44f5-4edb-8f2d-70ca5f5939f2", "started_at": "2026-09-23T10:39:15Z", "ended_at": null }
+  ],
+  "human_confirmations": [],
+  "decisions": [],
+  "artifacts": {},
+  "plan": null,
+  "implementation": null,
+  "evaluation": null
+}
