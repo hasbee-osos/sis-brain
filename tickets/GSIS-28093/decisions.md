@@ -55,3 +55,12 @@ Work type: `bug` · Line: `base` · Branch: `base/bugfix/GSIS-28093-final-invoic
 - **Convention cited:** `harness-core` → Tracks
 - **Evidence:** plan.md → Track
 - **Status:** LOCKED
+
+### D-7 — Evaluation 1 verdict: FAIL (1 blocking)
+- **Stage:** evaluate, iteration 1
+- **Decided by:** evaluator
+- **Options considered:** —
+- **Why:** the backend fix is correct and its regression test is proven. But E-1 found the same duplicate join in the frontend at `sponsor-interim-invoice-list.component.ts:49-51` (Sponsor master → Invoices child grid), which the backend change cannot fix. D-5's claim that the UI does no joining is contradicted.
+- **Convention cited:** —
+- **Evidence:** evaluation-1.md → E-1
+- **Status:** LOCKED
