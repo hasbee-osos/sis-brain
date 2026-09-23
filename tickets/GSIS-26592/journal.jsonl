@@ -1,3 +1,7 @@
 {"ts":"2026-09-23T10:17:07Z","event":"ticket_started","ticket":"GSIS-26592","session_id":"5b919b9b-850e-4a1e-8fe1-30ea4d40f8f2"}
 {"ts":"2026-09-23T10:19:27Z","event":"human_confirmed","what":"line_and_branch","value":"Customer Name 'Product Core Feature' → line base, base/bugfix/GSIS-26592-configure-fee-stale-credit-point, source base-development (developer override), PR to base-sandbox-qa"}
 {"ts":"2026-09-23T10:19:27Z","event":"decision_locked","id":"D-1","summary":"Bug on base line; cut from base-development, PR to base-sandbox-qa"}
+{"ts":"2026-09-23T10:20:33Z","event":"stage_start","stage":"plan","iteration":1}
+{"ts":"2026-09-23T10:26:10Z","event":"stage_end","stage":"plan","iteration":1}
+{"ts":"2026-09-23T10:26:10Z","event":"decision_locked","id":"D-2","summary":"Root cause: Configure Fee auto-fills Credit Points from the Module Offering copy, which Module edits do not update"}
+{"ts":"2026-09-23T10:26:10Z","event":"input_requested","audience":"qa","packet":"qa-packet.md","questions":3}

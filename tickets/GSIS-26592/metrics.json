@@ -1,0 +1,60 @@
+{
+  "ticket": "GSIS-26592",
+  "updated_at": "2026-09-23T10:25:12.052Z",
+  "sessions": {
+    "5b919b9b-850e-4a1e-8fe1-30ea4d40f8f2": {
+      "turns": 17,
+      "tokens_by_stage": {
+        "plan": {
+          "input": 38,
+          "output": 9379,
+          "cache_read": 1522448,
+          "cache_creation": 26820,
+          "thinking": 858
+        }
+      },
+      "tokens_by_model": {
+        "claude-opus-5-5": {
+          "input": 38,
+          "output": 9379,
+          "cache_read": 1522448,
+          "cache_creation": 26820,
+          "thinking": 858
+        }
+      }
+    }
+  },
+  "tokens": {
+    "input": 38,
+    "output": 9379,
+    "cache_read": 1522448,
+    "cache_creation": 26820,
+    "thinking": 858
+  },
+  "tokens_by_stage": {
+    "plan": {
+      "input": 38,
+      "output": 9379,
+      "cache_read": 1522448,
+      "cache_creation": 26820,
+      "thinking": 858
+    }
+  },
+  "tokens_by_model": {
+    "claude-opus-5-5": {
+      "input": 38,
+      "output": 9379,
+      "cache_read": 1522448,
+      "cache_creation": 26820,
+      "thinking": 858
+    }
+  },
+  "turns": 17,
+  "stage_seconds": {},
+  "iterations": 0,
+  "verdicts": {},
+  "findings": {
+    "blocking": 0,
+    "non_blocking": 0
+  }
+}
