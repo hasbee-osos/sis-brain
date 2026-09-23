@@ -48,10 +48,10 @@
     "refreshed_at": "2026-09-23T10:39:15Z"
   },
   "status": "PR_STAGE_1",
-  "next_action": "Developer opens the two compare links, creates the PRs to base-sandbox-qa using pr-sis-product-sis-admin-backend-base-sandbox-qa.md and pr-sis-product-sis-frontend-base-sandbox-qa.md, pastes the PR URLs back, and the reviewer checks the final-fix-round frontend change (E-1); QA runs the manual checks after promotion",
+  "next_action": "Developer replies on frontend PR #7506 that the optional-chain comment is not valid (no throw on a missing invoiceChargeList, verified with tsc es2017); developer creates the backend PR from its compare link and pastes the URL; QA runs the manual checks after promotion",
   "blocked_on": null,
   "created_at": "2026-09-23T10:39:15Z",
-  "updated_at": "2026-09-23T14:43:57Z",
+  "updated_at": "2026-09-23T16:43:48Z",
   "iteration": 2,
   "max_iterations": 1,
   "track": "light",
@@ -101,7 +101,7 @@
       "head": "base/bugfix/GSIS-28093-final-invoice-duplicate-fee-category",
       "resolve_branch": null,
       "compare_link": "https://github.com/pbsgears/sis-product-sis-frontend/compare/base-sandbox-qa...base/bugfix/GSIS-28093-final-invoice-duplicate-fee-category?expand=1&title=GSIS-28093%3A%20de-duplicate%20fee%20category%20in%20sponsor%20interim%20invoice%20grid",
-      "url": null
+      "url": "https://github.com/pbsgears/sis-product-sis-frontend/pull/7506"
     }
   ],
   "sessions": [
