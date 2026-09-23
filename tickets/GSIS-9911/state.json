@@ -45,13 +45,13 @@
         "logged": null
       }
     ],
-    "refreshed_at": "2026-09-23T04:57:47Z"
+    "refreshed_at": "2026-09-23T16:54:07Z"
   },
   "status": "PR_STAGE_1",
-  "next_action": "Developer opens the compare link, creates the PR to base-sandbox-qa using pr-sis-product-sis-frontend-base-sandbox-qa.md, and pastes the PR URL back; QA runs the manual paging check after promotion",
+  "next_action": "PR #7472 to base-sandbox-qa is open (builds green): reviewers review and merge it; then the base-line next human steps in the PR notes (promotion, ports, post-QA merge into base-development) and QA runs the manual paging check. Run /work GSIS-9911 if review comments or a QA issue come back.",
   "blocked_on": null,
   "created_at": "2026-09-23T04:57:47Z",
-  "updated_at": "2026-09-23T08:45:52Z",
+  "updated_at": "2026-09-23T16:54:07Z",
   "iteration": 1,
   "max_iterations": 2,
   "track": "full",
@@ -81,7 +81,7 @@
       "head": "base/bugfix/GSIS-9911-approval-matrix-missing-workflows",
       "resolve_branch": null,
       "compare_link": "https://github.com/pbsgears/sis-product-sis-frontend/compare/base-sandbox-qa...base/bugfix/GSIS-9911-approval-matrix-missing-workflows?expand=1&title=GSIS-9911%3A%20show%20a%20paginator%20on%20the%20Approval%20Matrix%20so%20every%20approval%20workflow%20can%20be%20reached",
-      "url": null
+      "url": "https://github.com/pbsgears/sis-product-sis-frontend/pull/7472"
     }
   ],
   "sessions": [
@@ -89,6 +89,11 @@
       "session_id": "1233f2ee-c75a-4a3a-a93e-473013ce8d1c",
       "started_at": "2026-09-23T04:57:47Z",
       "ended_at": null
+    },
+    {
+      "session_id": "7d48bb1d-4d4c-4560-81c1-1c3e733586f4",
+      "started_at": "2026-09-23T16:54:07Z",
+      "ended_at": "2026-09-23T16:54:07Z"
     }
   ],
   "human_confirmations": [
