@@ -27,6 +27,10 @@
       "label": "Implement",
       "color": "#d08a2e"
     },
+    "resolve": {
+      "label": "Resolve conflicts",
+      "color": "#5f8fb0"
+    },
     "evaluate": {
       "label": "Evaluate",
       "color": "#b95796"
@@ -112,6 +116,8 @@
     "decision_superseded": "{id} superseded by {superseded_by}",
     "branch_created": "Branch ready in {repo}",
     "evaluation": "Evaluation {iteration}: {verdict} — {blocking} blocking, {non_blocking} non-blocking",
+    "conflicts_checked": "Merge check of {repo} into {target}: {result}",
+    "conflicts_resolved": "Conflicts with {target} resolved in {repo} — {mechanical} mechanical, {semantic} decided by the developer; equivalence {equivalence}",
     "pr_prepared": "PR prepared for {repo} → {target}",
     "handed_off": "Handed off to {to}",
     "ticket_reopened": "Came back: {reason}",
